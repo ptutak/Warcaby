@@ -52,8 +52,8 @@ class Timer extends Thread {
 		while (!turnInfo.isTimerOn()) {
 			try {
 				sleep(10);	
-				}  catch (InterruptedException e){	}
-			}
+				}  catch (InterruptedException e){e.printStackTrace();	}
+		}
 		gameStart();
 		while (turnInfo.isTimerOn()){
 			Player nextPlayer=turnInfo.getActivePlayer();

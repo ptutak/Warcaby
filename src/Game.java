@@ -33,9 +33,15 @@ public class Game extends Thread{
 		gameTurnInfo=new TurnInfo();
 		gameTurnInfo.setActivePlayer(gameInfo.getPlayerRed());
 		gameTimer=new Timer(gameTurnInfo);
+		gameTimer.start();
 		play=new Play(gameBoard,gameInfo,gameTimer,gameTurnInfo);
-		play.run();
+		play.start();
 		gameTurnInfo.setTimerOn(true);
+		try{
+			play.join();
+			gameTimer.join();
+		} catch (InterruptedException e){e.printStackTrace();}
+		
 	}
 
 	public static void main(String[] args) {

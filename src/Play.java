@@ -82,7 +82,6 @@ class Play extends Thread {
 	void gamePause(){
 		turnInfo.setTimerOn(false);
 		gameInfo.setBoardState(gameBoard.boardState());
-		
 	}
 	void nextPlayer(){
 		if (gameInfo.getPlayerGreen()==turnInfo.getActivePlayer())
