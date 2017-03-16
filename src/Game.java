@@ -14,13 +14,15 @@
    limitations under the License.
 */
 public class Game extends Thread{
+	private DraughtsServer server;
 	private TurnInfo gameTurnInfo;
 	private GameInfo gameInfo;
 	private Board gameBoard;
 	private Timer gameTimer;
 	private Play play;
 	
-	Game(GameInfo gameInfo){
+	Game(DraughtsServer server,GameInfo gameInfo){
+		this.server=server;
 		this.gameInfo=gameInfo;
 		gameTurnInfo=null;
 		gameBoard=null;
@@ -41,7 +43,8 @@ public class Game extends Thread{
 			play.join();
 			gameTimer.join();
 		} catch (InterruptedException e){e.printStackTrace();}
-		
+		if (gameInfo.getGameState()==GSType.GAME_PAUSE)
+			server.addToDatabase(gameInfo, gameTurnInfo);
 	}
 
 	public static void main(String[] args) {
