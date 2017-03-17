@@ -267,13 +267,6 @@ public class Board{
 		return ret;
 	}
 
-	
-	
-	
-	
-	
-	
-	
 	void print(){
 		System.out.print("   ");
 		for (int i=colStart;i<=colStop;++i)
