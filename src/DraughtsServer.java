@@ -1,16 +1,3 @@
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
-
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -26,53 +13,71 @@ import java.util.UUID;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public class DraughtsServer {
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.UUID;
+
+
+public class DraughtsServer extends Thread {
 	
 	private String host;
 	private int port;
-	private ServerSocketChannel ssc = null;
+	private ServerSocketChannel serverSocketChannel = null;
 	private Selector selector = null;
 
 	public DraughtsServer(String host, int port ) {
 	    this.host=host;
 	    this.port=port;
+
+	}
+	
+	public void run(){
 	    try {
-				ssc = ServerSocketChannel.open();
-		    	ssc.configureBlocking(false);
-		    	ssc.socket().bind(new InetSocketAddress(host, port));
+				serverSocketChannel = ServerSocketChannel.open();
+		    	serverSocketChannel.configureBlocking(false);
+		    	serverSocketChannel.socket().bind(new InetSocketAddress(host, port));
 		    	selector = Selector.open();
-		    	ssc.register(selector,SelectionKey.OP_ACCEPT);
+		    	serverSocketChannel.register(selector,SelectionKey.OP_ACCEPT);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	    	System.out.println("Server started and ready for handling requests");
+	    	System.out.println("Server started");
 	    	serviceConnections();
 	}
-	
 	private void serviceConnections() {
 		    boolean serverIsRunning = true;
 		    while(serverIsRunning) {
 		      try {
 		        selector.select();
 
-		        Set keys = selector.selectedKeys();
+		        Set<SelectionKey> selectorKeys = selector.selectedKeys();
 
-		        Iterator iter = keys.iterator();
+		        Iterator<SelectionKey> iter = selectorKeys.iterator();
 		        while(iter.hasNext()) {  
 		          SelectionKey key = (SelectionKey) iter.next(); 
 		          iter.remove();                                 
 
 		          if (key.isAcceptable()) { 
-		            SocketChannel cc = ssc.accept();
-		            cc.configureBlocking(false);
-		            cc.register(selector, SelectionKey.OP_READ);
+		            SocketChannel newChannel = serverSocketChannel.accept();
+		            newChannel.configureBlocking(false);
+		            newChannel.register(selector, SelectionKey.OP_READ);
 		            continue;
 		          }
 
 		          if (key.isReadable()) {  
-		            SocketChannel cc = (SocketChannel) key.channel();
-		            serviceRequest(cc);
+		            SocketChannel serviceChannel = (SocketChannel) key.channel();
+		            serviceRequest(serviceChannel);
 		            continue;
 		          }
 		        }
@@ -82,7 +87,7 @@ public class DraughtsServer {
 		    }
 	}
 	
-	final static int BUFFSIZE=1024;
+	final static int BUFFSIZE=4096;
 	private ByteBuffer buffer=ByteBuffer.allocate(BUFFSIZE);
 	
 	private void serviceRequest(SocketChannel socketChannel) {
@@ -104,9 +109,6 @@ public class DraughtsServer {
 	synchronized void addToDatabase (GameInfo gameInfo, TurnInfo turnInfo){
 		
 	}
-	
-	
-	
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
