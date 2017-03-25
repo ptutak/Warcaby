@@ -1,3 +1,5 @@
+import java.util.UUID;
+
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -13,8 +15,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-enum FType {
-	FREE,
-	RED,
-	GREEN
+public class MoveSendPackage implements java.io.Serializable {
+	private static final long serialVersionUID = 5596422394990642535L;
+	public UUID ID;
+	public String login;
+	public Move move;
+	public MoveSendPackage(UUID iD, String login, Move move) {
+		ID = iD;
+		this.login = login;
+		this.move = move;
+	}
+	
 }

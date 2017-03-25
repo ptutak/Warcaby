@@ -13,9 +13,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-class ColPiece{
-	Piece piece;
-	FType field;
+class ColPiece implements java.io.Serializable{
+
+	private static final long serialVersionUID = 5914182075578536563L;
+	public Piece piece;
+	public FType field;
 	ColPiece(Piece piece,FType field){
 		this.piece=piece;
 		this.field=field;

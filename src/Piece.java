@@ -13,10 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-class Piece{
-	PType type;
-	int row;
-	int column;
+class Piece implements java.io.Serializable{
+
+	private static final long serialVersionUID = 5716247497499067226L;
+	public PType type;
+	public int row;
+	public int column;
 	
 	Piece(PType type, int row, int column){
 		this.type=type;

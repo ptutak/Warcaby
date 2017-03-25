@@ -13,7 +13,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public class Move {
+public class Move implements java.io.Serializable {
+	private static final long serialVersionUID = -8092964267528656373L;
 	public ColPiece moveFrom;
 	public ColPiece moveTo;
 	public PMType playerMove;
