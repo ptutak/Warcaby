@@ -34,6 +34,16 @@ public class DraughtsServer extends Thread {
 	private int port;
 	private ServerSocketChannel serverSocketChannel = null;
 	private Selector selector = null;
+	private boolean serverState;
+
+
+	public synchronized boolean getServerState() {
+		return serverState;
+	}
+
+	public synchronized void setServerState(boolean serverState) {
+		this.serverState = serverState;
+	}
 
 	public DraughtsServer(String host, int port ) {
 	    this.host=host;
@@ -56,14 +66,13 @@ public class DraughtsServer extends Thread {
 	    	serviceConnections();
 	}
 	private void serviceConnections() {
-		    boolean serverIsRunning = true;
-		    while(serverIsRunning) {
+		    while(getServerState()) {
 		      try {
 		        selector.select();
 
 		        Set<SelectionKey> selectorKeys = selector.selectedKeys();
-
 		        Iterator<SelectionKey> iter = selectorKeys.iterator();
+
 		        while(iter.hasNext()) {  
 		          SelectionKey key = (SelectionKey) iter.next(); 
 		          iter.remove();                                 
