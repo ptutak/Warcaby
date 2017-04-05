@@ -16,6 +16,7 @@
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -98,7 +99,7 @@ public class DraughtsServer extends Thread {
 	final int BUFFSIZE=4096;
 	private ByteBuffer buffer=ByteBuffer.allocate(BUFFSIZE);
 
-	private void serviceRequest(SocketChannel serviceChannel) {
+	private void serviceRequest(SocketChannel serviceChannel) throws EOFException {
 		if (!serviceChannel.isOpen())
 			return;
 		ByteBuffer oldBuffer=ByteBuffer.allocate(BUFFSIZE);
@@ -110,32 +111,23 @@ public class DraughtsServer extends Thread {
 					oldBuffer.flip();
 					ByteArrayInputStream bis=new ByteArrayInputStream(oldBuffer.array());
 					ObjectInputStream ois=new ObjectInputStream(bis);
-					SType tmptype=(SType)ois.readObject();
-					if(tmptype==SType.PACKAGE_BEGIN){
+					SType begin=(SType)ois.readObject();
+					if(begin==SType.PACKAGE_BEGIN){
 						MoveSendPackage newMove=(MoveSendPackage)ois.readObject();
+						SType end=(SType)ois.readObject();
+						if (end==SType.PACKAGE_END)
+							break;
 					}
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-				//TODO: tu przepisaæ zawartoœæ bufora do starego bufora.
-				
-				ByteArrayOutputStream bos=new ByteArrayOutputStream();
-				ObjectOutputStream oos;
-				try {
-					oos = new ObjectOutputStream(bos);
-					oos.writeObject(SType.PACKAGE_BEGIN);
-					oos.flush();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				ByteBuffer tmp=ByteBuffer.wrap(bos.toByteArray());
-				tmp.put(oldBuffer);
-				oldBuffer=tmp.duplicate();
-			} 
+			} catch (EOFException e){
+				oldBuffer=buffer.duplicate();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		
 	}
 	synchronized void addToDatabase (GameInfo gameInfo, TurnInfo turnInfo){
 
@@ -152,6 +144,32 @@ public class DraughtsServer extends Thread {
 			objectStream.writeObject(move);
 			objectStream.flush();
 			byte[] byteObject=byteStream.toByteArray();
+			ByteArrayInputStream byteStream2=new ByteArrayInputStream(byteObject);
+			ObjectInputStream objectStream2=new ObjectInputStream(byteStream2);
+			try {
+				MoveSendPackage x=(MoveSendPackage) objectStream2.readObject();
+				System.out.println(x);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("nie ma klasy");
+			} catch (ClassCastException e){
+				e.printStackTrace();
+				System.out.println("ut");
+			}
+			try {
+				MoveSendPackage x2=(MoveSendPackage) objectStream2.readObject();
+				System.out.println(x2);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("nie ma tej kklasy znowu :(");
+			} catch (EOFException e){
+				e.printStackTrace();
+				System.out.println("tutu");
+			}
+			
+			
 			System.out.println(byteObject.length);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
