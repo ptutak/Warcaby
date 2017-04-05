@@ -17,6 +17,7 @@ public class TurnInfo {
 	private long gameTime;
 	private long remainTurnTime;
 	private Player activePlayer;
+	
 	private boolean timerOn;
 	
 	public TurnInfo(){
