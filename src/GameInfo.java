@@ -24,6 +24,12 @@ public class GameInfo {
 	private Player playerGreen;
 	private Player winner;
 	
+	private Move playerRedMove;
+	private Move playerGreenMove;
+	
+	boolean playerRedMoveDone;
+	boolean playerGreenMoveDone;
+	
 	GameInfo(){
 		gameState=GSType.GAME_PAUSE;
 		boardState=null;
@@ -33,6 +39,46 @@ public class GameInfo {
 		winner=null;
 	}
 	
+	public synchronized Move getPlayerRedMove() {
+		while(!playerRedMoveDone)
+			try {
+				wait();
+			} catch (InterruptedException e){}
+		playerRedMoveDone=false;
+		notifyAll();
+		return playerRedMove;
+	}
+
+	public synchronized Move getPlayerGreenMove() {
+		while(!playerGreenMoveDone)
+			try {
+				wait();
+			} catch (InterruptedException e){}
+		playerGreenMoveDone=false;
+		notifyAll();
+		return playerGreenMove;
+	}
+
+	public synchronized void setPlayerRedMove(Move playerRedMove) {
+		while(playerRedMoveDone)
+			try{
+				wait();
+			} catch (InterruptedException e){}
+		playerRedMoveDone=true;
+		this.playerRedMove = playerRedMove;
+		notifyAll();
+	}
+
+	public synchronized void setPlayerGreenMove(Move playerGreenMove) {
+		while(playerGreenMoveDone)
+			try{
+				wait();
+			} catch (InterruptedException e){}
+		playerGreenMoveDone=true;
+		this.playerGreenMove = playerGreenMove;
+		notifyAll();
+	}
+
 	public synchronized Player getPlayerRed() {
 		return playerRed;
 	}

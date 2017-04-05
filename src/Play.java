@@ -103,7 +103,13 @@ class Play extends Thread {
 				gameWin();
 			}
 			else{
-				Move move=turnInfo.getActivePlayer().getMove();
+				Player activePlayer=turnInfo.getActivePlayer();
+				Move move;
+				if (activePlayer.equals(gameInfo.getPlayerRed()))
+					move=gameInfo.getPlayerRedMove();
+				else
+					move=gameInfo.getPlayerGreenMove();
+				
 				switch(move.playerMove){
 				case SURRENDER:
 					gameInfo.setGameState(GSType.GAME_END);

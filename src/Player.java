@@ -20,30 +20,12 @@ public class Player {
 	private final UUID ID;
 	private String login;
 	
-	private String firstName;
-	private String lastName;
-	
-	private Move move;
-	private boolean moveDone;
-	
 	private long mainPoints;
 	private long minorPoints;
 	
 	Player(String login){
 		ID=UUID.randomUUID();
-		firstName=new String();
-		lastName=new String();
 		this.login=login;
-	}
-	
-	public synchronized Move getMove() {
-		while(!moveDone)
-			try {
-				wait();
-			} catch (InterruptedException e){}
-		moveDone=false;
-		notifyAll();
-		return move;
 	}
 	
 	public synchronized UUID getID() {
@@ -52,14 +34,6 @@ public class Player {
 
 	public synchronized String getLogin() {
 		return login;
-	}
-
-	public synchronized String getFirstName() {
-		return firstName;
-	}
-
-	public synchronized String getLastName() {
-		return lastName;
 	}
 
 	public synchronized long getMainPoints() {
@@ -74,30 +48,12 @@ public class Player {
 		this.login = login;
 	}
 
-	public synchronized void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public synchronized void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
 	public synchronized void setMainPoints(long mainPoints) {
 		this.mainPoints = mainPoints;
 	}
 
 	public synchronized void setMinorPoints(long minorPoints) {
 		this.minorPoints = minorPoints;
-	}
-
-	public synchronized void setMove(Move move) {
-		while(moveDone)
-			try{
-				wait();
-			} catch (InterruptedException e){}
-		moveDone=true;
-		this.move = move;
-		notifyAll();
 	}
 
 	@Override

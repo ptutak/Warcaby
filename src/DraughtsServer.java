@@ -26,6 +26,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
@@ -38,6 +39,7 @@ public class DraughtsServer extends Thread {
 	private ServerSocketChannel serverSocketChannel = null;
 	private Selector selector = null;
 	private boolean serverState;
+	private HashSet<Player> playerSet=new HashSet<Player>();
 
 
 	public synchronized boolean getServerState() {
@@ -103,6 +105,7 @@ public class DraughtsServer extends Thread {
 		if (!serviceChannel.isOpen())
 			return;
 		ByteBuffer oldBuffer=ByteBuffer.allocate(BUFFSIZE);
+		CommandPackage newCommand;
 		while (true) {
 			try {
 				long n = serviceChannel.read(buffer);
@@ -111,11 +114,11 @@ public class DraughtsServer extends Thread {
 					oldBuffer.flip();
 					ByteArrayInputStream bis=new ByteArrayInputStream(oldBuffer.array());
 					ObjectInputStream ois=new ObjectInputStream(bis);
-					SType begin=(SType)ois.readObject();
-					if(begin==SType.PACKAGE_BEGIN){
-						MoveSendPackage newMove=(MoveSendPackage)ois.readObject();
-						SType end=(SType)ois.readObject();
-						if (end==SType.PACKAGE_END)
+					SPType begin=(SPType)ois.readObject();
+					if(begin==SPType.PACKAGE_BEGIN){
+						newCommand=(CommandPackage)ois.readObject();
+						SPType end=(SPType)ois.readObject();
+						if (end==SPType.PACKAGE_END)
 							break;
 					}
 				}
@@ -125,9 +128,17 @@ public class DraughtsServer extends Thread {
 				oldBuffer=buffer.duplicate();
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
+			}	
 		}
-		
+		switch(newCommand.commandType){
+		case REGISTER_NEW_USER:
+			playerSet.add(e)
+			break;
+		case GAME_MOVE:
+			break;
+		case END_CONNECTION:
+			break;
+		}
 	}
 	synchronized void addToDatabase (GameInfo gameInfo, TurnInfo turnInfo){
 
@@ -136,7 +147,7 @@ public class DraughtsServer extends Thread {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		MoveSendPackage move=new MoveSendPackage(UUID.randomUUID(),"PiotrTutak,ABCS",new Move(PMType.MOVE,new ColPiece(new Piece(PType.QUEEN,1,1),FType.GREEN),new ColPiece(new Piece(PType.PAWN,1,1),FType.GREEN)));
+		SendPackage move=new SendPackage(UUID.randomUUID(),"PiotrTutak,ABCS",new Move(PMType.MOVE,new ColPiece(new Piece(PType.QUEEN,1,1),FType.GREEN),new ColPiece(new Piece(PType.PAWN,1,1),FType.GREEN)));
 		System.out.println(move);
 		ByteArrayOutputStream byteStream=new ByteArrayOutputStream();
 		try {
@@ -147,7 +158,7 @@ public class DraughtsServer extends Thread {
 			ByteArrayInputStream byteStream2=new ByteArrayInputStream(byteObject);
 			ObjectInputStream objectStream2=new ObjectInputStream(byteStream2);
 			try {
-				MoveSendPackage x=(MoveSendPackage) objectStream2.readObject();
+				SendPackage x=(SendPackage) objectStream2.readObject();
 				System.out.println(x);
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -158,7 +169,7 @@ public class DraughtsServer extends Thread {
 				System.out.println("ut");
 			}
 			try {
-				MoveSendPackage x2=(MoveSendPackage) objectStream2.readObject();
+				SendPackage x2=(SendPackage) objectStream2.readObject();
 				System.out.println(x2);
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block

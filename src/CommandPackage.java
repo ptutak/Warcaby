@@ -1,5 +1,3 @@
-import java.util.UUID;
-
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -15,15 +13,13 @@ import java.util.UUID;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public class MoveSendPackage implements java.io.Serializable {
-	private static final long serialVersionUID = 5596422394990642535L;
-	public UUID ID;
-	public String login;
+import java.io.Serializable;
+
+public class CommandPackage implements Serializable{
+
+	private static final long serialVersionUID = -1294021581015850208L;
+	public CType commandType;
+	public Player player;
 	public Move move;
-	public MoveSendPackage(UUID iD, String login, Move move) {
-		ID = iD;
-		this.login = login;
-		this.move = move;
-	}
-	
+
 }
