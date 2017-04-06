@@ -1,5 +1,6 @@
 import enums.FType;
 import enums.GSType;
+import enums.PMType;
 import enums.PType;
 
 /* 
@@ -122,13 +123,24 @@ class Play extends Thread {
 			}
 			else{
 				Move move;
+				PMType moveType;
 				if (turnInfo.activePlayer.equals(gameInfo.playerRedMove.player)){
 					move=gameInfo.playerRedMove.getMove();
+					moveType=gameInfo.playerRedMove.getPlayerMoveType();
+					if (moveType==PMType.SURRENDER)
+						gameSurrender();
+					else if (moveType==PMType.DRAW)
+						gameDraw();
 					if (move.moveFrom.field==FType.GREEN)
 						continue;
 				}
 				else {
 					move=gameInfo.playerGreenMove.getMove();
+					moveType=gameInfo.playerGreenMove.getPlayerMoveType();
+					if (moveType==PMType.SURRENDER)
+						gameSurrender();
+					else if (moveType==PMType.DRAW)
+						gameDraw();
 					if (move.moveFrom.field==FType.RED)
 						continue;
 				}
@@ -164,6 +176,7 @@ class Play extends Thread {
 				case FREE:
 					break;
 				}
+				
 			}
 		}
 	}

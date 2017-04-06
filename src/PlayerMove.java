@@ -17,13 +17,21 @@ import enums.PMType;
 */
 public class PlayerMove {
 	public Player player;
-	public PMType playerMoveType;
+	private PMType playerMoveType;
 	private Move move;
 	private boolean moveDone;
 	
 	public PlayerMove(Player player, Move move) {
 		this.player = player;
 		this.move = move;
+	}
+
+	public synchronized PMType getPlayerMoveType() {
+		return playerMoveType;
+	}
+
+	public synchronized void setPlayerMoveType(PMType playerMoveType) {
+		this.playerMoveType = playerMoveType;
 	}
 
 	public synchronized Move getMove() {

@@ -141,7 +141,14 @@ public class DraughtsServer extends Thread {
 			break;
 		case NEW_GAME:
 			if (playerMap.containsKey(command.player)){
-				
+				if (!gameMap.containsKey(command.gameName)){
+					GameInfo newGame=new GameInfo(command.gameName);
+					newGame.setBoardBounds(command.boardBounds);
+					newGame.setRowNumber(command.rowNumber);
+					newGame.playerRedMove.player=command.player;
+					gameMap.put(command.gameName, newGame);
+				}
+					
 			}
 
 			break;
