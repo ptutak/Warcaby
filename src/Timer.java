@@ -48,7 +48,7 @@ class Timer extends Thread {
 	
 	@Override
 	public void run(){
-		Player prevPlayer=turnInfo.getActivePlayer();
+		Player prevPlayer=turnInfo.activePlayer;
 		while (!turnInfo.isTimerOn()) {
 			try {
 				sleep(10);	
@@ -56,7 +56,7 @@ class Timer extends Thread {
 		}
 		gameStart();
 		while (turnInfo.isTimerOn()){
-			Player nextPlayer=turnInfo.getActivePlayer();
+			Player nextPlayer=turnInfo.activePlayer;
 			if (prevPlayer!=nextPlayer){
 				prevPlayer=nextPlayer;
 				nextTurn();

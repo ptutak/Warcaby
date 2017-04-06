@@ -33,7 +33,7 @@ public class Game extends Thread{
 	public void run(){
 		gameBoard=new Board(gameInfo.getBoardBounds());
 		gameTurnInfo=new TurnInfo();
-		gameTurnInfo.setActivePlayer(gameInfo.getPlayerRed());
+		gameTurnInfo.activePlayer=gameInfo.playerRedMove.player;
 		gameTimer=new Timer(gameTurnInfo);
 		gameTimer.start();
 		play=new Play(gameBoard,gameInfo,gameTimer,gameTurnInfo);

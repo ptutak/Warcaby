@@ -20,73 +20,19 @@ public class GameInfo {
 	private ArrayList<ColPiece> boardState;
 	private BoardBounds boardBounds;
 
-	private Player playerRed;
-	private Player playerGreen;
-	private Player winner;
-	
-	private Move playerRedMove;
-	private Move playerGreenMove;
-	
-	boolean playerRedMoveDone;
-	boolean playerGreenMoveDone;
+	public PlayerMove playerRedMove;
+	public PlayerMove playerGreenMove;
+	public Player winner;
 	
 	GameInfo(){
 		gameState=GSType.GAME_PAUSE;
 		boardState=null;
 		boardBounds=null;
-		playerRed=null;
-		playerGreen=null;
+		playerRedMove=null;
+		playerGreenMove=null;
 		winner=null;
 	}
 	
-	public synchronized Move getPlayerRedMove() {
-		while(!playerRedMoveDone)
-			try {
-				wait();
-			} catch (InterruptedException e){}
-		playerRedMoveDone=false;
-		notifyAll();
-		return playerRedMove;
-	}
-
-	public synchronized Move getPlayerGreenMove() {
-		while(!playerGreenMoveDone)
-			try {
-				wait();
-			} catch (InterruptedException e){}
-		playerGreenMoveDone=false;
-		notifyAll();
-		return playerGreenMove;
-	}
-
-	public synchronized void setPlayerRedMove(Move playerRedMove) {
-		while(playerRedMoveDone)
-			try{
-				wait();
-			} catch (InterruptedException e){}
-		playerRedMoveDone=true;
-		this.playerRedMove = playerRedMove;
-		notifyAll();
-	}
-
-	public synchronized void setPlayerGreenMove(Move playerGreenMove) {
-		while(playerGreenMoveDone)
-			try{
-				wait();
-			} catch (InterruptedException e){}
-		playerGreenMoveDone=true;
-		this.playerGreenMove = playerGreenMove;
-		notifyAll();
-	}
-
-	public synchronized Player getPlayerRed() {
-		return playerRed;
-	}
-
-	public synchronized Player getPlayerGreen() {
-		return playerGreen;
-	}
-
 	public synchronized GSType getGameState() {
 		return gameState;
 	}
@@ -95,30 +41,14 @@ public class GameInfo {
 		return boardBounds;
 	}
 	
-	public synchronized Player getWinner() {
-		return winner;
-	}
-
 	public synchronized ArrayList<ColPiece> getBoardState() {
 		return boardState;
-	}
-	
-	public synchronized void setPlayerRed(Player playerRed) {
-		this.playerRed = playerRed;
-	}
-
-	public synchronized void setPlayerGreen(Player playerGreen) {
-		this.playerGreen = playerGreen;
 	}
 	
 	public synchronized void setGameState(GSType gameState) {
 		this.gameState = gameState;
 	}
 
-	public synchronized void setWinner(Player winner) {
-		this.winner = winner;
-	}
-	
 	public synchronized void setBoardState(ArrayList<ColPiece> boardState) {
 		this.boardState = boardState;
 	}

@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.UUID;
 
 /* 
@@ -16,18 +17,32 @@ import java.util.UUID;
    limitations under the License.
 */
 
-public class Player {
+public class Player implements Serializable {
+
+	private static final long serialVersionUID = 2839322776104880115L;
 	private final UUID ID;
 	private String login;
 	
-	private long mainPoints;
-	private long minorPoints;
+	private PlayerInfo playerInfo;
 	
 	Player(String login){
 		ID=UUID.randomUUID();
+		playerInfo.firstName=null;
+		playerInfo.lastName=null;
+		playerInfo.nickName=null;
+		playerInfo.mainPoints=0;
+		playerInfo.minorPoints=0;
 		this.login=login;
 	}
 	
+	public synchronized PlayerInfo getPlayerInfo() {
+		return playerInfo;
+	}
+
+	public synchronized void setPlayerInfo(PlayerInfo playerInfo) {
+		this.playerInfo = playerInfo;
+	}
+
 	public synchronized UUID getID() {
 		return ID;
 	}
@@ -36,24 +51,8 @@ public class Player {
 		return login;
 	}
 
-	public synchronized long getMainPoints() {
-		return mainPoints;
-	}
-
-	public synchronized long getMinorPoints() {
-		return minorPoints;
-	}
-
 	public synchronized void setLogin(String login) {
 		this.login = login;
-	}
-
-	public synchronized void setMainPoints(long mainPoints) {
-		this.mainPoints = mainPoints;
-	}
-
-	public synchronized void setMinorPoints(long minorPoints) {
-		this.minorPoints = minorPoints;
 	}
 
 	@Override

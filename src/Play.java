@@ -28,8 +28,8 @@ class Play extends Thread {
 	
 	void gameWin(){
 		turnInfo.setTimerOn(false);
-		if (turnInfo.getActivePlayer().equals(gameInfo.getPlayerRed())){
-			gameInfo.setWinner(gameInfo.getPlayerGreen());
+		if (turnInfo.activePlayer.equals(gameInfo.playerRedMove.player)){
+			gameInfo.winner=gameInfo.playerGreenMove.player;
 			int points=0;
 			for (ColPiece x:gameBoard.boardState()){
 				if (x.field==FType.GREEN){
@@ -39,11 +39,11 @@ class Play extends Thread {
 						points+=2;
 				}
 			}
-			gameInfo.getPlayerGreen().setMinorPoints(gameInfo.getPlayerGreen().getMinorPoints()+points);
-			gameInfo.getPlayerGreen().setMainPoints(gameInfo.getPlayerGreen().getMainPoints()+3);
+			gameInfo.playerGreenMove.player.getPlayerInfo().minorPoints+=points;
+			gameInfo.playerGreenMove.player.getPlayerInfo().mainPoints+=3;
 		}
 		else {
-			gameInfo.setWinner(gameInfo.getPlayerRed());
+			gameInfo.winner=gameInfo.playerRedMove.player;
 			int points=0;
 			for (ColPiece x:gameBoard.boardState()){
 				if (x.field==FType.RED){
@@ -53,13 +53,13 @@ class Play extends Thread {
 						points+=2;
 				}
 			}
-			gameInfo.getPlayerRed().setMinorPoints(gameInfo.getPlayerRed().getMinorPoints()+points);
-			gameInfo.getPlayerRed().setMainPoints(gameInfo.getPlayerRed().getMainPoints()+3);
+			gameInfo.playerRedMove.player.getPlayerInfo().minorPoints+=points;
+			gameInfo.playerRedMove.player.getPlayerInfo().mainPoints+=3;
 		}
 	}
 	void gameDraw(){
 		turnInfo.setTimerOn(false);
-		gameInfo.setWinner(null);
+		gameInfo.winner=null;
 		int greenPoints=0;
 		int redPoints=0;
 		for (ColPiece x:gameBoard.boardState()){
@@ -74,20 +74,20 @@ class Play extends Thread {
 				else
 					redPoints+=2;			}
 		}
-		gameInfo.getPlayerRed().setMinorPoints(gameInfo.getPlayerRed().getMinorPoints()+redPoints);
-		gameInfo.getPlayerGreen().setMinorPoints(gameInfo.getPlayerGreen().getMinorPoints()+greenPoints);
-		gameInfo.getPlayerRed().setMainPoints(gameInfo.getPlayerRed().getMainPoints()+1);
-		gameInfo.getPlayerGreen().setMainPoints(gameInfo.getPlayerGreen().getMainPoints()+1);
+		gameInfo.playerRedMove.player.getPlayerInfo().minorPoints+=redPoints;
+		gameInfo.playerGreenMove.player.getPlayerInfo().minorPoints+=greenPoints;
+		gameInfo.playerRedMove.player.getPlayerInfo().mainPoints+=1;
+		gameInfo.playerGreenMove.player.getPlayerInfo().mainPoints+=1;
 	}
 	void gamePause(){
 		turnInfo.setTimerOn(false);
 		gameInfo.setBoardState(gameBoard.boardState());
 	}
 	void nextPlayer(){
-		if (gameInfo.getPlayerGreen().equals(turnInfo.getActivePlayer()))
-			turnInfo.setActivePlayer(gameInfo.getPlayerRed());
+		if (gameInfo.playerGreenMove.equals(turnInfo.activePlayer))
+			turnInfo.activePlayer=gameInfo.playerRedMove.player;
 		else
-			turnInfo.setActivePlayer(gameInfo.getPlayerGreen());
+			turnInfo.activePlayer=gameInfo.playerGreenMove.player;
 	}
 	
 	public void run(){
@@ -103,12 +103,11 @@ class Play extends Thread {
 				gameWin();
 			}
 			else{
-				Player activePlayer=turnInfo.getActivePlayer();
 				Move move;
-				if (activePlayer.equals(gameInfo.getPlayerRed()))
-					move=gameInfo.getPlayerRedMove();
+				if (turnInfo.activePlayer.equals(gameInfo.playerRedMove.player))
+					move=gameInfo.playerRedMove.getMove();
 				else
-					move=gameInfo.getPlayerGreenMove();
+					move=gameInfo.playerGreenMove.getMove();
 				
 				switch(move.playerMove){
 				case SURRENDER:
@@ -124,20 +123,20 @@ class Play extends Thread {
 					gameDraw();
 					break;
 				case MOVE:
-					if (move.moveFrom.field==FType.GREEN && turnInfo.getActivePlayer().equals(gameInfo.getPlayerRed()))
+					if (move.moveFrom.field==FType.GREEN && turnInfo.activePlayer.equals(gameInfo.playerRedMove.player))
 						break;
-					if (move.moveFrom.field==FType.RED && turnInfo.getActivePlayer().equals(gameInfo.getPlayerGreen()))
+					if (move.moveFrom.field==FType.RED && turnInfo.activePlayer.equals(gameInfo.playerGreenMove.player))
 						break;
 					switch(gameBoard.movePiece(move.moveFrom.piece, move.moveTo.piece.row, move.moveTo.piece.column)){
 					case MOVE:
 						nextPlayer();
 						break;
 					case KILL:
-						if (move.moveFrom.piece.type==PType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.getActivePlayer().equals(gameInfo.getPlayerRed()) && move.moveTo.piece.type==PType.QUEEN){
+						if (move.moveFrom.piece.type==PType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.activePlayer.equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PType.QUEEN){
 							nextPlayer();
 							break;
 						}
-						else if (move.moveFrom.piece.type==PType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.getActivePlayer().equals(gameInfo.getPlayerGreen()) && move.moveTo.piece.type==PType.QUEEN){
+						else if (move.moveFrom.piece.type==PType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.activePlayer.equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PType.QUEEN){
 							nextPlayer();
 							break;
 						}

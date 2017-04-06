@@ -16,12 +16,14 @@
 public class TurnInfo {
 	private long gameTime;
 	private long remainTurnTime;
-	private Player activePlayer;
+	public Player activePlayer;
 	
 	private boolean timerOn;
 	
 	public TurnInfo(){
 		timerOn=false;
+		gameTime=0;
+		remainTurnTime=0;
 		activePlayer=null;
 	}
 	public synchronized long getGameTime() {
@@ -30,17 +32,11 @@ public class TurnInfo {
 	public synchronized long getRemainTurnTime() {
 		return remainTurnTime;
 	}
-	public synchronized Player getActivePlayer() {
-		return activePlayer;
-	}
 	public synchronized void setGameTime(long gameTime) {
 		this.gameTime = gameTime;
 	}
 	public synchronized void setRemainTurnTime(long remainTurnTime) {
 		this.remainTurnTime = remainTurnTime;
-	}
-	public synchronized void setActivePlayer(Player activePlayer) {
-		this.activePlayer = activePlayer;
 	}
 	public synchronized boolean isTimerOn() {
 		return timerOn;

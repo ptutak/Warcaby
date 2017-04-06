@@ -13,8 +13,34 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum CType {
-	REGISTER_NEW_USER,
-	GAME_MOVE,
-	END_CONNECTION
+public class PlayerMove {
+	public Player player;
+	private Move move;
+	private boolean moveDone;
+	
+	public PlayerMove(Player player, Move move) {
+		this.player = player;
+		this.move = move;
+	}
+
+	public synchronized Move getMove() {
+		while(!moveDone)
+			try {
+				wait();
+			} catch (InterruptedException e){}
+		moveDone=false;
+		notifyAll();
+		return move;
+	}
+
+	public synchronized void setMove(Move move) {
+		while(moveDone)
+			try{
+				wait();
+			} catch (InterruptedException e){}
+		moveDone=true;
+		this.move = move;
+		notifyAll();
+	}
+	
 }
