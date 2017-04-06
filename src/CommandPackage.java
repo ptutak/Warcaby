@@ -14,12 +14,14 @@
    limitations under the License.
 */
 import java.io.Serializable;
+import java.util.UUID;
 
 public class CommandPackage implements Serializable{
 
 	private static final long serialVersionUID = -1294021581015850208L;
 	public CType commandType;
+	public String gameName;
+	public UUID gameID;
 	public Player player;
-	public Move move;
-
+	public Move move;	
 }

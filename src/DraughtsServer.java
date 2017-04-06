@@ -26,6 +26,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -39,8 +40,9 @@ public class DraughtsServer extends Thread {
 	private ServerSocketChannel serverSocketChannel = null;
 	private Selector selector = null;
 	private boolean serverState;
-	private HashSet<Player> playerSet=new HashSet<Player>();
-
+	private HashMap<Player,PlayerMove> playerMap=new HashMap<Player,PlayerMove>();
+	private HashMap<String,GameInfo> gameMap=new HashMap<String,GameInfo>();
+	
 
 	public synchronized boolean getServerState() {
 		return serverState;
@@ -99,24 +101,25 @@ public class DraughtsServer extends Thread {
 	}
 
 	final int BUFFSIZE=4096;
-	private ByteBuffer buffer=ByteBuffer.allocate(BUFFSIZE);
+	private ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
 
 	private void serviceRequest(SocketChannel serviceChannel) throws EOFException {
 		if (!serviceChannel.isOpen())
 			return;
-		ByteBuffer oldBuffer=ByteBuffer.allocate(BUFFSIZE);
-		CommandPackage newCommand;
+		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
+		CommandPackage command;
 		while (true) {
 			try {
-				long n = serviceChannel.read(buffer);
-				oldBuffer.put(buffer);
+				long n = serviceChannel.read(readBuffer);
+				safeBuffer.put(readBuffer);
 				if (n > 0) {
-					oldBuffer.flip();
-					ByteArrayInputStream bis=new ByteArrayInputStream(oldBuffer.array());
+					ByteBuffer tmpBuffer=safeBuffer.duplicate();
+					tmpBuffer.flip();
+					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer.array());
 					ObjectInputStream ois=new ObjectInputStream(bis);
 					SPType begin=(SPType)ois.readObject();
 					if(begin==SPType.PACKAGE_BEGIN){
-						newCommand=(CommandPackage)ois.readObject();
+						command=(CommandPackage)ois.readObject();
 						SPType end=(SPType)ois.readObject();
 						if (end==SPType.PACKAGE_END)
 							break;
@@ -125,16 +128,25 @@ public class DraughtsServer extends Thread {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (EOFException e){
-				oldBuffer=buffer.duplicate();
+				continue;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}	
 		}
-		switch(newCommand.commandType){
+		switch(command.commandType){
 		case REGISTER_NEW_USER:
-			playerSet.add(e)
+			playerMap.put(command.player, new PlayerMove(command.player,null));
+			break;
+		case NEW_GAME:
+			if (playerMap.containsKey(command.player)){
+				
+			}
+
 			break;
 		case GAME_MOVE:
+			if (playerMap.containsKey(command.player) && gameMap.get(command.gameName).getID().equals(command.gameID)){
+				
+			}
 			break;
 		case END_CONNECTION:
 			break;
@@ -145,54 +157,6 @@ public class DraughtsServer extends Thread {
 	}
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 
-		SendPackage move=new SendPackage(UUID.randomUUID(),"PiotrTutak,ABCS",new Move(PMType.MOVE,new ColPiece(new Piece(PType.QUEEN,1,1),FType.GREEN),new ColPiece(new Piece(PType.PAWN,1,1),FType.GREEN)));
-		System.out.println(move);
-		ByteArrayOutputStream byteStream=new ByteArrayOutputStream();
-		try {
-			ObjectOutputStream objectStream=new ObjectOutputStream(byteStream);
-			objectStream.writeObject(move);
-			objectStream.flush();
-			byte[] byteObject=byteStream.toByteArray();
-			ByteArrayInputStream byteStream2=new ByteArrayInputStream(byteObject);
-			ObjectInputStream objectStream2=new ObjectInputStream(byteStream2);
-			try {
-				SendPackage x=(SendPackage) objectStream2.readObject();
-				System.out.println(x);
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("nie ma klasy");
-			} catch (ClassCastException e){
-				e.printStackTrace();
-				System.out.println("ut");
-			}
-			try {
-				SendPackage x2=(SendPackage) objectStream2.readObject();
-				System.out.println(x2);
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("nie ma tej kklasy znowu :(");
-			} catch (EOFException e){
-				e.printStackTrace();
-				System.out.println("tutu");
-			}
-			
-			
-			System.out.println(byteObject.length);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally{
-			try {
-				byteStream.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 	}
-
 }

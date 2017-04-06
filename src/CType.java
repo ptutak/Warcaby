@@ -15,6 +15,8 @@
 */
 public enum CType {
 	REGISTER_NEW_USER,
+	NEW_GAME,
+	JOIN_GAME,
 	GAME_MOVE,
 	END_CONNECTION
 }

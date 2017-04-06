@@ -14,8 +14,11 @@
    limitations under the License.
 */
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class GameInfo {
+	private String gameName;
+	private UUID ID;
 	private GSType gameState;
 	private ArrayList<ColPiece> boardState;
 	private BoardBounds boardBounds;
@@ -24,7 +27,9 @@ public class GameInfo {
 	public PlayerMove playerGreenMove;
 	public Player winner;
 	
-	GameInfo(){
+	GameInfo(String gameName){
+		this.gameName=gameName;
+		this.ID=UUID.randomUUID();
 		gameState=GSType.GAME_PAUSE;
 		boardState=null;
 		boardBounds=null;
@@ -33,6 +38,14 @@ public class GameInfo {
 		winner=null;
 	}
 	
+	public String getGameName() {
+		return gameName;
+	}
+
+	public UUID getID() {
+		return ID;
+	}
+
 	public synchronized GSType getGameState() {
 		return gameState;
 	}
@@ -55,6 +68,37 @@ public class GameInfo {
 	
 	public synchronized void setBoardBounds(BoardBounds boardBounds) {
 		this.boardBounds = boardBounds;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((ID == null) ? 0 : ID.hashCode());
+		result = prime * result + ((gameName == null) ? 0 : gameName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GameInfo other = (GameInfo) obj;
+		if (ID == null) {
+			if (other.ID != null)
+				return false;
+		} else if (!ID.equals(other.ID))
+			return false;
+		if (gameName == null) {
+			if (other.gameName != null)
+				return false;
+		} else if (!gameName.equals(other.gameName))
+			return false;
+		return true;
 	}
 	
 }
