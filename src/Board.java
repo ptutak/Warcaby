@@ -16,6 +16,10 @@
 import java.io.Console;
 import java.util.*;
 
+import enums.FType;
+import enums.MType;
+import enums.PType;
+
 public class Board{
 	
 	private LinkedList<Piece> red=new LinkedList<Piece>();

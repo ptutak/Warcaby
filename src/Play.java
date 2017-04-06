@@ -1,3 +1,7 @@
+import enums.FType;
+import enums.GSType;
+import enums.PType;
+
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -59,8 +63,17 @@ class Play extends Thread {
 	}
 	
 	private void gameWin(Player winner){
-		//TODO: winning the game
 		
+		int points=0;
+		for (ColPiece x:gameBoard.getBoardState()){
+			if (x.piece.type==PType.PAWN)
+				points+=1;
+			else
+				points+=2;
+		}
+		winner.getPlayerInfo().mainPoints+=3;
+		winner.getPlayerInfo().minorPoints+=points;
+		gameInfo.winner=winner;
 	}
 	public void gameDraw(){
 		turnInfo.setTimerOn(false);
@@ -89,7 +102,7 @@ class Play extends Thread {
 		gameInfo.setBoardState(gameBoard.getBoardState());
 	}
 	void nextPlayer(){
-		if (gameInfo.playerGreenMove.equals(turnInfo.activePlayer))
+		if (gameInfo.playerGreenMove.player.equals(turnInfo.activePlayer))
 			turnInfo.activePlayer=gameInfo.playerRedMove.player;
 		else
 			turnInfo.activePlayer=gameInfo.playerGreenMove.player;
@@ -109,15 +122,17 @@ class Play extends Thread {
 			}
 			else{
 				Move move;
-				if (turnInfo.activePlayer.equals(gameInfo.playerRedMove.player))
+				if (turnInfo.activePlayer.equals(gameInfo.playerRedMove.player)){
 					move=gameInfo.playerRedMove.getMove();
-				else
+					if (move.moveFrom.field==FType.GREEN)
+						continue;
+				}
+				else {
 					move=gameInfo.playerGreenMove.getMove();
-				
-				if (move.moveFrom.field==FType.GREEN && turnInfo.activePlayer.equals(gameInfo.playerRedMove.player))
-					break;
-				if (move.moveFrom.field==FType.RED && turnInfo.activePlayer.equals(gameInfo.playerGreenMove.player))
-					break;
+					if (move.moveFrom.field==FType.RED)
+						continue;
+				}
+					
 				switch(gameBoard.movePiece(move.moveFrom.piece, move.moveTo.piece.row, move.moveTo.piece.column)){
 				case MOVE:
 					nextPlayer();
@@ -136,9 +151,18 @@ class Play extends Thread {
 				case BAD:
 					break;
 				}
+				
 				switch (gameBoard.checkWinner()){
 				case GREEN:
-					
+					gameInfo.setGameState(GSType.GAME_END);
+					gameWin(gameInfo.playerGreenMove.player);
+					break;
+				case RED:
+					gameInfo.setGameState(GSType.GAME_END);
+					gameWin(gameInfo.playerRedMove.player);
+					break;
+				case FREE:
+					break;
 				}
 			}
 		}

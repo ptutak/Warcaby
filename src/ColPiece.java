@@ -1,3 +1,5 @@
+import enums.FType;
+
 /* 
   Copyright 2017 Piotr Tutak
  

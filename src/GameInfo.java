@@ -16,6 +16,8 @@
 import java.util.ArrayList;
 import java.util.UUID;
 
+import enums.GSType;
+
 public class GameInfo {
 	private String gameName;
 	private UUID ID;

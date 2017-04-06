@@ -1,3 +1,5 @@
+import enums.PType;
+
 /* 
   Copyright 2017 Piotr Tutak
  

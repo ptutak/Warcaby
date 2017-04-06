@@ -1,3 +1,4 @@
+package enums;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -13,8 +14,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum PType{
-	BLANK,
-	PAWN,
-	QUEEN
+public enum PMType {
+	SURRENDER,
+	PAUSE,
+	DRAW,
+	MOVE
 }

@@ -16,6 +16,9 @@
 import java.io.Serializable;
 import java.util.UUID;
 
+import enums.CType;
+import enums.PMType;
+
 public class CommandPackage implements Serializable{
 
 	private static final long serialVersionUID = -1294021581015850208L;

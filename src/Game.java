@@ -1,3 +1,5 @@
+import enums.GSType;
+
 /* 
   Copyright 2017 Piotr Tutak
  

@@ -1,3 +1,5 @@
+package enums;
+
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -13,7 +15,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-enum FType {
+public enum FType {
 	FREE,
 	RED,
 	GREEN

@@ -32,6 +32,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
+import enums.SPType;
+
 
 public class DraughtsServer extends Thread {
 

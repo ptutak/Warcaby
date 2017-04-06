@@ -1,3 +1,4 @@
+package enums;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -13,10 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum CType {
-	REGISTER_NEW_USER,
-	NEW_GAME,
-	JOIN_GAME,
-	GAME_MOVE,
-	END_CONNECTION
+public enum MType{
+	BAD,
+	MOVE,
+	KILL
 }

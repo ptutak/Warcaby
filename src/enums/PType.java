@@ -1,3 +1,4 @@
+package enums;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -13,8 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum GSType {
-	GAME_END,
-	GAME_PAUSE,
-	GAME_RUNNING
+public enum PType{
+	BLANK,
+	PAWN,
+	QUEEN
 }
