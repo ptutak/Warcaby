@@ -15,6 +15,7 @@
 */
 public class PlayerMove {
 	public Player player;
+	public PMType playerMoveType;
 	private Move move;
 	private boolean moveDone;
 	

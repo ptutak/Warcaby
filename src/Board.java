@@ -18,8 +18,8 @@ import java.util.*;
 
 public class Board{
 	
-	private LinkedList<Piece> Red=new LinkedList<Piece>();
-	private LinkedList<Piece> Green=new LinkedList<Piece>();
+	private LinkedList<Piece> red=new LinkedList<Piece>();
+	private LinkedList<Piece> green=new LinkedList<Piece>();
 
 	private int colStart;
 	private int colStop;
@@ -67,11 +67,11 @@ public class Board{
 	}
 	
 	private ColPiece fieldState(int row, int column){
-		for (Piece x:Red){
+		for (Piece x:red){
 			if (x.row==row && x.column==column)
 				return new ColPiece(x,FType.RED);
 		}
-		for (Piece x:Green){
+		for (Piece x:green){
 			if (x.row==row && x.column==column)
 				return new ColPiece(x,FType.GREEN);
 		}
@@ -218,10 +218,10 @@ public class Board{
 				j=colStart+1;
 			if (i<(rowStart+rowStop)/2)
 				for(;j<=colStop;j+=2)
-					Red.add(new Piece(PType.PAWN,i,j));
+					red.add(new Piece(PType.PAWN,i,j));
 			else
 				for(;j<=colStop;j+=2)
-					Green.add(new Piece(PType.PAWN,i,j));
+					green.add(new Piece(PType.PAWN,i,j));
 		}
 		return true;
 	}
@@ -244,9 +244,9 @@ public class Board{
 				piece.row=row;
 				piece.column=column;
 				if (toRemove.field==FType.GREEN)
-					Green.remove(toRemove.piece);
+					green.remove(toRemove.piece);
 				else
-					Red.remove(toRemove.piece);
+					red.remove(toRemove.piece);
 				return MType.KILL;
 			}
 			else{
@@ -258,13 +258,21 @@ public class Board{
 		return MType.BAD;
 	}
 	
-	ArrayList<ColPiece> boardState(){
+	ArrayList<ColPiece> getBoardState(){
 		ArrayList<ColPiece> ret=new ArrayList<ColPiece>();
-		for (Piece x:Red)
+		for (Piece x:red)
 			ret.add(new ColPiece(x,FType.RED));
-		for (Piece x:Green)
+		for (Piece x:green)
 			ret.add(new ColPiece(x,FType.GREEN));
 		return ret;
+	}
+	
+	public FType checkWinner(){
+		if (red.isEmpty())
+			return FType.GREEN;
+		else if (green.isEmpty())
+			return FType.RED;
+		return FType.FREE;
 	}
 
 	void print(){
@@ -283,13 +291,13 @@ public class Board{
 			else
 				System.out.print("|");
 			for(int j=colStart;j<=colStop;++j){
-				if(Red.contains(new Piece(PType.PAWN,i,j)))
+				if(red.contains(new Piece(PType.PAWN,i,j)))
 					System.out.print(" r ");
-				else if (Red.contains(new Piece(PType.QUEEN,i,j)))
+				else if (red.contains(new Piece(PType.QUEEN,i,j)))
 					System.out.print(" R ");
-				else if (Green.contains(new Piece(PType.PAWN,i,j)))
+				else if (green.contains(new Piece(PType.PAWN,i,j)))
 					System.out.print(" g ");
-				else if (Green.contains(new Piece(PType.QUEEN,i,j)))
+				else if (green.contains(new Piece(PType.QUEEN,i,j)))
 					System.out.print(" G ");
 				else
 					System.out.print(" _ ");

@@ -26,12 +26,12 @@ class Play extends Thread {
 		this.gameInfo=gameInfo;
 	}
 	
-	void gameWin(){
+	public void gameSurrender(){
 		turnInfo.setTimerOn(false);
 		if (turnInfo.activePlayer.equals(gameInfo.playerRedMove.player)){
 			gameInfo.winner=gameInfo.playerGreenMove.player;
 			int points=0;
-			for (ColPiece x:gameBoard.boardState()){
+			for (ColPiece x:gameBoard.getBoardState()){
 				if (x.field==FType.GREEN){
 					if (x.piece.type==PType.PAWN)
 						points+=1;
@@ -45,7 +45,7 @@ class Play extends Thread {
 		else {
 			gameInfo.winner=gameInfo.playerRedMove.player;
 			int points=0;
-			for (ColPiece x:gameBoard.boardState()){
+			for (ColPiece x:gameBoard.getBoardState()){
 				if (x.field==FType.RED){
 					if (x.piece.type==PType.PAWN)
 						points+=1;
@@ -57,12 +57,17 @@ class Play extends Thread {
 			gameInfo.playerRedMove.player.getPlayerInfo().mainPoints+=3;
 		}
 	}
-	void gameDraw(){
+	
+	private void gameWin(Player winner){
+		//TODO: winning the game
+		
+	}
+	public void gameDraw(){
 		turnInfo.setTimerOn(false);
 		gameInfo.winner=null;
 		int greenPoints=0;
 		int redPoints=0;
-		for (ColPiece x:gameBoard.boardState()){
+		for (ColPiece x:gameBoard.getBoardState()){
 			if (x.field==FType.GREEN){
 				if (x.piece.type==PType.PAWN)
 					greenPoints+=1;
@@ -79,9 +84,9 @@ class Play extends Thread {
 		gameInfo.playerRedMove.player.getPlayerInfo().mainPoints+=1;
 		gameInfo.playerGreenMove.player.getPlayerInfo().mainPoints+=1;
 	}
-	void gamePause(){
+	public void gamePause(){
 		turnInfo.setTimerOn(false);
-		gameInfo.setBoardState(gameBoard.boardState());
+		gameInfo.setBoardState(gameBoard.getBoardState());
 	}
 	void nextPlayer(){
 		if (gameInfo.playerGreenMove.equals(turnInfo.activePlayer))
@@ -100,7 +105,7 @@ class Play extends Thread {
 		while (gameInfo.getGameState()==GSType.GAME_RUNNING){
 			if (turnInfo.getRemainTurnTime()<=0){
 				gameInfo.setGameState(GSType.GAME_END);
-				gameWin();
+				gameSurrender();
 			}
 			else{
 				Move move;
@@ -109,42 +114,31 @@ class Play extends Thread {
 				else
 					move=gameInfo.playerGreenMove.getMove();
 				
-				switch(move.playerMove){
-				case SURRENDER:
-					gameInfo.setGameState(GSType.GAME_END);
-					gameWin();
+				if (move.moveFrom.field==FType.GREEN && turnInfo.activePlayer.equals(gameInfo.playerRedMove.player))
 					break;
-				case PAUSE:
-					gameInfo.setGameState(GSType.GAME_PAUSE);
-					gamePause();
+				if (move.moveFrom.field==FType.RED && turnInfo.activePlayer.equals(gameInfo.playerGreenMove.player))
 					break;
-				case DRAW:
-					gameInfo.setGameState(GSType.GAME_END);
-					gameDraw();
-					break;
+				switch(gameBoard.movePiece(move.moveFrom.piece, move.moveTo.piece.row, move.moveTo.piece.column)){
 				case MOVE:
-					if (move.moveFrom.field==FType.GREEN && turnInfo.activePlayer.equals(gameInfo.playerRedMove.player))
-						break;
-					if (move.moveFrom.field==FType.RED && turnInfo.activePlayer.equals(gameInfo.playerGreenMove.player))
-						break;
-					switch(gameBoard.movePiece(move.moveFrom.piece, move.moveTo.piece.row, move.moveTo.piece.column)){
-					case MOVE:
+					nextPlayer();
+					break;
+				case KILL:
+					if (move.moveFrom.piece.type==PType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.activePlayer.equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PType.QUEEN){
 						nextPlayer();
 						break;
-					case KILL:
-						if (move.moveFrom.piece.type==PType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.activePlayer.equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PType.QUEEN){
-							nextPlayer();
-							break;
-						}
-						else if (move.moveFrom.piece.type==PType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.activePlayer.equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PType.QUEEN){
-							nextPlayer();
-							break;
-						}
-						timer.nextTurn();
-						break;
-					case BAD:
+					}
+					else if (move.moveFrom.piece.type==PType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.activePlayer.equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PType.QUEEN){
+						nextPlayer();
 						break;
 					}
+					timer.nextTurn();
+					break;
+				case BAD:
+					break;
+				}
+				switch (gameBoard.checkWinner()){
+				case GREEN:
+					
 				}
 			}
 		}

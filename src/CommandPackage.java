@@ -20,8 +20,11 @@ public class CommandPackage implements Serializable{
 
 	private static final long serialVersionUID = -1294021581015850208L;
 	public CType commandType;
+	public Player player;
 	public String gameName;
 	public UUID gameID;
-	public Player player;
+	public BoardBounds boardBounds;
+	public int rowNumber;
+	public PMType playerMoveType;
 	public Move move;	
 }

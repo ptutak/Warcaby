@@ -17,17 +17,11 @@ public class Move implements java.io.Serializable {
 	private static final long serialVersionUID = -8092964267528656373L;
 	public ColPiece moveFrom;
 	public ColPiece moveTo;
-	public PMType playerMove;
 	Move(){
-		playerMove=null;
 		moveFrom=null;
 		moveTo=null;
 	}
-	Move(PMType playerMove){
-		this.playerMove=playerMove;
-	}
-	Move(PMType playerMove,ColPiece moveFrom, ColPiece moveTo){
-		this.playerMove=playerMove;
+	Move(ColPiece moveFrom, ColPiece moveTo){
 		this.moveFrom=moveFrom;
 		this.moveTo=moveTo;
 	}

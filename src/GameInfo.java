@@ -22,6 +22,7 @@ public class GameInfo {
 	private GSType gameState;
 	private ArrayList<ColPiece> boardState;
 	private BoardBounds boardBounds;
+	private int rowNumber;
 
 	public PlayerMove playerRedMove;
 	public PlayerMove playerGreenMove;
@@ -38,6 +39,14 @@ public class GameInfo {
 		winner=null;
 	}
 	
+	public int getRowNumber() {
+		return rowNumber;
+	}
+
+	public void setRowNumber(int rowNumber) {
+		this.rowNumber = rowNumber;
+	}
+
 	public String getGameName() {
 		return gameName;
 	}
