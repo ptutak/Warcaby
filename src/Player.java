@@ -20,6 +20,7 @@ import java.util.UUID;
 public class Player implements Serializable {
 
 	private static final long serialVersionUID = 2839322776104880115L;
+	
 	private final UUID ID;
 	private String login;
 	

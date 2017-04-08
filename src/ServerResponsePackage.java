@@ -14,7 +14,7 @@
    limitations under the License.
 */
 import java.io.Serializable;
-import java.util.UUID;
+
 
 import enums.ResponseType;
 
@@ -22,7 +22,5 @@ public class ServerResponsePackage implements Serializable {
 	private static final long serialVersionUID = -7196969330105075920L;
 	
 	public ResponseType response;
-	public UUID gameID;
-	public String[] gameList;
-	
+	public Object object;
 }

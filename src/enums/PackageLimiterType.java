@@ -14,7 +14,7 @@ Copyright 2017 Piotr Tutak
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-public enum SendPackageType {
+public enum PackageLimiterType {
 	PACKAGE_BEGIN,
 	PACKAGE_END
 }

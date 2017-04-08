@@ -1,5 +1,5 @@
 import enums.FieldType;
-import enums.GameStateType;
+import enums.GameStatusType;
 import enums.PlayerMoveType;
 import enums.PieceType;
 
@@ -115,10 +115,10 @@ class Play extends Thread {
 				sleep(10);
 			} catch (InterruptedException e){}
 		}
-		gameInfo.setGameState(GameStateType.GAME_RUNNING);
-		while (gameInfo.getGameState()==GameStateType.GAME_RUNNING){
+		gameInfo.setGameStatus(GameStatusType.GAME_RUNNING);
+		while (gameInfo.getGameStatus()==GameStatusType.GAME_RUNNING){
 			if (turnInfo.getRemainTurnTime()<=0){
-				gameInfo.setGameState(GameStateType.GAME_END);
+				gameInfo.setGameStatus(GameStatusType.GAME_END);
 				gameSurrender();
 			}
 			else{
@@ -166,11 +166,11 @@ class Play extends Thread {
 				
 				switch (gameBoard.checkWinner()){
 				case GREEN:
-					gameInfo.setGameState(GameStateType.GAME_END);
+					gameInfo.setGameStatus(GameStatusType.GAME_END);
 					gameWin(gameInfo.playerGreenMove.player);
 					break;
 				case RED:
-					gameInfo.setGameState(GameStateType.GAME_END);
+					gameInfo.setGameStatus(GameStatusType.GAME_END);
 					gameWin(gameInfo.playerRedMove.player);
 					break;
 				case FREE:

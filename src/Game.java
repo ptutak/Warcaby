@@ -1,6 +1,6 @@
 import java.util.concurrent.TimeUnit;
 
-import enums.GameStateType;
+import enums.GameStatusType;
 
 /* 
   Copyright 2017 Piotr Tutak
@@ -49,7 +49,7 @@ public class Game extends Thread{
 			play.join();
 			gameTimer.join();
 		} catch (InterruptedException e){e.printStackTrace();}
-		if (gameInfo.getGameState()==GameStateType.GAME_PAUSE)
+		if (gameInfo.getGameStatus()==GameStatusType.GAME_PAUSE)
 			server.addToDatabase(gameInfo, gameTurnInfo);
 	}
 

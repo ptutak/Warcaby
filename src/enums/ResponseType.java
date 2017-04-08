@@ -3,10 +3,11 @@ package enums;
 public enum ResponseType {
 	GAME_LIST,
 	GAME_CREATED,
+	GAME_EXISTS,
+	GAME_READY,
 	GAME_END,
 	
 	USER_REGISTERED,
 	USER_EXISTS,
-	
-
+	USER_NOT_REGISTERED
 }

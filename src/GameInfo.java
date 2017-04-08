@@ -16,12 +16,12 @@
 import java.util.ArrayList;
 import java.util.UUID;
 
-import enums.GameStateType;
+import enums.GameStatusType;
 
 public class GameInfo {
 	private String gameName;
 	private UUID ID;
-	private GameStateType gameState;
+	private GameStatusType gameStatus;
 	private ArrayList<ColPiece> boardState;
 	private BoardBounds boardBounds;
 	private int rowNumber;
@@ -33,7 +33,7 @@ public class GameInfo {
 	GameInfo(String gameName){
 		this.gameName=gameName;
 		this.ID=UUID.randomUUID();
-		gameState=GameStateType.GAME_WAITING;
+		gameStatus=GameStatusType.GAME_WAITING;
 		boardState=null;
 		boardBounds=null;
 		playerRedMove=null;
@@ -57,8 +57,8 @@ public class GameInfo {
 		return ID;
 	}
 
-	public synchronized GameStateType getGameState() {
-		return gameState;
+	public synchronized GameStatusType getGameStatus() {
+		return gameStatus;
 	}
 	
 	public synchronized BoardBounds getBoardBounds() {
@@ -69,8 +69,8 @@ public class GameInfo {
 		return boardState;
 	}
 	
-	public synchronized void setGameState(GameStateType gameState) {
-		this.gameState = gameState;
+	public synchronized void setGameStatus(GameStatusType gameStatus) {
+		this.gameStatus = gameStatus;
 	}
 
 	public synchronized void setBoardState(ArrayList<ColPiece> boardState) {

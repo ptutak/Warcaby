@@ -14,8 +14,9 @@ package enums;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum GameStateType {
+public enum GameStatusType {
 	GAME_WAITING,
+	GAME_READY,
 	GAME_PAUSE,
 	GAME_RUNNING,
 	GAME_END

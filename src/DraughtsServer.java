@@ -29,11 +29,12 @@ import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Set;
-import java.util.UUID;
 
-import enums.SendPackageType;
+
+import enums.ResponseType;
+import enums.GameStatusType;
+import enums.PackageLimiterType;
 
 
 public class DraughtsServer extends Thread {
@@ -43,6 +44,7 @@ public class DraughtsServer extends Thread {
 	private ServerSocketChannel serverSocketChannel = null;
 	private Selector selector = null;
 	private boolean serverState;
+	private HashSet<String> playerLoginSet=new HashSet<String>();
 	private HashMap<Player,PlayerService> playerMap=new HashMap<Player,PlayerService>();
 	private HashMap<String,GameInfo> gameMap=new HashMap<String,GameInfo>();
 	
@@ -120,11 +122,11 @@ public class DraughtsServer extends Thread {
 					tmpBuffer.flip();
 					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer.array());
 					ObjectInputStream ois=new ObjectInputStream(bis);
-					SendPackageType begin=(SendPackageType)ois.readObject();
-					if(begin==SendPackageType.PACKAGE_BEGIN){
+					PackageLimiterType begin=(PackageLimiterType)ois.readObject();
+					if(begin==PackageLimiterType.PACKAGE_BEGIN){
 						command=(UserCommandPackage)ois.readObject();
-						SendPackageType end=(SendPackageType)ois.readObject();
-						if (end==SendPackageType.PACKAGE_END)
+						PackageLimiterType end=(PackageLimiterType)ois.readObject();
+						if (end==PackageLimiterType.PACKAGE_END)
 							break;
 					}
 				}
@@ -138,7 +140,12 @@ public class DraughtsServer extends Thread {
 		}
 		switch(command.commandType){
 		case REGISTER_NEW_USER:
-			playerMap.put(command.player,new PlayerService(serviceChannel, new PlayerMove(command.player,null)));
+			if (playerLoginSet.contains(command.player.getLogin()))
+				writeResponse(serviceChannel,ResponseType.USER_EXISTS,null);
+			else{
+				playerMap.put(command.player,new PlayerService(serviceChannel, new PlayerMove(command.player,null)));
+				writeResponse(serviceChannel,ResponseType.USER_REGISTERED,null);
+			}
 			break;
 		case NEW_GAME:
 			if (playerMap.containsKey(command.player)){
@@ -146,27 +153,34 @@ public class DraughtsServer extends Thread {
 					GameInfo newGame=new GameInfo(command.gameName);
 					newGame.setBoardBounds(command.boardBounds);
 					newGame.setRowNumber(command.rowNumber);
-					newGame.playerRedMove.player=command.player;
+					newGame.playerRedMove=playerMap.get(command.player).playerMove;
 					gameMap.put(command.gameName, newGame);
-				}	
+					writeResponse(serviceChannel,ResponseType.GAME_CREATED,newGame.getID());
+				}
+				else
+					writeResponse(serviceChannel,ResponseType.GAME_EXISTS,null);
 			}
 			break;
 		case AVAILABLE_GAMES:
 			if (serviceChannel.isOpen()){
 				String[] gameList=(String[]) (gameMap.keySet()).toArray();
-				ByteArrayOutputStream bos=new ByteArrayOutputStream();
-				ObjectOutputStream oos;
-				try {
-					oos = new ObjectOutputStream(bos);
-					oos.writeObject(gameList);
-					oos.flush();
-					ByteBuffer response=ByteBuffer.wrap(bos.toByteArray());
-					serviceChannel.write(response);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				writeResponse(serviceChannel,ResponseType.GAME_LIST,gameList);			
+			}
+			break;
+		case JOIN_GAME:
+			if (playerMap.containsKey(command.player)){
+				if (gameMap.containsKey(command.gameName) && gameMap.get(command.gameName).getID().equals(command.gameID)){
+					if (gameMap.get(command.gameName).getGameStatus().equals(GameStatusType.GAME_WAITING)){
+						gameMap.get(command.gameName).playerGreenMove=playerMap.get(command.player).playerMove;
+						gameMap.get(command.gameName).setGameStatus(GameStatusType.GAME_READY);
+						Player playerRed=gameMap.get(command.gameName).playerRedMove.player;
+						writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
+						writeResponse(serviceChannel,ResponseType.GAME_READY,playerRed.getLogin());
+					}
 				}
-				
+			}
+			else {
+				writeResponse(serviceChannel,ResponseType.USER_NOT_REGISTERED,null);
 			}
 			break;
 		case GAME_MOVE:
@@ -176,6 +190,24 @@ public class DraughtsServer extends Thread {
 			break;
 		case END_CONNECTION:
 			break;
+		}
+	}
+	
+	private void writeResponse(SocketChannel socketChannel,ResponseType response, Object object){
+		ServerResponsePackage responsePackage=new ServerResponsePackage();
+		responsePackage.response=response;
+		responsePackage.object=object;
+		ByteArrayOutputStream bos=new ByteArrayOutputStream();
+		ObjectOutputStream oos;
+		try {
+			oos=new ObjectOutputStream(bos);
+			oos.writeObject(PackageLimiterType.PACKAGE_BEGIN);
+			oos.writeObject(responsePackage);
+			oos.writeObject(PackageLimiterType.PACKAGE_END);
+			oos.flush();
+			socketChannel.write(ByteBuffer.wrap(bos.toByteArray()));
+		} catch (IOException e){
+			e.printStackTrace();
 		}
 	}
 	synchronized void addToDatabase (GameInfo gameInfo, TurnInfo turnInfo){
