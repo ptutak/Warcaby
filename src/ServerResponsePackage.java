@@ -1,4 +1,3 @@
-package enums;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -14,9 +13,16 @@ package enums;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum PMType {
-	SURRENDER,
-	PAUSE,
-	DRAW,
-	MOVE
+import java.io.Serializable;
+import java.util.UUID;
+
+import enums.ResponseType;
+
+public class ServerResponsePackage implements Serializable {
+	private static final long serialVersionUID = -7196969330105075920L;
+	
+	public ResponseType response;
+	public UUID gameID;
+	public String[] gameList;
+	
 }

@@ -14,8 +14,9 @@ package enums;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum MType{
-	BAD,
-	MOVE,
-	KILL
+public enum PlayerMoveType {
+	SURRENDER,
+	PAUSE,
+	DRAW,
+	MOVE
 }

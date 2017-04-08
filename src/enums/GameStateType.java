@@ -1,5 +1,4 @@
 package enums;
-
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -15,8 +14,9 @@ package enums;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum FType {
-	FREE,
-	RED,
-	GREEN
+public enum GameStateType {
+	GAME_WAITING,
+	GAME_PAUSE,
+	GAME_RUNNING,
+	GAME_END
 }

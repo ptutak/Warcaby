@@ -1,5 +1,4 @@
-import enums.FieldType;
-
+package enums;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -15,13 +14,8 @@ import enums.FieldType;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-class ColPiece implements java.io.Serializable{
-
-	private static final long serialVersionUID = 5914182075578536563L;
-	public Piece piece;
-	public FieldType field;
-	ColPiece(Piece piece,FieldType field){
-		this.piece=piece;
-		this.field=field;
-	}
+public enum PieceType{
+	BLANK,
+	PAWN,
+	QUEEN
 }

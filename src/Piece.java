@@ -1,4 +1,4 @@
-import enums.PType;
+import enums.PieceType;
 
 /* 
   Copyright 2017 Piotr Tutak
@@ -18,11 +18,11 @@ import enums.PType;
 class Piece implements java.io.Serializable{
 
 	private static final long serialVersionUID = 5716247497499067226L;
-	public PType type;
+	public PieceType type;
 	public int row;
 	public int column;
 	
-	Piece(PType type, int row, int column){
+	Piece(PieceType type, int row, int column){
 		this.type=type;
 		this.row=row;
 		this.column=column;

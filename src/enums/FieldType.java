@@ -1,4 +1,5 @@
 package enums;
+
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -14,8 +15,8 @@ package enums;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum GSType {
-	GAME_END,
-	GAME_PAUSE,
-	GAME_RUNNING
+public enum FieldType {
+	FREE,
+	RED,
+	GREEN
 }

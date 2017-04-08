@@ -1,4 +1,4 @@
-import enums.PMType;
+import enums.PlayerMoveType;
 
 /* 
   Copyright 2017 Piotr Tutak
@@ -17,7 +17,7 @@ import enums.PMType;
 */
 public class PlayerMove {
 	public Player player;
-	private PMType playerMoveType;
+	private PlayerMoveType playerMoveType;
 	private Move move;
 	private boolean moveDone;
 	
@@ -26,11 +26,11 @@ public class PlayerMove {
 		this.move = move;
 	}
 
-	public synchronized PMType getPlayerMoveType() {
+	public synchronized PlayerMoveType getPlayerMoveType() {
 		return playerMoveType;
 	}
 
-	public synchronized void setPlayerMoveType(PMType playerMoveType) {
+	public synchronized void setPlayerMoveType(PlayerMoveType playerMoveType) {
 		this.playerMoveType = playerMoveType;
 	}
 

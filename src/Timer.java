@@ -28,6 +28,7 @@ class Timer extends Thread {
 
 	Timer(TurnInfo turnInfo){
 		this.turnInfo=turnInfo;
+		turnLimitTime=turnInfo.getTurnLimitTime();
 	}
 	
 	Timer(long turnLimitTime){

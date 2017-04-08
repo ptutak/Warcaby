@@ -1,3 +1,4 @@
+package enums;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -13,21 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-import java.io.Serializable;
-import java.util.UUID;
-
-import enums.CType;
-import enums.PMType;
-
-public class CommandPackage implements Serializable{
-
-	private static final long serialVersionUID = -1294021581015850208L;
-	public CType commandType;
-	public Player player;
-	public String gameName;
-	public UUID gameID;
-	public BoardBounds boardBounds;
-	public int rowNumber;
-	public PMType playerMoveType;
-	public Move move;	
+public enum MoveType{
+	BAD,
+	MOVE,
+	KILL
 }

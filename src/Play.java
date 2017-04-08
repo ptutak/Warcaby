@@ -1,7 +1,7 @@
-import enums.FType;
-import enums.GSType;
-import enums.PMType;
-import enums.PType;
+import enums.FieldType;
+import enums.GameStateType;
+import enums.PlayerMoveType;
+import enums.PieceType;
 
 /* 
   Copyright 2017 Piotr Tutak
@@ -37,8 +37,8 @@ class Play extends Thread {
 			gameInfo.winner=gameInfo.playerGreenMove.player;
 			int points=0;
 			for (ColPiece x:gameBoard.getBoardState()){
-				if (x.field==FType.GREEN){
-					if (x.piece.type==PType.PAWN)
+				if (x.field==FieldType.GREEN){
+					if (x.piece.type==PieceType.PAWN)
 						points+=1;
 					else
 						points+=2;
@@ -51,8 +51,8 @@ class Play extends Thread {
 			gameInfo.winner=gameInfo.playerRedMove.player;
 			int points=0;
 			for (ColPiece x:gameBoard.getBoardState()){
-				if (x.field==FType.RED){
-					if (x.piece.type==PType.PAWN)
+				if (x.field==FieldType.RED){
+					if (x.piece.type==PieceType.PAWN)
 						points+=1;
 					else
 						points+=2;
@@ -67,7 +67,7 @@ class Play extends Thread {
 		
 		int points=0;
 		for (ColPiece x:gameBoard.getBoardState()){
-			if (x.piece.type==PType.PAWN)
+			if (x.piece.type==PieceType.PAWN)
 				points+=1;
 			else
 				points+=2;
@@ -82,13 +82,13 @@ class Play extends Thread {
 		int greenPoints=0;
 		int redPoints=0;
 		for (ColPiece x:gameBoard.getBoardState()){
-			if (x.field==FType.GREEN){
-				if (x.piece.type==PType.PAWN)
+			if (x.field==FieldType.GREEN){
+				if (x.piece.type==PieceType.PAWN)
 					greenPoints+=1;
 				else
 					greenPoints+=2;
 			} else {
-				if (x.piece.type==PType.PAWN)
+				if (x.piece.type==PieceType.PAWN)
 					redPoints+=1;
 				else
 					redPoints+=2;			}
@@ -115,33 +115,33 @@ class Play extends Thread {
 				sleep(10);
 			} catch (InterruptedException e){}
 		}
-		gameInfo.setGameState(GSType.GAME_RUNNING);
-		while (gameInfo.getGameState()==GSType.GAME_RUNNING){
+		gameInfo.setGameState(GameStateType.GAME_RUNNING);
+		while (gameInfo.getGameState()==GameStateType.GAME_RUNNING){
 			if (turnInfo.getRemainTurnTime()<=0){
-				gameInfo.setGameState(GSType.GAME_END);
+				gameInfo.setGameState(GameStateType.GAME_END);
 				gameSurrender();
 			}
 			else{
 				Move move;
-				PMType moveType;
+				PlayerMoveType moveType;
 				if (turnInfo.activePlayer.equals(gameInfo.playerRedMove.player)){
 					move=gameInfo.playerRedMove.getMove();
 					moveType=gameInfo.playerRedMove.getPlayerMoveType();
-					if (moveType==PMType.SURRENDER)
+					if (moveType==PlayerMoveType.SURRENDER)
 						gameSurrender();
-					else if (moveType==PMType.DRAW)
+					else if (moveType==PlayerMoveType.DRAW)
 						gameDraw();
-					if (move.moveFrom.field==FType.GREEN)
+					if (move.moveFrom.field==FieldType.GREEN)
 						continue;
 				}
 				else {
 					move=gameInfo.playerGreenMove.getMove();
 					moveType=gameInfo.playerGreenMove.getPlayerMoveType();
-					if (moveType==PMType.SURRENDER)
+					if (moveType==PlayerMoveType.SURRENDER)
 						gameSurrender();
-					else if (moveType==PMType.DRAW)
+					else if (moveType==PlayerMoveType.DRAW)
 						gameDraw();
-					if (move.moveFrom.field==FType.RED)
+					if (move.moveFrom.field==FieldType.RED)
 						continue;
 				}
 					
@@ -150,11 +150,11 @@ class Play extends Thread {
 					nextPlayer();
 					break;
 				case KILL:
-					if (move.moveFrom.piece.type==PType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.activePlayer.equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PType.QUEEN){
+					if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.activePlayer.equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
 						nextPlayer();
 						break;
 					}
-					else if (move.moveFrom.piece.type==PType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.activePlayer.equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PType.QUEEN){
+					else if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.activePlayer.equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
 						nextPlayer();
 						break;
 					}
@@ -166,11 +166,11 @@ class Play extends Thread {
 				
 				switch (gameBoard.checkWinner()){
 				case GREEN:
-					gameInfo.setGameState(GSType.GAME_END);
+					gameInfo.setGameState(GameStateType.GAME_END);
 					gameWin(gameInfo.playerGreenMove.player);
 					break;
 				case RED:
-					gameInfo.setGameState(GSType.GAME_END);
+					gameInfo.setGameState(GameStateType.GAME_END);
 					gameWin(gameInfo.playerRedMove.player);
 					break;
 				case FREE:

@@ -14,9 +14,10 @@ package enums;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum CType {
+public enum CommandType {
 	REGISTER_NEW_USER,
 	NEW_GAME,
+	AVAILABLE_GAMES,
 	JOIN_GAME,
 	GAME_MOVE,
 	END_CONNECTION

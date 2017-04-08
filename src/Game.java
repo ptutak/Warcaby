@@ -1,4 +1,6 @@
-import enums.GSType;
+import java.util.concurrent.TimeUnit;
+
+import enums.GameStateType;
 
 /* 
   Copyright 2017 Piotr Tutak
@@ -26,28 +28,28 @@ public class Game extends Thread{
 	Game(DraughtsServer server,GameInfo gameInfo){
 		this.server=server;
 		this.gameInfo=gameInfo;
-		gameTurnInfo=null;
-		gameBoard=null;
-		gameTimer=null;
-		play=null;
+		gameTurnInfo=new TurnInfo();
+		gameTurnInfo.activePlayer=gameInfo.playerRedMove.player;
+		gameBoard=new Board(gameInfo.getBoardBounds());
+		gameBoard.setNRowGame(gameInfo.getRowNumber());
+		gameTimer=new Timer(gameTurnInfo);
+		play=new Play(gameBoard,gameInfo,gameTimer,gameTurnInfo);
 	}
 	
 	public void run(){
-		gameBoard=new Board(gameInfo.getBoardBounds());
-		gameBoard.setNRowGame(gameInfo.getRowNumber());
-		gameTurnInfo=new TurnInfo();
-		gameTurnInfo.activePlayer=gameInfo.playerRedMove.player;
-		gameTimer=new Timer(gameTurnInfo);
 		gameTimer.start();
-		play=new Play(gameBoard,gameInfo,gameTimer,gameTurnInfo);
 		play.start();
+		try {
+			TimeUnit.SECONDS.sleep(5);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		gameTurnInfo.setTimerOn(true);
-		
 		try{
 			play.join();
 			gameTimer.join();
 		} catch (InterruptedException e){e.printStackTrace();}
-		if (gameInfo.getGameState()==GSType.GAME_PAUSE)
+		if (gameInfo.getGameState()==GameStateType.GAME_PAUSE)
 			server.addToDatabase(gameInfo, gameTurnInfo);
 	}
 

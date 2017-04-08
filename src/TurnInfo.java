@@ -16,15 +16,31 @@
 public class TurnInfo {
 	private long gameTime;
 	private long remainTurnTime;
+	private long turnLimitTime;
+	private long gameLimitTime;
 	public Player activePlayer;
 	
 	private boolean timerOn;
 	
 	public TurnInfo(){
 		timerOn=false;
+		gameLimitTime=0;
+		turnLimitTime=0;
 		gameTime=0;
 		remainTurnTime=0;
 		activePlayer=null;
+	}
+	public synchronized long getTurnLimitTime() {
+		return turnLimitTime;
+	}
+	public synchronized long getGameLimitTime() {
+		return gameLimitTime;
+	}
+	public synchronized void setTurnLimitTime(long turnLimitTime) {
+		this.turnLimitTime = turnLimitTime;
+	}
+	public synchronized void setGameLimitTime(long gameLimitTime) {
+		this.gameLimitTime = gameLimitTime;
 	}
 	public synchronized long getGameTime() {
 		return gameTime;

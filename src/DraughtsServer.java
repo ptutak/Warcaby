@@ -29,10 +29,11 @@ import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.UUID;
 
-import enums.SPType;
+import enums.SendPackageType;
 
 
 public class DraughtsServer extends Thread {
@@ -42,7 +43,7 @@ public class DraughtsServer extends Thread {
 	private ServerSocketChannel serverSocketChannel = null;
 	private Selector selector = null;
 	private boolean serverState;
-	private HashMap<Player,PlayerMove> playerMap=new HashMap<Player,PlayerMove>();
+	private HashMap<Player,PlayerService> playerMap=new HashMap<Player,PlayerService>();
 	private HashMap<String,GameInfo> gameMap=new HashMap<String,GameInfo>();
 	
 
@@ -109,7 +110,7 @@ public class DraughtsServer extends Thread {
 		if (!serviceChannel.isOpen())
 			return;
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
-		CommandPackage command;
+		UserCommandPackage command;
 		while (true) {
 			try {
 				long n = serviceChannel.read(readBuffer);
@@ -119,11 +120,11 @@ public class DraughtsServer extends Thread {
 					tmpBuffer.flip();
 					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer.array());
 					ObjectInputStream ois=new ObjectInputStream(bis);
-					SPType begin=(SPType)ois.readObject();
-					if(begin==SPType.PACKAGE_BEGIN){
-						command=(CommandPackage)ois.readObject();
-						SPType end=(SPType)ois.readObject();
-						if (end==SPType.PACKAGE_END)
+					SendPackageType begin=(SendPackageType)ois.readObject();
+					if(begin==SendPackageType.PACKAGE_BEGIN){
+						command=(UserCommandPackage)ois.readObject();
+						SendPackageType end=(SendPackageType)ois.readObject();
+						if (end==SendPackageType.PACKAGE_END)
 							break;
 					}
 				}
@@ -137,7 +138,7 @@ public class DraughtsServer extends Thread {
 		}
 		switch(command.commandType){
 		case REGISTER_NEW_USER:
-			playerMap.put(command.player, new PlayerMove(command.player,null));
+			playerMap.put(command.player,new PlayerService(serviceChannel, new PlayerMove(command.player,null)));
 			break;
 		case NEW_GAME:
 			if (playerMap.containsKey(command.player)){
@@ -147,10 +148,26 @@ public class DraughtsServer extends Thread {
 					newGame.setRowNumber(command.rowNumber);
 					newGame.playerRedMove.player=command.player;
 					gameMap.put(command.gameName, newGame);
-				}
-					
+				}	
 			}
-
+			break;
+		case AVAILABLE_GAMES:
+			if (serviceChannel.isOpen()){
+				String[] gameList=(String[]) (gameMap.keySet()).toArray();
+				ByteArrayOutputStream bos=new ByteArrayOutputStream();
+				ObjectOutputStream oos;
+				try {
+					oos = new ObjectOutputStream(bos);
+					oos.writeObject(gameList);
+					oos.flush();
+					ByteBuffer response=ByteBuffer.wrap(bos.toByteArray());
+					serviceChannel.write(response);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
 			break;
 		case GAME_MOVE:
 			if (playerMap.containsKey(command.player) && gameMap.get(command.gameName).getID().equals(command.gameID)){
