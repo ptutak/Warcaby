@@ -1,3 +1,4 @@
+package general;
 import java.io.Serializable;
 
 /* 

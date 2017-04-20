@@ -1,3 +1,4 @@
+package general;
 /* 
   Copyright 2017 Piotr Tutak
  

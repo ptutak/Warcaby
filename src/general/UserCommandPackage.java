@@ -1,3 +1,4 @@
+package general;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -13,6 +14,21 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public class GameDatabase {
+import java.io.Serializable;
+import java.util.UUID;
 
+import enums.CommandType;
+import enums.PlayerMoveType;
+
+public class UserCommandPackage implements Serializable{
+
+	private static final long serialVersionUID = -1294021581015850208L;
+	public CommandType commandType;
+	public Player player;
+	public String gameName;
+	public UUID gameID;
+	public BoardBounds boardBounds;
+	public int rowNumber;
+	public PlayerMoveType playerMoveType;
+	public Move move;	
 }

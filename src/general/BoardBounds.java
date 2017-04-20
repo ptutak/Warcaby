@@ -1,5 +1,4 @@
-import enums.FieldType;
-
+package general;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -15,13 +14,22 @@ import enums.FieldType;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-class ColPiece implements java.io.Serializable{
-
-	private static final long serialVersionUID = 5914182075578536563L;
-	public Piece piece;
-	public FieldType field;
-	ColPiece(Piece piece,FieldType field){
-		this.piece=piece;
-		this.field=field;
+public class BoardBounds {
+	public int rowStart;
+	public int rowStop;
+	public int colStart;
+	public int colStop;
+	
+	BoardBounds(){
+		rowStart=1;
+		rowStop=8;
+		colStart=1;
+		colStop=8;
+	}
+	public BoardBounds(int rowStart, int rowStop, int colStart, int colStop){
+		this.rowStart=rowStart;
+		this.rowStop=rowStop;
+		this.colStart=colStart;
+		this.colStop=colStop;
 	}
 }

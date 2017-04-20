@@ -1,3 +1,7 @@
+package server;
+
+import general.Player;
+
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -18,7 +22,7 @@ public class TurnInfo {
 	private long remainTurnTime;
 	private long turnLimitTime;
 	private long gameLimitTime;
-	public Player activePlayer;
+	private Player activePlayer;
 	
 	private boolean timerOn;
 	
@@ -29,6 +33,12 @@ public class TurnInfo {
 		gameTime=0;
 		remainTurnTime=0;
 		activePlayer=null;
+	}
+	public synchronized Player getActivePlayer() {
+		return activePlayer;
+	}
+	public synchronized void setActivePlayer(Player activePlayer) {
+		this.activePlayer = activePlayer;
 	}
 	public synchronized long getTurnLimitTime() {
 		return turnLimitTime;

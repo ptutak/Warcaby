@@ -1,3 +1,7 @@
+package server;
+
+import general.Player;
+
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -49,7 +53,7 @@ class Timer extends Thread {
 	
 	@Override
 	public void run(){
-		Player prevPlayer=turnInfo.activePlayer;
+		Player prevPlayer=turnInfo.getActivePlayer();
 		while (!turnInfo.isTimerOn()) {
 			try {
 				sleep(10);	
@@ -57,7 +61,7 @@ class Timer extends Thread {
 		}
 		gameStart();
 		while (turnInfo.isTimerOn()){
-			Player nextPlayer=turnInfo.activePlayer;
+			Player nextPlayer=turnInfo.getActivePlayer();
 			if (prevPlayer!=nextPlayer){
 				prevPlayer=nextPlayer;
 				nextTurn();

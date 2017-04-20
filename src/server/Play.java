@@ -1,6 +1,12 @@
+package server;
+
 import enums.FieldType;
 import enums.GameStatusType;
 import enums.PlayerMoveType;
+import general.Board;
+import general.ColPiece;
+import general.Move;
+import general.Player;
 import enums.PieceType;
 
 /* 
@@ -18,7 +24,7 @@ import enums.PieceType;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-class Play extends Thread {
+public class Play extends Thread {
 	private GameInfo gameInfo;
 	private TurnInfo turnInfo;
 	private Board gameBoard;
@@ -33,7 +39,7 @@ class Play extends Thread {
 	
 	public void gameSurrender(){
 		turnInfo.setTimerOn(false);
-		if (turnInfo.activePlayer.equals(gameInfo.playerRedMove.player)){
+		if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
 			gameInfo.winner=gameInfo.playerGreenMove.player;
 			int points=0;
 			for (ColPiece x:gameBoard.getBoardState()){
@@ -103,10 +109,10 @@ class Play extends Thread {
 		gameInfo.setBoardState(gameBoard.getBoardState());
 	}
 	void nextPlayer(){
-		if (gameInfo.playerGreenMove.player.equals(turnInfo.activePlayer))
-			turnInfo.activePlayer=gameInfo.playerRedMove.player;
+		if (gameInfo.playerGreenMove.player.equals(turnInfo.getActivePlayer()))
+			turnInfo.setActivePlayer(gameInfo.playerRedMove.player);
 		else
-			turnInfo.activePlayer=gameInfo.playerGreenMove.player;
+			turnInfo.setActivePlayer(gameInfo.playerGreenMove.player);
 	}
 	
 	public void run(){
@@ -124,7 +130,7 @@ class Play extends Thread {
 			else{
 				Move move;
 				PlayerMoveType moveType;
-				if (turnInfo.activePlayer.equals(gameInfo.playerRedMove.player)){
+				if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
 					move=gameInfo.playerRedMove.getMove();
 					moveType=gameInfo.playerRedMove.getPlayerMoveType();
 					if (moveType==PlayerMoveType.SURRENDER)
@@ -150,11 +156,11 @@ class Play extends Thread {
 					nextPlayer();
 					break;
 				case KILL:
-					if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.activePlayer.equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
+					if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
 						nextPlayer();
 						break;
 					}
-					else if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.activePlayer.equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
+					else if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.getActivePlayer().equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
 						nextPlayer();
 						break;
 					}

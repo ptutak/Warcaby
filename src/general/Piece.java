@@ -1,3 +1,4 @@
+package general;
 import enums.PieceType;
 
 /* 
@@ -15,14 +16,14 @@ import enums.PieceType;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-class Piece implements java.io.Serializable{
+public class Piece implements java.io.Serializable{
 
 	private static final long serialVersionUID = 5716247497499067226L;
 	public PieceType type;
 	public int row;
 	public int column;
 	
-	Piece(PieceType type, int row, int column){
+	public Piece(PieceType type, int row, int column){
 		this.type=type;
 		this.row=row;
 		this.column=column;

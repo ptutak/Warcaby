@@ -1,4 +1,5 @@
-/* 
+package general;
+ /* 
   Copyright 2017 Piotr Tutak
  
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,21 +14,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-import java.io.Serializable;
-import java.util.UUID;
-
-import enums.CommandType;
-import enums.PlayerMoveType;
-
-public class UserCommandPackage implements Serializable{
-
-	private static final long serialVersionUID = -1294021581015850208L;
-	public CommandType commandType;
-	public Player player;
-	public String gameName;
-	public UUID gameID;
-	public BoardBounds boardBounds;
-	public int rowNumber;
-	public PlayerMoveType playerMoveType;
-	public Move move;	
+public class Move implements java.io.Serializable {
+	private static final long serialVersionUID = -8092964267528656373L;
+	public ColPiece moveFrom;
+	public ColPiece moveTo;
+	Move(){
+		moveFrom=null;
+		moveTo=null;
+	}
+	Move(ColPiece moveFrom, ColPiece moveTo){
+		this.moveFrom=moveFrom;
+		this.moveTo=moveTo;
+	}
 }

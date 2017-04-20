@@ -1,6 +1,8 @@
+package server;
 import java.util.concurrent.TimeUnit;
 
 import enums.GameStatusType;
+import general.Board;
 
 /* 
   Copyright 2017 Piotr Tutak
@@ -25,11 +27,11 @@ public class Game extends Thread{
 	private Timer gameTimer;
 	private Play play;
 	
-	Game(DraughtsServer server,GameInfo gameInfo){
+	public Game(DraughtsServer server,GameInfo gameInfo){
 		this.server=server;
 		this.gameInfo=gameInfo;
 		gameTurnInfo=new TurnInfo();
-		gameTurnInfo.activePlayer=gameInfo.playerRedMove.player;
+		gameTurnInfo.setActivePlayer(gameInfo.playerRedMove.player);
 		gameBoard=new Board(gameInfo.getBoardBounds());
 		gameBoard.setNRowGame(gameInfo.getRowNumber());
 		gameTimer=new Timer(gameTurnInfo);

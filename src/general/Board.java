@@ -1,3 +1,4 @@
+package general;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -30,23 +31,23 @@ public class Board{
 	private int rowStart;
 	private int rowStop;
 	
-	Board(BoardBounds boardBounds){
+	public Board(BoardBounds boardBounds){
 		this.rowStart=boardBounds.rowStart;
 		this.rowStop=boardBounds.rowStop;
 		this.colStop=boardBounds.colStop;
 		this.colStart=boardBounds.colStart;
 	}
 	
-	int getColStart() {
+	public int getColStart() {
 		return colStart;
 	}
-	int getColStop() {
+	public int getColStop() {
 		return colStop;
 	}	
-	int getRowStart() {
+	public int getRowStart() {
 		return rowStart;
 	}
-	int getRowStop() {
+	public int getRowStop() {
 		return rowStop;
 	}
 	
@@ -209,7 +210,7 @@ public class Board{
 		return ret;
 	}
 	
-	boolean setNRowGame(int n){
+	public boolean setNRowGame(int n){
 		if ((rowStop-rowStart+1)/2<=n)
 			return false;
 		for (int i=rowStart;i<=rowStop;++i){
@@ -231,7 +232,7 @@ public class Board{
 	}
 		
 	
-	MoveType movePiece(Piece piece,int row, int column){
+	public MoveType movePiece(Piece piece,int row, int column){
 		if (fieldState(row,column).field!=FieldType.FREE)
 			return MoveType.BAD;
 		ArrayList<ColPiece> vMove=validMove(piece);
@@ -262,7 +263,7 @@ public class Board{
 		return MoveType.BAD;
 	}
 	
-	ArrayList<ColPiece> getBoardState(){
+	public ArrayList<ColPiece> getBoardState(){
 		ArrayList<ColPiece> ret=new ArrayList<ColPiece>();
 		for (Piece x:red)
 			ret.add(new ColPiece(x,FieldType.RED));

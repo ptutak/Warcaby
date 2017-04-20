@@ -1,3 +1,4 @@
+package server;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -17,6 +18,10 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import enums.GameStatusType;
+import general.BoardBounds;
+import general.ColPiece;
+import general.Player;
+import general.PlayerMove;
 
 public class GameInfo {
 	private String gameName;

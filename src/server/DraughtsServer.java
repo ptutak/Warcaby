@@ -1,3 +1,4 @@
+package server;
 /* 
   Copyright 2017 Piotr Tutak
 
@@ -31,8 +32,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-
 import enums.ResponseType;
+import general.Player;
+import general.PlayerMove;
+import general.ServerResponsePackage;
+import general.UserCommandPackage;
 import enums.GameStatusType;
 import enums.PackageLimiterType;
 

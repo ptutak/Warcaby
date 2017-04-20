@@ -1,4 +1,7 @@
- /* 
+package general;
+import enums.FieldType;
+
+/* 
   Copyright 2017 Piotr Tutak
  
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +16,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public class Move implements java.io.Serializable {
-	private static final long serialVersionUID = -8092964267528656373L;
-	public ColPiece moveFrom;
-	public ColPiece moveTo;
-	Move(){
-		moveFrom=null;
-		moveTo=null;
-	}
-	Move(ColPiece moveFrom, ColPiece moveTo){
-		this.moveFrom=moveFrom;
-		this.moveTo=moveTo;
+public class ColPiece implements java.io.Serializable{
+
+	private static final long serialVersionUID = 5914182075578536563L;
+	public Piece piece;
+	public FieldType field;
+	public ColPiece(Piece piece,FieldType field){
+		this.piece=piece;
+		this.field=field;
 	}
 }

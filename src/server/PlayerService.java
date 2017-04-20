@@ -1,4 +1,7 @@
+package server;
 import java.nio.channels.SocketChannel;
+
+import general.PlayerMove;
 
 public class PlayerService {
 	public SocketChannel channel;
