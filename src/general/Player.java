@@ -27,13 +27,9 @@ public class Player implements Serializable {
 	
 	private PlayerInfo playerInfo;
 	
-	Player(String login){
+	public Player(String login){
 		ID=UUID.randomUUID();
-		playerInfo.firstName=null;
-		playerInfo.lastName=null;
-		playerInfo.nickName=null;
-		playerInfo.mainPoints=0;
-		playerInfo.minorPoints=0;
+		playerInfo=null;
 		this.login=login;
 	}
 	
