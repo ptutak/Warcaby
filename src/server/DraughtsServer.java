@@ -45,9 +45,16 @@ public class DraughtsServer extends Thread {
 
 	private String host;
 	private int port;
+	
+	final int BUFFSIZE=4096;
+	private ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
+	long responseTime=1500;
+	
 	private ServerSocketChannel serverSocketChannel = null;
 	private Selector selector = null;
+
 	private boolean serverState;
+	
 	private HashSet<String> playerLoginSet=new HashSet<String>();
 	private HashMap<Player,PlayerService> playerMap=new HashMap<Player,PlayerService>();
 	private HashMap<String,GameInfo> gameMap=new HashMap<String,GameInfo>();
@@ -66,8 +73,8 @@ public class DraughtsServer extends Thread {
 		this.port=port;
 
 	}
-
-	public void run(){
+	
+	public void establishConnection(){
 		try {
 			serverSocketChannel = ServerSocketChannel.open();
 			serverSocketChannel.configureBlocking(false);
@@ -78,10 +85,16 @@ public class DraughtsServer extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("Server started");
+		System.out.println("Connection established");
+	}
+
+	public void run(){
+		serverState=true;
 		serviceConnections();
 	}
+	
 	private void serviceConnections() {
+		System.out.println("ServiceConnections");
 		while(getServerState()) {
 			try {
 				selector.select();
@@ -109,15 +122,14 @@ public class DraughtsServer extends Thread {
 		}
 	}
 
-	final int BUFFSIZE=4096;
-	private ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
 
-	private void serviceRequest(SocketChannel serviceChannel) throws EOFException {
+	private void serviceRequest(SocketChannel serviceChannel) {
 		if (!serviceChannel.isOpen())
 			return;
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
-		UserCommandPackage command;
-		while (true) {
+		UserCommandPackage command=null;
+		long startTime=System.currentTimeMillis();
+		while (System.currentTimeMillis()-startTime<responseTime) {
 			try {
 				long n = serviceChannel.read(readBuffer);
 				safeBuffer.put(readBuffer);
@@ -135,13 +147,18 @@ public class DraughtsServer extends Thread {
 					}
 				}
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				System.out.println("CNF");
 			} catch (EOFException e){
-				continue;
+				System.out.println("EOF");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}	
 		}
+		if (command==null){
+			System.out.println("ResponseTimeout");
+			readBuffer.clear();
+		}
+		else
 		switch(command.commandType){
 		case REGISTER_NEW_USER:
 			if (playerLoginSet.contains(command.player.getLogin()))
@@ -219,6 +236,8 @@ public class DraughtsServer extends Thread {
 	}
 
 	public static void main(String[] args) {
-
+		DraughtsServer server=new DraughtsServer("127.0.0.1",50000);
+		server.establishConnection();
+		server.start();
 	}
 }

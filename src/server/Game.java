@@ -35,7 +35,7 @@ public class Game extends Thread{
 		gameBoard=new Board(gameInfo.getBoardBounds());
 		gameBoard.setNRowGame(gameInfo.getRowNumber());
 		gameTimer=new Timer(gameTurnInfo);
-		play=new Play(gameBoard,gameInfo,gameTimer,gameTurnInfo);
+		play=new Play(gameBoard,gameInfo,gameTimer,gameTurnInfo,server);
 	}
 	
 	public void run(){

@@ -29,12 +29,14 @@ public class Play extends Thread {
 	private TurnInfo turnInfo;
 	private Board gameBoard;
 	private Timer timer;
+	private DraughtsServer server;
 	
-	Play(Board gameBoard, GameInfo gameInfo,Timer timer, TurnInfo turnInfo){
+	Play(Board gameBoard, GameInfo gameInfo,Timer timer, TurnInfo turnInfo, DraughtsServer server){
 		this.gameBoard=gameBoard;
 		this.timer=timer;
 		this.turnInfo=turnInfo;
 		this.gameInfo=gameInfo;
+		this.server=server;
 	}
 	
 	public void gameSurrender(){
@@ -113,6 +115,7 @@ public class Play extends Thread {
 			turnInfo.setActivePlayer(gameInfo.playerRedMove.player);
 		else
 			turnInfo.setActivePlayer(gameInfo.playerGreenMove.player);
+		timer.nextTurn();
 	}
 	
 	public void run(){

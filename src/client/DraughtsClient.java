@@ -27,7 +27,7 @@ public class DraughtsClient {
 	private String serverIp=null;
 	private int serverPort=0;
 	private SocketChannel socketChannel=null;
-	private final long responseTime=500;
+	private final long responseTime=1500;
 	
 	private final int BUFFSIZE=4096;
 	private ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
@@ -42,6 +42,7 @@ public class DraughtsClient {
 	
 	
 	public boolean establishConnection(String ip, int port){
+		int serverMultiTime=5;
 		try {
 			socketChannel = SocketChannel.open();
 			socketChannel.configureBlocking(false);
@@ -50,7 +51,7 @@ public class DraughtsClient {
 			while (!connected){
 				TimeUnit.MILLISECONDS.sleep(responseTime);
 				connected=socketChannel.finishConnect();
-				if (i>10)
+				if (i>serverMultiTime)
 					break;
 				i++;
 			}
@@ -107,9 +108,12 @@ public class DraughtsClient {
 					}
 				}
 			} catch (ClassNotFoundException e) {
+				System.out.println("CNF");
 			} catch (EOFException e){
+				System.out.println("EOF");
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("IOException");
+//				e.printStackTrace();
 			}	
 		}
 		return null;
@@ -136,6 +140,16 @@ public class DraughtsClient {
 			socketChannel.write(ByteBuffer.wrap(bos.toByteArray()));
 		} catch (IOException e){
 			e.printStackTrace();
+		}
+	}
+	public static void main(String[] args){
+		DraughtsClient client=new DraughtsClient();
+		boolean response=client.establishConnection("127.0.0.1", 50000);
+		System.out.println(response);
+		response=client.registerUser("piotr");
+		System.out.println(response);
+		while(true){
+			
 		}
 	}
 }

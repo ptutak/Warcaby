@@ -1,7 +1,5 @@
 package server;
 
-import general.Player;
-
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -23,37 +21,26 @@ class Timer extends Thread {
 	private long turnLimitTime;
 	private TurnInfo turnInfo;
 		
-	void setTurnLimitTime(long turnLimitTime) {
-		if (turnLimitTime<0)
-			this.turnLimitTime=0;
-		else
-			this.turnLimitTime = turnLimitTime;
-	}
-
-	Timer(TurnInfo turnInfo){
+	public Timer(TurnInfo turnInfo){
 		this.turnInfo=turnInfo;
 		turnLimitTime=turnInfo.getTurnLimitTime();
 	}
 	
-	Timer(long turnLimitTime){
-		if (turnLimitTime<0)
-			this.turnLimitTime=0;
-		else
-			this.turnLimitTime=turnLimitTime;
-	}
-	
-	void nextTurn(){
+	public synchronized void nextTurn(){
 		turnStartTime=System.currentTimeMillis();
 	}
 	
-	void gameStart(){
+	private synchronized long getTurnStartTime(){
+		return turnStartTime;
+	}
+	
+	private synchronized void gameStart(){
 		gameStartTime=System.currentTimeMillis();
 		turnStartTime=gameStartTime;
 	}
 	
 	@Override
 	public void run(){
-		Player prevPlayer=turnInfo.getActivePlayer();
 		while (!turnInfo.isTimerOn()) {
 			try {
 				sleep(10);	
@@ -61,16 +48,16 @@ class Timer extends Thread {
 		}
 		gameStart();
 		while (turnInfo.isTimerOn()){
-			Player nextPlayer=turnInfo.getActivePlayer();
-			if (prevPlayer!=nextPlayer){
-				prevPlayer=nextPlayer;
-				nextTurn();
-			}
 			turnInfo.setGameTime(System.currentTimeMillis()-gameStartTime);
 			if (turnLimitTime>0)
-				turnInfo.setRemainTurnTime(turnLimitTime-System.currentTimeMillis()+turnStartTime);
+				turnInfo.setRemainTurnTime(turnLimitTime-System.currentTimeMillis()+getTurnStartTime());
 			else
 				turnInfo.setRemainTurnTime(1);
+			try {
+				sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }
