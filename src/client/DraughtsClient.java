@@ -96,7 +96,6 @@ public class DraughtsClient {
 				safeBuffer.put(readBuffer);
 				if (n > 0) {
 					ByteBuffer tmpBuffer=safeBuffer.duplicate();
-					tmpBuffer.flip();
 					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer.array());
 					ObjectInputStream ois=new ObjectInputStream(bis);
 					PackageLimiterType begin=(PackageLimiterType)ois.readObject();

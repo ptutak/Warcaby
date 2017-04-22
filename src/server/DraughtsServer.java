@@ -15,6 +15,8 @@ package server;
    limitations under the License.
  */
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -134,12 +136,15 @@ public class DraughtsServer extends Thread {
 		while (System.currentTimeMillis()-startTime<responseTime) {
 			try {
 				long n = serviceChannel.read(readBuffer);
-				safeBuffer.put(readBuffer);
+				safeBuffer=safeBuffer.put(readBuffer);
+//				System.out.println(safeBuffer.remaining());
+//				System.out.println(safeBuffer.array());
 				if (n > 0) {
-					System.out.println(System.currentTimeMillis());
-					ByteBuffer tmpBuffer= ByteBuffer.wrap(safeBuffer.array());
-					tmpBuffer.flip();
+					ByteBuffer tmpBuffer=safeBuffer.duplicate();
+//					tmpBuffer.flip();
+
 					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer.array());
+
 					ObjectInputStream ois=new ObjectInputStream(bis);
 					PackageLimiterType begin=(PackageLimiterType)ois.readObject();
 					if(begin==PackageLimiterType.PACKAGE_BEGIN){
@@ -216,6 +221,7 @@ public class DraughtsServer extends Thread {
 			break;
 		}
 	}
+	
 	
 	private void writeResponse(SocketChannel socketChannel,ResponseType response, Object object){
 		ServerResponsePackage responsePackage=new ServerResponsePackage();
