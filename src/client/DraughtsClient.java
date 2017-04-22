@@ -119,6 +119,15 @@ public class DraughtsClient {
 		return null;
 	}
 	
+	public void closeConnection(){
+		try {
+			socketChannel.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	private void writeCommand(SocketChannel socketChannel,CommandType command){
 		UserCommandPackage commandPackage=new UserCommandPackage();
 		commandPackage.commandType=command;
@@ -148,8 +157,7 @@ public class DraughtsClient {
 		System.out.println(response);
 		response=client.registerUser("piotr");
 		System.out.println(response);
-		while(true){
-			
-		}
+		client.closeConnection();
+
 	}
 }

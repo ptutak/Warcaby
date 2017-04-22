@@ -127,6 +127,8 @@ public class DraughtsServer extends Thread {
 		if (!serviceChannel.isOpen())
 			return;
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
+		safeBuffer.clear();
+		readBuffer.clear();
 		UserCommandPackage command=null;
 		long startTime=System.currentTimeMillis();
 		while (System.currentTimeMillis()-startTime<responseTime) {
@@ -134,7 +136,8 @@ public class DraughtsServer extends Thread {
 				long n = serviceChannel.read(readBuffer);
 				safeBuffer.put(readBuffer);
 				if (n > 0) {
-					ByteBuffer tmpBuffer=safeBuffer.duplicate();
+					System.out.println(System.currentTimeMillis());
+					ByteBuffer tmpBuffer= ByteBuffer.wrap(safeBuffer.array());
 					tmpBuffer.flip();
 					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer.array());
 					ObjectInputStream ois=new ObjectInputStream(bis);
