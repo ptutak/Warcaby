@@ -94,9 +94,12 @@ public class DraughtsClient {
 			try {
 				long n = socketChannel.read(readBuffer);
 				safeBuffer.put(readBuffer);
-				if (n > 0) {
-					ByteBuffer tmpBuffer=safeBuffer.duplicate();
-					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer.array());
+				if (n >= 0) {
+					ByteBuffer copyBuffer=safeBuffer.duplicate();
+					copyBuffer.flip();
+					byte[] tmpBuffer=new byte[copyBuffer.remaining()];
+					copyBuffer.get(tmpBuffer,copyBuffer.arrayOffset(),copyBuffer.remaining());
+					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer);
 					ObjectInputStream ois=new ObjectInputStream(bis);
 					PackageLimiterType begin=(PackageLimiterType)ois.readObject();
 					if(begin.equals(PackageLimiterType.PACKAGE_BEGIN)){
@@ -106,13 +109,18 @@ public class DraughtsClient {
 							return response;
 					}
 				}
+				else if (n==-1){
+					socketChannel.close();
+					return null;
+				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("CNF");
 			} catch (EOFException e){
 				System.out.println("EOF");
 			} catch (IOException e) {
 				System.out.println("IOException");
-//				e.printStackTrace();
+				e.printStackTrace();
+				break;
 			}	
 		}
 		return null;
@@ -145,6 +153,8 @@ public class DraughtsClient {
 			oos.writeObject(commandPackage);
 			oos.writeObject(PackageLimiterType.PACKAGE_END);
 			oos.flush();
+			System.out.println(bos.toByteArray().length);
+
 			socketChannel.write(ByteBuffer.wrap(bos.toByteArray()));
 		} catch (IOException e){
 			e.printStackTrace();
@@ -157,6 +167,5 @@ public class DraughtsClient {
 		response=client.registerUser("piotr");
 		System.out.println(response);
 		client.closeConnection();
-
 	}
 }

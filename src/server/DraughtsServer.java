@@ -47,20 +47,20 @@ public class DraughtsServer extends Thread {
 
 	private String host;
 	private int port;
-	
+
 	final int BUFFSIZE=4096;
 	private ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
 	long responseTime=1500;
-	
+
 	private ServerSocketChannel serverSocketChannel = null;
 	private Selector selector = null;
 
 	private boolean serverState;
-	
+
 	private HashSet<String> playerLoginSet=new HashSet<String>();
 	private HashMap<Player,PlayerService> playerMap=new HashMap<Player,PlayerService>();
 	private HashMap<String,GameInfo> gameMap=new HashMap<String,GameInfo>();
-	
+
 
 	public synchronized boolean getServerState() {
 		return serverState;
@@ -75,7 +75,7 @@ public class DraughtsServer extends Thread {
 		this.port=port;
 
 	}
-	
+
 	public void establishConnection(){
 		try {
 			serverSocketChannel = ServerSocketChannel.open();
@@ -94,7 +94,7 @@ public class DraughtsServer extends Thread {
 		serverState=true;
 		serviceConnections();
 	}
-	
+
 	private void serviceConnections() {
 		System.out.println("ServiceConnections");
 		while(getServerState()) {
@@ -106,7 +106,7 @@ public class DraughtsServer extends Thread {
 
 				while(iter.hasNext()) {  
 					SelectionKey key = (SelectionKey) iter.next(); 
-					                                 
+
 					if (key.isAcceptable()) { 
 						SocketChannel newChannel = serverSocketChannel.accept();
 						newChannel.configureBlocking(false);
@@ -114,8 +114,11 @@ public class DraughtsServer extends Thread {
 					} else if (key.isReadable()) {  
 						SocketChannel serviceChannel = (SocketChannel) key.channel();
 						serviceRequest(serviceChannel);
+					} else if (!key.isValid()){
+						key.cancel();
+						System.out.println("Key canceled");
 					}
-					
+
 					iter.remove();
 				}
 			} catch (IOException e){
@@ -137,13 +140,15 @@ public class DraughtsServer extends Thread {
 			try {
 				long n = serviceChannel.read(readBuffer);
 				safeBuffer=safeBuffer.put(readBuffer);
-//				System.out.println(safeBuffer.remaining());
-//				System.out.println(safeBuffer.array());
 				if (n > 0) {
-					ByteBuffer tmpBuffer=safeBuffer.duplicate();
-//					tmpBuffer.flip();
-
-					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer.array());
+					ByteBuffer copyBuffer=safeBuffer.slice();
+					copyBuffer.flip();
+					System.out.println(copyBuffer.remaining());
+					System.out.println(copyBuffer.arrayOffset());
+					byte[] tmpBuffer=new byte[copyBuffer.remaining()];
+					copyBuffer.get(tmpBuffer,copyBuffer.arrayOffset(),copyBuffer.remaining());
+					
+					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer);
 
 					ObjectInputStream ois=new ObjectInputStream(bis);
 					PackageLimiterType begin=(PackageLimiterType)ois.readObject();
@@ -154,12 +159,24 @@ public class DraughtsServer extends Thread {
 							break;
 					}
 				}
+				else if (n==-1){
+					serviceChannel.close();
+
+				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("CNF");
 			} catch (EOFException e){
 				System.out.println("EOF");
 			} catch (IOException e) {
+				System.out.println("IOException");
 				e.printStackTrace();
+				try {
+					serviceChannel.close();
+				} catch (IOException e1) {
+	
+					e1.printStackTrace();
+				}
+				break;
 			}	
 		}
 		if (command==null){
@@ -167,62 +184,62 @@ public class DraughtsServer extends Thread {
 			readBuffer.clear();
 		}
 		else
-		switch(command.commandType){
-		case REGISTER_NEW_USER:
-			if (playerLoginSet.contains(command.player.getLogin()))
-				writeResponse(serviceChannel,ResponseType.USER_EXISTS,null);
-			else{
-				playerMap.put(command.player,new PlayerService(serviceChannel, new PlayerMove(command.player,null)));
-				writeResponse(serviceChannel,ResponseType.USER_REGISTERED,null);
-			}
-			break;
-		case NEW_GAME:
-			if (playerMap.containsKey(command.player)){
-				if (!gameMap.containsKey(command.gameName)){
-					GameInfo newGame=new GameInfo(command.gameName);
-					newGame.setBoardBounds(command.boardBounds);
-					newGame.setRowNumber(command.rowNumber);
-					newGame.playerRedMove=playerMap.get(command.player).playerMove;
-					gameMap.put(command.gameName, newGame);
-					writeResponse(serviceChannel,ResponseType.GAME_CREATED,newGame.getID());
+			switch(command.commandType){
+			case REGISTER_NEW_USER:
+				if (playerLoginSet.contains(command.player.getLogin()))
+					writeResponse(serviceChannel,ResponseType.USER_EXISTS,null);
+				else{
+					playerMap.put(command.player,new PlayerService(serviceChannel, new PlayerMove(command.player,null)));
+					writeResponse(serviceChannel,ResponseType.USER_REGISTERED,null);
 				}
-				else
-					writeResponse(serviceChannel,ResponseType.GAME_EXISTS,null);
-			}
-			break;
-		case AVAILABLE_GAMES:
-			if (serviceChannel.isOpen()){
-				String[] gameList=(String[]) (gameMap.keySet()).toArray();
-				writeResponse(serviceChannel,ResponseType.GAME_LIST,gameList);			
-			}
-			break;
-		case JOIN_GAME:
-			if (playerMap.containsKey(command.player)){
-				if (gameMap.containsKey(command.gameName) && gameMap.get(command.gameName).getID().equals(command.gameID)){
-					if (gameMap.get(command.gameName).getGameStatus().equals(GameStatusType.GAME_WAITING)){
-						gameMap.get(command.gameName).playerGreenMove=playerMap.get(command.player).playerMove;
-						gameMap.get(command.gameName).setGameStatus(GameStatusType.GAME_READY);
-						Player playerRed=gameMap.get(command.gameName).playerRedMove.player;
-						writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
-						writeResponse(serviceChannel,ResponseType.GAME_READY,playerRed.getLogin());
+				break;
+			case NEW_GAME:
+				if (playerMap.containsKey(command.player)){
+					if (!gameMap.containsKey(command.gameName)){
+						GameInfo newGame=new GameInfo(command.gameName);
+						newGame.setBoardBounds(command.boardBounds);
+						newGame.setRowNumber(command.rowNumber);
+						newGame.playerRedMove=playerMap.get(command.player).playerMove;
+						gameMap.put(command.gameName, newGame);
+						writeResponse(serviceChannel,ResponseType.GAME_CREATED,newGame.getID());
+					}
+					else
+						writeResponse(serviceChannel,ResponseType.GAME_EXISTS,null);
+				}
+				break;
+			case AVAILABLE_GAMES:
+				if (serviceChannel.isOpen()){
+					String[] gameList=(String[]) (gameMap.keySet()).toArray();
+					writeResponse(serviceChannel,ResponseType.GAME_LIST,gameList);			
+				}
+				break;
+			case JOIN_GAME:
+				if (playerMap.containsKey(command.player)){
+					if (gameMap.containsKey(command.gameName) && gameMap.get(command.gameName).getID().equals(command.gameID)){
+						if (gameMap.get(command.gameName).getGameStatus().equals(GameStatusType.GAME_WAITING)){
+							gameMap.get(command.gameName).playerGreenMove=playerMap.get(command.player).playerMove;
+							gameMap.get(command.gameName).setGameStatus(GameStatusType.GAME_READY);
+							Player playerRed=gameMap.get(command.gameName).playerRedMove.player;
+							writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
+							writeResponse(serviceChannel,ResponseType.GAME_READY,playerRed.getLogin());
+						}
 					}
 				}
+				else {
+					writeResponse(serviceChannel,ResponseType.USER_NOT_REGISTERED,null);
+				}
+				break;
+			case GAME_MOVE:
+				if (playerMap.containsKey(command.player) && gameMap.get(command.gameName).getID().equals(command.gameID)){
+
+				}
+				break;
+			case END_CONNECTION:
+				break;
 			}
-			else {
-				writeResponse(serviceChannel,ResponseType.USER_NOT_REGISTERED,null);
-			}
-			break;
-		case GAME_MOVE:
-			if (playerMap.containsKey(command.player) && gameMap.get(command.gameName).getID().equals(command.gameID)){
-				
-			}
-			break;
-		case END_CONNECTION:
-			break;
-		}
 	}
-	
-	
+
+
 	private void writeResponse(SocketChannel socketChannel,ResponseType response, Object object){
 		ServerResponsePackage responsePackage=new ServerResponsePackage();
 		responsePackage.response=response;
