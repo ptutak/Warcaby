@@ -141,12 +141,18 @@ public class DraughtsServer extends Thread {
 				long n = serviceChannel.read(readBuffer);
 				safeBuffer=safeBuffer.put(readBuffer);
 				if (n > 0) {
-					ByteBuffer copyBuffer=safeBuffer.slice();
+					ByteBuffer copyBuffer=safeBuffer.duplicate();
 					copyBuffer.flip();
 					System.out.println(copyBuffer.remaining());
 					System.out.println(copyBuffer.arrayOffset());
+					System.out.println(copyBuffer.position());
+					System.out.println(copyBuffer.limit());
+//					copyBuffer.position(copyBuffer.arrayOffset());
+//					byte[] tmpBuffer=copyBuffer.array();
 					byte[] tmpBuffer=new byte[copyBuffer.remaining()];
-					copyBuffer.get(tmpBuffer,copyBuffer.arrayOffset(),copyBuffer.remaining());
+					System.out.println(tmpBuffer.length);
+					for (int i=0;i<copyBuffer.remaining();i++)
+						tmpBuffer[i]=copyBuffer.get();
 					
 					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer);
 
