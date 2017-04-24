@@ -115,7 +115,7 @@ public class DraughtsClient {
 					if(begin==PackageLimiterType.PACKAGE_BEGIN){
 //						System.out.println("package begin");
 						response=(ServerResponsePackage)ois.readObject();
-						System.out.println(response);
+//						System.out.println(response);
 						PackageLimiterType end=(PackageLimiterType)ois.readObject();
 						if (end==PackageLimiterType.PACKAGE_END){
 //							System.out.println("package end");

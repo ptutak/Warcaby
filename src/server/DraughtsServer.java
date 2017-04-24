@@ -129,7 +129,7 @@ public class DraughtsServer extends Thread {
 	}
 	
 	private UserCommandPackage checkCommand(SocketChannel serviceChannel){
-		System.out.println("check func");
+		System.out.println("Check func begin");
 		if (!serviceChannel.isOpen())
 			return null;
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
@@ -156,12 +156,12 @@ public class DraughtsServer extends Thread {
 					PackageLimiterType begin=(PackageLimiterType)ois.readObject();
 					
 					if(begin==PackageLimiterType.PACKAGE_BEGIN){
-						System.out.println("package begin");
+//						System.out.println("package begin");
 						command=(UserCommandPackage)ois.readObject();
-						System.out.println(command);
+//						System.out.println(command);
 						PackageLimiterType end=(PackageLimiterType)ois.readObject();
 						if (end==PackageLimiterType.PACKAGE_END){
-							System.out.println("package end");
+//							System.out.println("package end");
 							break;
 						}	
 					}
