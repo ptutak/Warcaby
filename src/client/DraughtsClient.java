@@ -124,7 +124,8 @@ public class DraughtsClient {
 					}
 				}
 				else if (n==-1){
-//					socketChannel.close();
+					socketChannel.close();
+					return null;
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("CNF");
@@ -193,6 +194,7 @@ public class DraughtsClient {
 		System.out.println(response);
 		response=client.registerUser("piotr");
 		System.out.println(response);
-		client.closeConnection();
+//		client.closeConnection();
+		while(true);
 	}
 }

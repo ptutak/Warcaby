@@ -167,8 +167,8 @@ public class DraughtsServer extends Thread {
 					}
 				}
 				else if (n==-1){
+					serviceChannel.close();
 					return null;
-//					serviceChannel.close();
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("CNF");
