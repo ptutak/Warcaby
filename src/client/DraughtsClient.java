@@ -86,7 +86,7 @@ public class DraughtsClient {
 	}
 	
 	private ServerResponsePackage checkResponse(SocketChannel socketChannel){
-		System.out.println("check func");
+//		System.out.println("check func");
 		if (!socketChannel.isOpen())
 			return null;
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
@@ -95,7 +95,7 @@ public class DraughtsClient {
 		while (System.currentTimeMillis()-startTime<responseTime) {
 			try {
 				long n = socketChannel.read(readBuffer);
-				System.out.println(n);
+//				System.out.println(n);
 				if (n > 0) {
 					readBuffer.flip();
 					byte[] tmpBuffer=new byte[readBuffer.remaining()];
@@ -141,9 +141,10 @@ public class DraughtsClient {
 				break;
 			} catch (IOException e) {
 				System.out.println("IOE");
-				e.printStackTrace();
+//				e.printStackTrace();
 				try {
 					socketChannel.close();
+					System.out.println("ServiceChannel Closed");
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -157,8 +158,8 @@ public class DraughtsClient {
 	public void closeConnection(){
 		try {
 			socketChannel.close();
+			System.out.println("SocketChannel closed");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -181,7 +182,7 @@ public class DraughtsClient {
 			oos.writeObject(commandPackage);
 			oos.writeObject(PackageLimiterType.PACKAGE_END);
 			oos.flush();
-			System.out.println(bos.toByteArray().length);
+//			System.out.println(bos.toByteArray().length);
 
 			socketChannel.write(ByteBuffer.wrap(bos.toByteArray()));
 		} catch (IOException e){

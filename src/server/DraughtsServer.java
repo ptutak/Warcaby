@@ -129,7 +129,7 @@ public class DraughtsServer extends Thread {
 	}
 	
 	private UserCommandPackage checkCommand(SocketChannel serviceChannel){
-		System.out.println("Check func begin");
+//		System.out.println("Check func begin");
 		if (!serviceChannel.isOpen())
 			return null;
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
@@ -138,7 +138,7 @@ public class DraughtsServer extends Thread {
 		while (System.currentTimeMillis()-startTime<responseTime) {
 			try {
 				long n = serviceChannel.read(readBuffer);
-				System.out.println(n);
+//				System.out.println(n);
 				if (n > 0) {
 					readBuffer.flip();
 					byte[] tmpBuffer=new byte[readBuffer.remaining()];
@@ -184,9 +184,11 @@ public class DraughtsServer extends Thread {
 				break;
 			} catch (IOException e) {
 				System.out.println("IOE");
-				e.printStackTrace();
+//				e.printStackTrace();
 				try {
+					serviceChannel.socket().close();
 					serviceChannel.close();
+					System.out.println("Service Channel Closed");
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
