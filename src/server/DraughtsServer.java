@@ -25,6 +25,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -126,61 +127,80 @@ public class DraughtsServer extends Thread {
 			}
 		}
 	}
-
-
-	private void serviceRequest(SocketChannel serviceChannel) {
+	
+	private UserCommandPackage checkCommand(SocketChannel serviceChannel){
+		System.out.println("check func");
 		if (!serviceChannel.isOpen())
-			return;
+			return null;
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
 		UserCommandPackage command=null;
 		long startTime=System.currentTimeMillis();
 		while (System.currentTimeMillis()-startTime<responseTime) {
 			try {
 				long n = serviceChannel.read(readBuffer);
-				readBuffer.flip();
-				byte[] copy=new byte[readBuffer.remaining()];
-				readBuffer.get(copy);
-				safeBuffer.put(copy);
+				System.out.println(n);
 				if (n > 0) {
+					readBuffer.flip();
+					byte[] tmpBuffer=new byte[readBuffer.remaining()];
+					readBuffer.get(tmpBuffer);
+					safeBuffer.put(tmpBuffer);
+					readBuffer.clear();
+					
 					ByteBuffer copyBuffer=safeBuffer.duplicate();
 					copyBuffer.flip();
-					System.out.println(copyBuffer.remaining());
-					byte[] tmpBuffer=new byte[copyBuffer.remaining()];
+					tmpBuffer=new byte[copyBuffer.remaining()];
 					copyBuffer.get(tmpBuffer);
+					
 					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer);
-
 					ObjectInputStream ois=new ObjectInputStream(bis);
 					PackageLimiterType begin=(PackageLimiterType)ois.readObject();
+					
 					if(begin==PackageLimiterType.PACKAGE_BEGIN){
+						System.out.println("package begin");
 						command=(UserCommandPackage)ois.readObject();
+						System.out.println(command);
 						PackageLimiterType end=(PackageLimiterType)ois.readObject();
-						if (end==PackageLimiterType.PACKAGE_END)
+						if (end==PackageLimiterType.PACKAGE_END){
+							System.out.println("package end");
 							break;
+						}	
 					}
 				}
 				else if (n==-1){
 					serviceChannel.close();
-
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("CNF");
 			} catch (EOFException e){
 				System.out.println("EOF");
+			} catch (ClosedChannelException e){
+				System.out.println("Channel closed");
+				try {
+					serviceChannel.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				break;
 			} catch (IOException e) {
-				System.out.println("IOException");
+				System.out.println("IOE");
 				e.printStackTrace();
 				try {
 					serviceChannel.close();
 				} catch (IOException e1) {
-	
 					e1.printStackTrace();
 				}
 				break;
 			}	
 		}
+		readBuffer.clear();
+		return command;
+	}
+
+
+	private void serviceRequest(SocketChannel serviceChannel) {
+		UserCommandPackage command=checkCommand(serviceChannel);
 		if (command==null){
-			System.out.println("ResponseTimeout");
-			readBuffer.clear();
+			System.out.println("Command = null");
 		}
 		else
 			switch(command.commandType){

@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -85,45 +86,71 @@ public class DraughtsClient {
 	}
 	
 	private ServerResponsePackage checkResponse(SocketChannel socketChannel){
+		System.out.println("check func");
 		if (!socketChannel.isOpen())
 			return null;
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
-		ServerResponsePackage response;
-		long startClock=System.currentTimeMillis();
-		while (System.currentTimeMillis()-startClock<responseTime) {
+		ServerResponsePackage response=null;
+		long startTime=System.currentTimeMillis();
+		while (System.currentTimeMillis()-startTime<responseTime) {
 			try {
 				long n = socketChannel.read(readBuffer);
-				safeBuffer.put(readBuffer);
-				if (n >= 0) {
+				System.out.println(n);
+				if (n > 0) {
+					readBuffer.flip();
+					byte[] tmpBuffer=new byte[readBuffer.remaining()];
+					readBuffer.get(tmpBuffer);
+					safeBuffer.put(tmpBuffer);
+					readBuffer.clear();
+					
 					ByteBuffer copyBuffer=safeBuffer.duplicate();
 					copyBuffer.flip();
-					byte[] tmpBuffer=new byte[copyBuffer.remaining()];
-					copyBuffer.get(tmpBuffer,copyBuffer.arrayOffset(),copyBuffer.remaining());
+					tmpBuffer=new byte[copyBuffer.remaining()];
+					copyBuffer.get(tmpBuffer);
+					
 					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer);
 					ObjectInputStream ois=new ObjectInputStream(bis);
 					PackageLimiterType begin=(PackageLimiterType)ois.readObject();
-					if(begin.equals(PackageLimiterType.PACKAGE_BEGIN)){
+					
+					if(begin==PackageLimiterType.PACKAGE_BEGIN){
+						System.out.println("package begin");
 						response=(ServerResponsePackage)ois.readObject();
+						System.out.println(response);
 						PackageLimiterType end=(PackageLimiterType)ois.readObject();
-						if (end.equals(PackageLimiterType.PACKAGE_END))
-							return response;
+						if (end==PackageLimiterType.PACKAGE_END){
+							System.out.println("package end");
+							break;
+						}	
 					}
 				}
 				else if (n==-1){
 					socketChannel.close();
-					return null;
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("CNF");
 			} catch (EOFException e){
 				System.out.println("EOF");
+			} catch (ClosedChannelException e){
+				System.out.println("Channel closed");
+				try {
+					socketChannel.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				break;
 			} catch (IOException e) {
-				System.out.println("IOException");
+				System.out.println("IOE");
 				e.printStackTrace();
+				try {
+					socketChannel.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 				break;
 			}	
 		}
-		return null;
+		readBuffer.clear();
+		return response;
 	}
 	
 	public void closeConnection(){
