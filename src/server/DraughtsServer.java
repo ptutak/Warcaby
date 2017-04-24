@@ -167,14 +167,15 @@ public class DraughtsServer extends Thread {
 					}
 				}
 				else if (n==-1){
-					serviceChannel.close();
+					return null;
+//					serviceChannel.close();
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("CNF");
 			} catch (EOFException e){
 				System.out.println("EOF");
 			} catch (ClosedChannelException e){
-				System.out.println("Channel closed");
+				System.out.println("CCE");
 				try {
 					serviceChannel.close();
 				} catch (IOException e1) {

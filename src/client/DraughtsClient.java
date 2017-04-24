@@ -113,25 +113,25 @@ public class DraughtsClient {
 					PackageLimiterType begin=(PackageLimiterType)ois.readObject();
 					
 					if(begin==PackageLimiterType.PACKAGE_BEGIN){
-						System.out.println("package begin");
+//						System.out.println("package begin");
 						response=(ServerResponsePackage)ois.readObject();
 						System.out.println(response);
 						PackageLimiterType end=(PackageLimiterType)ois.readObject();
 						if (end==PackageLimiterType.PACKAGE_END){
-							System.out.println("package end");
+//							System.out.println("package end");
 							break;
 						}	
 					}
 				}
 				else if (n==-1){
-					socketChannel.close();
+//					socketChannel.close();
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("CNF");
 			} catch (EOFException e){
 				System.out.println("EOF");
 			} catch (ClosedChannelException e){
-				System.out.println("Channel closed");
+				System.out.println("CCE");
 				try {
 					socketChannel.close();
 				} catch (IOException e1) {
