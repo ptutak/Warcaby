@@ -24,15 +24,18 @@ import general.ServerResponsePackage;
 import general.UserCommandPackage;
 
 public class DraughtsClient {
-	
+
 	private String serverIp=null;
 	private int serverPort=0;
 	private SocketChannel socketChannel=null;
 	private final long responseTime=1500;
-	
+	private final int serverResponseMultiTime=3;
+
 	private final int BUFFSIZE=4096;
 	private ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
-	
+	private ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
+	private ByteBuffer writeBuffer=ByteBuffer.allocate(BUFFSIZE);
+
 	private Player player=null;
 	private String gameName=null;
 	private UUID gameID=null;
@@ -40,10 +43,9 @@ public class DraughtsClient {
 	private int rowNumber=0;
 	private PlayerMoveType playerMoveType=null;
 	private Move move=null;
-	
-	
+
+
 	public boolean establishConnection(String ip, int port){
-		int serverMultiTime=5;
 		try {
 			socketChannel = SocketChannel.open();
 			socketChannel.configureBlocking(false);
@@ -52,7 +54,7 @@ public class DraughtsClient {
 			while (!connected){
 				TimeUnit.MILLISECONDS.sleep(responseTime);
 				connected=socketChannel.finishConnect();
-				if (i>serverMultiTime)
+				if (i>serverResponseMultiTime)
 					break;
 				i++;
 			}
@@ -61,7 +63,7 @@ public class DraughtsClient {
 				serverPort=port;
 				return true;
 			}
-			
+
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (InterruptedException e) {
@@ -70,62 +72,72 @@ public class DraughtsClient {
 		socketChannel=null;
 		return false;
 	}
-	
-	public boolean registerUser(String login){
+
+	public ResponseType registerUser(String login){
 		if (socketChannel==null)
-			return false;
+			return null;
 		player=new Player(login);
 		writeCommand(socketChannel,CommandType.REGISTER_NEW_USER);
 		ServerResponsePackage response=checkResponse(socketChannel);
 		if (response!=null)
 			if (response.response==ResponseType.USER_REGISTERED){
 				player=(Player)response.object;
-				return true;
-			}
-		return false;
+				return ResponseType.USER_REGISTERED;
+			} else if(response.response==ResponseType.USER_EXISTS)
+				return ResponseType.USER_EXISTS;
+		return null;
 	}
-	
+
 	private ServerResponsePackage checkResponse(SocketChannel socketChannel){
-//		System.out.println("check func");
+		System.out.println("check func");
 		if (!socketChannel.isOpen())
 			return null;
-		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
+		//		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
 		ServerResponsePackage response=null;
 		long startTime=System.currentTimeMillis();
 		while (System.currentTimeMillis()-startTime<responseTime) {
 			try {
 				long n = socketChannel.read(readBuffer);
-//				System.out.println(n);
+				//				System.out.println(n);
 				if (n > 0) {
 					readBuffer.flip();
 					byte[] tmpBuffer=new byte[readBuffer.remaining()];
 					readBuffer.get(tmpBuffer);
 					safeBuffer.put(tmpBuffer);
 					readBuffer.clear();
-					
 					ByteBuffer copyBuffer=safeBuffer.duplicate();
 					copyBuffer.flip();
+					int packageSize=0;
+					if (copyBuffer.remaining()>=4)
+						packageSize=copyBuffer.getInt();
+					else
+						continue;
+					if (copyBuffer.remaining()<packageSize)
+						continue;
+
 					tmpBuffer=new byte[copyBuffer.remaining()];
 					copyBuffer.get(tmpBuffer);
-					
+
 					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer);
 					ObjectInputStream ois=new ObjectInputStream(bis);
 					PackageLimiterType begin=(PackageLimiterType)ois.readObject();
-					
+
 					if(begin==PackageLimiterType.PACKAGE_BEGIN){
-//						System.out.println("package begin");
+						//						System.out.println("package begin");
 						response=(ServerResponsePackage)ois.readObject();
-//						System.out.println(response);
+						//						System.out.println(response);
 						PackageLimiterType end=(PackageLimiterType)ois.readObject();
 						if (end==PackageLimiterType.PACKAGE_END){
-//							System.out.println("package end");
+							System.out.println("package end");
 							break;
 						}	
 					}
 				}
 				else if (n==-1){
 					socketChannel.close();
-					return null;
+					System.out.println("Service Channel Closed");
+					response=null;
+					break;
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("CNF");
@@ -144,7 +156,7 @@ public class DraughtsClient {
 //				e.printStackTrace();
 				try {
 					socketChannel.close();
-					System.out.println("ServiceChannel Closed");
+					System.out.println("Service Channel Closed");
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -152,18 +164,25 @@ public class DraughtsClient {
 			}	
 		}
 		readBuffer.clear();
+		safeBuffer.clear();
 		return response;
 	}
-	
+
 	public void closeConnection(){
-		try {
-			socketChannel.close();
-			System.out.println("SocketChannel closed");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		if (socketChannel!=null)
+			try {
+				socketChannel.close();
+				socketChannel=null;
+				System.out.println("Socket Channel closed");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 	}
 	
+	private void reconnect(){
+		establishConnection(serverIp,serverPort);
+	}
+
 	private void writeCommand(SocketChannel socketChannel,CommandType command){
 		UserCommandPackage commandPackage=new UserCommandPackage();
 		commandPackage.commandType=command;
@@ -174,28 +193,31 @@ public class DraughtsClient {
 		commandPackage.gameID=gameID;
 		commandPackage.move=move;
 		commandPackage.playerMoveType=playerMoveType;
-		ByteArrayOutputStream bos=new ByteArrayOutputStream();
-		ObjectOutputStream oos;
 		try {
-			oos=new ObjectOutputStream(bos);
+			ByteArrayOutputStream bos=new ByteArrayOutputStream();
+			ObjectOutputStream oos=new ObjectOutputStream(bos);
 			oos.writeObject(PackageLimiterType.PACKAGE_BEGIN);
 			oos.writeObject(commandPackage);
 			oos.writeObject(PackageLimiterType.PACKAGE_END);
 			oos.flush();
-//			System.out.println(bos.toByteArray().length);
-
-			socketChannel.write(ByteBuffer.wrap(bos.toByteArray()));
+			writeBuffer.putInt(bos.toByteArray().length);
+			writeBuffer.put(bos.toByteArray());
+			writeBuffer.flip();
+			socketChannel.write(writeBuffer);
+			writeBuffer.clear();
 		} catch (IOException e){
 			e.printStackTrace();
 		}
 	}
+	
 	public static void main(String[] args){
 		DraughtsClient client=new DraughtsClient();
 		boolean response=client.establishConnection("127.0.0.1", 50000);
 		System.out.println(response);
-		response=client.registerUser("piotr");
-		System.out.println(response);
-//		client.closeConnection();
+		ResponseType resp=client.registerUser("piotr");
+		System.out.println(resp);
+		
+		//		client.closeConnection();
 		while(true);
 	}
 }

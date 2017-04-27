@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
@@ -48,8 +49,8 @@ public class DraughtsServer extends Thread {
 	private int port;
 
 	final int BUFFSIZE=4096;
-	private ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
-	long responseTime=1500;
+	long responseTime=500;
+
 
 	private ServerSocketChannel serverSocketChannel = null;
 	private Selector selector = null;
@@ -73,6 +74,7 @@ public class DraughtsServer extends Thread {
 		this.host=host;
 		this.port=port;
 
+
 	}
 
 	public void establishConnection(){
@@ -83,7 +85,6 @@ public class DraughtsServer extends Thread {
 			selector = Selector.open();
 			serverSocketChannel.register(selector,SelectionKey.OP_ACCEPT);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Connection established");
@@ -104,18 +105,17 @@ public class DraughtsServer extends Thread {
 				Iterator<SelectionKey> iter = selectorKeys.iterator();
 
 				while(iter.hasNext()) {  
-					SelectionKey key = (SelectionKey) iter.next(); 
-
-					if (key.isAcceptable()) { 
+					SelectionKey key = (SelectionKey) iter.next();
+					if (!key.isValid()){
+						key.cancel();
+						System.out.println("Key canceled");
+					} else if (key.isAcceptable()) { 
 						SocketChannel newChannel = serverSocketChannel.accept();
 						newChannel.configureBlocking(false);
 						newChannel.register(selector, SelectionKey.OP_READ);
 					} else if (key.isReadable()) {  
 						SocketChannel serviceChannel = (SocketChannel) key.channel();
 						serviceRequest(serviceChannel);
-					} else if (!key.isValid()){
-						key.cancel();
-						System.out.println("Key canceled");
 					}
 
 					iter.remove();
@@ -125,48 +125,58 @@ public class DraughtsServer extends Thread {
 			}
 		}
 	}
-	
-	private UserCommandPackage checkCommand(SocketChannel serviceChannel){
-//		System.out.println("Check func begin");
-		if (!serviceChannel.isOpen())
-			return null;
+
+	private UserCommandPackage checkCommand(SocketChannel socketChannel){
+		ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
+
+		//		System.out.println("Check func begin");
+		if (!socketChannel.isOpen())
+			return null;
 		UserCommandPackage command=null;
 		long startTime=System.currentTimeMillis();
 		while (System.currentTimeMillis()-startTime<responseTime) {
 			try {
-				long n = serviceChannel.read(readBuffer);
-//				System.out.println(n);
+				long n = socketChannel.read(readBuffer);
+				//				System.out.println(n);
 				if (n > 0) {
 					readBuffer.flip();
 					byte[] tmpBuffer=new byte[readBuffer.remaining()];
 					readBuffer.get(tmpBuffer);
 					safeBuffer.put(tmpBuffer);
 					readBuffer.clear();
-					
 					ByteBuffer copyBuffer=safeBuffer.duplicate();
 					copyBuffer.flip();
+					int packageSize=0;
+					if (copyBuffer.remaining()>=4)
+						packageSize=copyBuffer.getInt();
+					else
+						continue;
+					if (copyBuffer.remaining()<packageSize)
+						continue;
 					tmpBuffer=new byte[copyBuffer.remaining()];
 					copyBuffer.get(tmpBuffer);
-					
+
 					ByteArrayInputStream bis=new ByteArrayInputStream(tmpBuffer);
 					ObjectInputStream ois=new ObjectInputStream(bis);
 					PackageLimiterType begin=(PackageLimiterType)ois.readObject();
-					
+
 					if(begin==PackageLimiterType.PACKAGE_BEGIN){
-//						System.out.println("package begin");
+						//						System.out.println("package begin");
 						command=(UserCommandPackage)ois.readObject();
-//						System.out.println(command);
+						//						System.out.println(command);
 						PackageLimiterType end=(PackageLimiterType)ois.readObject();
 						if (end==PackageLimiterType.PACKAGE_END){
-//							System.out.println("package end");
+							//							System.out.println("package end");
 							break;
 						}	
 					}
 				}
 				else if (n==-1){
-					serviceChannel.close();
-					return null;
+					socketChannel.close();
+					System.out.println("Service Channel Closed");
+					command=null;
+					break;
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println("CNF");
@@ -175,25 +185,27 @@ public class DraughtsServer extends Thread {
 			} catch (ClosedChannelException e){
 				System.out.println("CCE");
 				try {
-					serviceChannel.close();
+					socketChannel.close();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
+				command=null;
 				break;
 			} catch (IOException e) {
 				System.out.println("IOE");
-//				e.printStackTrace();
+				//				e.printStackTrace();
 				try {
-					serviceChannel.socket().close();
-					serviceChannel.close();
+					socketChannel.close();
 					System.out.println("Service Channel Closed");
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
+				command=null;
 				break;
 			}	
 		}
-		readBuffer.clear();
+		//		safeBuffer.clear();
+		//		readBuffer.clear();
 		return command;
 	}
 
@@ -201,16 +213,33 @@ public class DraughtsServer extends Thread {
 	private void serviceRequest(SocketChannel serviceChannel) {
 		UserCommandPackage command=checkCommand(serviceChannel);
 		if (command==null){
-			System.out.println("Command = null");
 		}
-		else
+		else{
 			switch(command.commandType){
 			case REGISTER_NEW_USER:
-				if (playerLoginSet.contains(command.player.getLogin()))
+				if (playerLoginSet.contains(command.player.getLogin())){
 					writeResponse(serviceChannel,ResponseType.USER_EXISTS,null);
-				else{
+					System.out.println(ResponseType.USER_EXISTS);
+				} else{
 					playerMap.put(command.player,new PlayerService(serviceChannel, new PlayerMove(command.player,null)));
+					playerLoginSet.add(command.player.getLogin());
 					writeResponse(serviceChannel,ResponseType.USER_REGISTERED,null);
+					System.out.println(ResponseType.USER_REGISTERED);
+				}
+				break;
+			case USER_RECONNECT:
+				if (playerLoginSet.contains(command.player.getLogin())){
+					if (playerMap.containsKey(command.player)){
+						playerMap.get(command.player).channel=serviceChannel;
+						writeResponse(serviceChannel,ResponseType.USER_RECONNECTED,null);
+						System.out.println(ResponseType.USER_RECONNECTED);
+					} else{
+						writeResponse(serviceChannel,ResponseType.USER_NOT_REGISTERED,null);
+						System.out.println(ResponseType.USER_NOT_REGISTERED);
+					}
+				} else{
+					writeResponse(serviceChannel,ResponseType.USER_NOT_REGISTERED,null);
+					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}
 				break;
 			case NEW_GAME:
@@ -222,15 +251,20 @@ public class DraughtsServer extends Thread {
 						newGame.playerRedMove=playerMap.get(command.player).playerMove;
 						gameMap.put(command.gameName, newGame);
 						writeResponse(serviceChannel,ResponseType.GAME_CREATED,newGame.getID());
+						System.out.println(ResponseType.GAME_CREATED);
 					}
-					else
+					else{
 						writeResponse(serviceChannel,ResponseType.GAME_EXISTS,null);
+						System.out.println(ResponseType.GAME_EXISTS);
+					}
+
 				}
 				break;
 			case AVAILABLE_GAMES:
 				if (serviceChannel.isOpen()){
 					String[] gameList=(String[]) (gameMap.keySet()).toArray();
-					writeResponse(serviceChannel,ResponseType.GAME_LIST,gameList);			
+					writeResponse(serviceChannel,ResponseType.GAME_LIST,gameList);
+					System.out.println(ResponseType.GAME_LIST);
 				}
 				break;
 			case JOIN_GAME:
@@ -242,11 +276,13 @@ public class DraughtsServer extends Thread {
 							Player playerRed=gameMap.get(command.gameName).playerRedMove.player;
 							writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
 							writeResponse(serviceChannel,ResponseType.GAME_READY,playerRed.getLogin());
+							System.out.println(ResponseType.GAME_READY);
 						}
 					}
 				}
 				else {
 					writeResponse(serviceChannel,ResponseType.USER_NOT_REGISTERED,null);
+					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}
 				break;
 			case GAME_MOVE:
@@ -257,32 +293,73 @@ public class DraughtsServer extends Thread {
 			case END_CONNECTION:
 				break;
 			}
+		}
 	}
 
 
 	private void writeResponse(SocketChannel socketChannel,ResponseType response, Object object){
+		ByteBuffer writeBuffer=ByteBuffer.allocate(BUFFSIZE);
+
 		ServerResponsePackage responsePackage=new ServerResponsePackage();
 		responsePackage.response=response;
 		responsePackage.object=object;
-		ByteArrayOutputStream bos=new ByteArrayOutputStream();
-		ObjectOutputStream oos;
 		try {
-			oos=new ObjectOutputStream(bos);
+			ByteArrayOutputStream bos=new ByteArrayOutputStream();
+			ObjectOutputStream oos=new ObjectOutputStream(bos);
+
 			oos.writeObject(PackageLimiterType.PACKAGE_BEGIN);
 			oos.writeObject(responsePackage);
 			oos.writeObject(PackageLimiterType.PACKAGE_END);
 			oos.flush();
-			socketChannel.write(ByteBuffer.wrap(bos.toByteArray()));
+
+			writeBuffer.putInt(bos.toByteArray().length);
+			writeBuffer.put(bos.toByteArray());
+			writeBuffer.flip();
+			socketChannel.write(writeBuffer);
+			writeBuffer.clear();
 		} catch (IOException e){
 			e.printStackTrace();
-		}
+		} 
 	}
 	synchronized void addToDatabase (GameInfo gameInfo, TurnInfo turnInfo){
 
 	}
 
 	public static void main(String[] args) {
-		DraughtsServer server=new DraughtsServer("127.0.0.1",50000);
+		System.out.println("Podaj adres ip i port");
+
+		String ipS=new String();
+		try {
+			byte[] ip=new byte[16];
+			System.out.println("ip:");
+			System.in.read(ip);
+			for (int i=0;i<16;++i)
+				if((char)ip[i]!='\n')
+					ipS+=(char)ip[i];
+				else
+					break;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		int port=-1;
+		try {
+			char [] cbuf=new char[5];
+			System.out.println("port:");
+			InputStreamReader dis=new InputStreamReader(System.in);
+			dis.read(cbuf);
+			String tmp=new String();
+			for (int i=0;i<5;++i)
+				tmp+=cbuf[i];
+			port=Integer.parseInt(tmp);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println(ipS);
+		System.out.println(Integer.toString(port));
+		DraughtsServer server=new DraughtsServer(ipS,port);
+
 		server.establishConnection();
 		server.start();
 	}

@@ -184,8 +184,7 @@ public class Play extends Thread {
 					break;
 				case FREE:
 					break;
-				}
-				
+				}	
 			}
 		}
 	}

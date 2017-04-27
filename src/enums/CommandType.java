@@ -16,6 +16,7 @@ package enums;
 */
 public enum CommandType {
 	REGISTER_NEW_USER,
+	USER_RECONNECT,
 	NEW_GAME,
 	AVAILABLE_GAMES,
 	JOIN_GAME,
