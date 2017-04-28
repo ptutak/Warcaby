@@ -71,9 +71,10 @@ public class LoginWindowController {
 			ResponseType resp=client.registerUser(login);
 			if (resp==ResponseType.USER_REGISTERED){
 				stage.setScene(mainScene);
-				
 			} else if (resp==ResponseType.USER_EXISTS){
 				infoLabel.setText("User exists");
+			} else{
+				infoLabel.setText("Server not responding, or no connection to the server, Try again.");
 			}
 		}
 	}

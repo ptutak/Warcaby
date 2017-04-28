@@ -27,8 +27,7 @@ public class UserCommandPackage implements Serializable{
 	public Player player;
 	public String gameName;
 	public UUID gameID;
-	public BoardBounds boardBounds;
-	public int rowNumber;
 	public PlayerMoveType playerMoveType;
 	public Move move;	
+	public Object attachment;
 }

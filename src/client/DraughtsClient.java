@@ -17,7 +17,6 @@ import enums.CommandType;
 import enums.PackageLimiterType;
 import enums.PlayerMoveType;
 import enums.ResponseType;
-import general.BoardBounds;
 import general.Move;
 import general.Player;
 import general.ServerResponsePackage;
@@ -39,8 +38,6 @@ public class DraughtsClient {
 	private Player player=null;
 	private String gameName=null;
 	private UUID gameID=null;
-	private BoardBounds boardBounds=null;
-	private int rowNumber=0;
 	private PlayerMoveType playerMoveType=null;
 	private Move move=null;
 
@@ -77,7 +74,7 @@ public class DraughtsClient {
 		if (socketChannel==null)
 			return null;
 		player=new Player(login);
-		writeCommand(socketChannel,CommandType.REGISTER_NEW_USER);
+		writeCommand(socketChannel,CommandType.REGISTER_NEW_USER,null);
 		ServerResponsePackage response=checkResponse(socketChannel);
 		if (response!=null)
 			if (response.response==ResponseType.USER_REGISTERED){
@@ -183,12 +180,11 @@ public class DraughtsClient {
 		establishConnection(serverIp,serverPort);
 	}
 
-	private void writeCommand(SocketChannel socketChannel,CommandType command){
+	private void writeCommand(SocketChannel socketChannel,CommandType command,Object object){
 		UserCommandPackage commandPackage=new UserCommandPackage();
 		commandPackage.commandType=command;
 		commandPackage.player=player;
-		commandPackage.boardBounds=boardBounds;
-		commandPackage.rowNumber=rowNumber;
+		commandPackage.attachment=object;
 		commandPackage.gameName=gameName;
 		commandPackage.gameID=gameID;
 		commandPackage.move=move;

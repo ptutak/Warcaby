@@ -39,6 +39,7 @@ import general.Player;
 import general.PlayerMove;
 import general.ServerResponsePackage;
 import general.UserCommandPackage;
+import general.BoardInfo;
 import enums.GameStatusType;
 import enums.PackageLimiterType;
 
@@ -49,8 +50,10 @@ public class DraughtsServer extends Thread {
 	private int port;
 
 	final int BUFFSIZE=4096;
-	long responseTime=500;
+	ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
+	ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
 
+	long responseTime=500;
 
 	private ServerSocketChannel serverSocketChannel = null;
 	private Selector selector = null;
@@ -127,8 +130,6 @@ public class DraughtsServer extends Thread {
 	}
 
 	private UserCommandPackage checkCommand(SocketChannel socketChannel){
-		ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
-		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
 
 		//		System.out.println("Check func begin");
 		if (!socketChannel.isOpen())
@@ -204,8 +205,8 @@ public class DraughtsServer extends Thread {
 				break;
 			}	
 		}
-		//		safeBuffer.clear();
-		//		readBuffer.clear();
+		safeBuffer.clear();
+		readBuffer.clear();
 		return command;
 	}
 
@@ -246,8 +247,8 @@ public class DraughtsServer extends Thread {
 				if (playerMap.containsKey(command.player)){
 					if (!gameMap.containsKey(command.gameName)){
 						GameInfo newGame=new GameInfo(command.gameName);
-						newGame.setBoardBounds(command.boardBounds);
-						newGame.setRowNumber(command.rowNumber);
+						newGame.setBoardBounds(((BoardInfo)command.attachment).boardBounds);
+						newGame.setRowNumber(((BoardInfo)command.attachment).rowNumber);
 						newGame.playerRedMove=playerMap.get(command.player).playerMove;
 						gameMap.put(command.gameName, newGame);
 						writeResponse(serviceChannel,ResponseType.GAME_CREATED,newGame.getID());

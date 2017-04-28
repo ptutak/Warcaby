@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 public class DraughtsClientGui extends Application {
 	
-	private static MainWindowController mainWindowController;
+//	private static MainWindowController mainWindowController;
 	private LoginWindowController loginWindowController;
 	
 	private static DraughtsClient client;
@@ -23,7 +23,7 @@ public class DraughtsClientGui extends Application {
 	public void start(Stage stage) throws Exception {
 		FXMLLoader loaderMain=new FXMLLoader(this.getClass().getResource("mainWindow.fxml"));
 		Parent mainNode=loaderMain.load();
-		mainWindowController=loaderMain.getController();
+//		mainWindowController=loaderMain.getController();
 		Scene mainScene=new Scene(mainNode);
 
 		FXMLLoader loaderLogin=new FXMLLoader(this.getClass().getResource("mainWindow.fxml"));
