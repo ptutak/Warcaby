@@ -5,9 +5,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import server.GameInfo;
 
 public class gameListWindowController {
@@ -20,12 +21,14 @@ public class gameListWindowController {
 	@FXML private TableColumn<GameInfo, String> playerRedCol;
 	@FXML private TableColumn<GameInfo, String> turnTimeLimitCol;
 	@FXML private TableColumn<GameInfo, String> gameTimeLimitCol;
-	@FXML private ListView<GameInfo> gameTableView;
+	@FXML private TableView<GameInfo> gameTableView;
 	
 	@FXML private Button newGameButton;
 	@FXML private Button joinGameButton;
 	@FXML private Button refreshButton;
 	@FXML private Button cancelButton;
+	
+	@FXML private AnchorPane gameManager;
 	
 	
 	public void gameAdd(GameInfo gameInfo){
@@ -35,6 +38,21 @@ public class gameListWindowController {
 		gameList.remove(gameInfo);
 	}
 	
+	public void newGameButtonClick(){
+		
+	}
+	
+	public void joinGameButtonClick(){
+		
+	}
+	
+	public void refreshButtonClick(){
+		
+	}
+	
+	public void cancelButtonClick(){
+		
+	}
 	@FXML public void initialize(){
 		gameTableView.setItems(gameList);
 		gameNameCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("gameName"));

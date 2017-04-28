@@ -8,10 +8,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 public class LoginWindowController {
-	
+	@FXML private AnchorPane loginWindow;
 	@FXML private TextField loginTextField;
 	@FXML private TextField ipTextField;
 	@FXML private TextField portTextField;
