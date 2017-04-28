@@ -39,6 +39,9 @@ public class gameListWindowController {
 		gameTableView.setItems(gameList);
 		gameNameCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("gameName"));
 		rowNumberCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("rowNumber"));
+		playerRedCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("playerRed"));
+		turnTimeLimitCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("turnTimeLimit"));
+		gameTimeLimitCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("gameTimeLimit"));
 	}
 
 }
