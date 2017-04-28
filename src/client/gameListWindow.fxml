@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane fx:id="gameManager" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.gameListWindowController">
+   <children>
+      <TextField layoutX="629.0" layoutY="156.0" prefHeight="25.0" prefWidth="138.0" />
+      <Button fx:id="newGameButton" layoutX="629.0" layoutY="241.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="138.0" text="New Game" />
+      <Button fx:id="joinGameButton" layoutX="629.0" layoutY="322.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="138.0" text="Join Game" />
+      <Button fx:id="refreshButton" layoutX="629.0" layoutY="401.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="138.0" text="Refresh" />
+      <Button fx:id="cancelButton" layoutX="629.0" layoutY="478.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="138.0" text="Cancel" />
+      <TableView fx:id="gameTableView" prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
+        <columns>
+          <TableColumn fx:id="gameNameCol" editable="false" prefWidth="118.0" text="Game Name" />
+          <TableColumn fx:id="rowNumberCol" editable="false" prefWidth="112.0" text="Row Number" />
+            <TableColumn fx:id="playerRedCol" editable="false" prefWidth="75.0" text="Player Red" />
+            <TableColumn fx:id="turnTimeLimitCol" editable="false" prefWidth="144.0" text="Turn Time Limit" />
+            <TableColumn fx:id="gameTimeLimitCol" editable="false" minWidth="6.0" prefWidth="128.0" text="Game Time Limit" />
+        </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+      <Label fx:id="infoLabel" layoutX="629.0" layoutY="59.0" prefHeight="52.0" prefWidth="138.0" text="Join or create a game." textAlignment="CENTER" wrapText="true" />
+   </children>
+</AnchorPane>

@@ -30,6 +30,8 @@ public class GameInfo {
 	private ArrayList<ColPiece> boardState;
 	private BoardBounds boardBounds;
 	private int rowNumber;
+	private int turnTimeLimit;
+	private int gameTimeLimit;
 
 	public PlayerMove playerRedMove;
 	public PlayerMove playerGreenMove;
@@ -44,8 +46,26 @@ public class GameInfo {
 		playerRedMove=null;
 		playerGreenMove=null;
 		winner=null;
+		turnTimeLimit=0;
+		gameTimeLimit=0;
 	}
 	
+	public int getTurnTimeLimit() {
+		return turnTimeLimit;
+	}
+
+	public int getGameTimeLimit() {
+		return gameTimeLimit;
+	}
+
+	public void setTurnTimeLimit(int turnTimeLimit) {
+		this.turnTimeLimit = turnTimeLimit;
+	}
+
+	public void setGameTimeLimit(int gameTimeLimit) {
+		this.gameTimeLimit = gameTimeLimit;
+	}
+
 	public int getRowNumber() {
 		return rowNumber;
 	}
@@ -85,6 +105,11 @@ public class GameInfo {
 	public synchronized void setBoardBounds(BoardBounds boardBounds) {
 		this.boardBounds = boardBounds;
 	}
+
+	public String getPlayerRed(){
+		return playerRedMove.player.getLogin();
+	}
+	
 
 	@Override
 	public int hashCode() {
