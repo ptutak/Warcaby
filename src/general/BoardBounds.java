@@ -20,7 +20,7 @@ public class BoardBounds {
 	public int colStart;
 	public int colStop;
 	
-	BoardBounds(){
+	public BoardBounds(){
 		rowStart=1;
 		rowStop=8;
 		colStart=1;

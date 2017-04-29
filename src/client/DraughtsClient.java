@@ -17,6 +17,7 @@ import enums.CommandType;
 import enums.PackageLimiterType;
 import enums.PlayerMoveType;
 import enums.ResponseType;
+import general.BoardInfo;
 import general.Move;
 import general.Player;
 import general.ServerResponsePackage;
@@ -108,8 +109,10 @@ public class DraughtsClient {
 		return null;
 	}
 	
-	public void newGame(String gameName, int gameRows, int rowColumns){
+	public void newGame(String gameName, int rowNumber, int rowColumns){
 		if (socketChannel!=null){
+			BoardInfo info=new BoardInfo();
+			writeCommand(socketChannel, CommandType.NEW_GAME, info);
 			
 		}
 		

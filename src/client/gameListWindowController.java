@@ -55,7 +55,7 @@ public class GameListWindowController {
 	public void gameRemove(GameInfo gameInfo){
 		gameList.remove(gameInfo);
 	}
-	public void updateList(){
+	private void updateList(){
 		this.gameList.setAll(client.getGameList());
 	}
 	
@@ -63,12 +63,13 @@ public class GameListWindowController {
 	private void newGameButtonClick(){
 		String gameName=gameNameTextField.getText();
 		if (!gameName.equals("")){
+			client.newGame(gameName, 3, 8);
 			
 		}
 	}
 	@FXML
 	private void joinGameButtonClick(){
-		
+		String gameName=gameNameTextField.getText();
 	}
 	@FXML
 	private void refreshButtonClick(){
@@ -76,7 +77,7 @@ public class GameListWindowController {
 	}
 	@FXML
 	private void quitButtonClick(){
-		
+		System.exit(0);
 	}
 	@FXML public void initialize(){
 		gameTableView.setItems(gameList);

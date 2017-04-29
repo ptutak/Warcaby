@@ -256,12 +256,11 @@ public class DraughtsServer extends Thread {
 						writeResponse(serviceChannel,ResponseType.GAME_EXISTS,null);
 						System.out.println(ResponseType.GAME_EXISTS);
 					}
-
 				}
 				break;
 			case AVAILABLE_GAMES:
 				if (serviceChannel.isOpen()){
-					GameInfo[] gameList=(GameInfo[]) (gameMap.values()).toArray();
+					GameInfo[] gameList=gameMap.values().toArray(new GameInfo[0]);
 					writeResponse(serviceChannel,ResponseType.GAME_LIST,gameList);
 					System.out.println(ResponseType.GAME_LIST);
 				}
@@ -334,16 +333,16 @@ public class DraughtsServer extends Thread {
 	public static void main(String[] args) {
 		System.out.println("Podaj adres ip i port");
 
-		String ipS=new String();
-		int port=-1;
+		String ipS=new String("127.0.0.1");
+		int port=50000;
 		
-		ipS=System.console().readLine();
+/*		ipS=System.console().readLine();
 		port=Integer.parseInt(System.console().readLine());
 	
 		System.out.println(ipS);
 		System.out.println(Integer.toString(port));
 		new InetSocketAddress(ipS, port);
-
+*/
 		DraughtsServer server=new DraughtsServer(ipS,port);
 
 		server.establishConnection();

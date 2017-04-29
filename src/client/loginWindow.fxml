@@ -7,13 +7,13 @@
 
 <AnchorPane fx:id="loginWindow" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.LoginWindowController">
    <children>
-      <Button fx:id="connectLoginButton" layoutX="243.0" layoutY="256.0" mnemonicParsing="false" onMouseClicked="#connectLoginButtonClick" text="Connect and login" />
+      <TextField fx:id="ipTextField" layoutX="226.0" layoutY="91.0" />
+      <TextField fx:id="portTextField" layoutX="226.0" layoutY="140.0" />
       <TextField fx:id="loginTextField" layoutX="226.0" layoutY="188.0" />
+      <Button fx:id="connectLoginButton" layoutX="243.0" layoutY="256.0" mnemonicParsing="false" onMouseClicked="#connectLoginButtonClick" text="Connect and login" />
       <Label layoutX="147.0" layoutY="192.0" text="login:" />
       <Label layoutX="148.0" layoutY="144.0" text="port:" />
       <Label layoutX="148.0" layoutY="95.0" text="ip:" />
       <Label fx:id="infoLabel" layoutX="228.0" layoutY="36.0" text="Enter server data and login:" wrapText="true" />
-      <TextField fx:id="ipTextField" layoutX="226.0" layoutY="91.0" />
-      <TextField fx:id="portTextField" layoutX="226.0" layoutY="140.0" />
    </children>
 </AnchorPane>
