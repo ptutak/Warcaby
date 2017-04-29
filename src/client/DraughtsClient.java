@@ -42,6 +42,11 @@ public class DraughtsClient {
 	private PlayerMoveType playerMoveType=null;
 	private Move move=null;
 
+	private String oppositePlayer;
+
+	public String getOppositePlayer() {
+		return oppositePlayer;
+	}
 
 	public boolean establishConnection(String ip, int port){
 		try {
@@ -86,17 +91,21 @@ public class DraughtsClient {
 		return null;
 	}
 	
-	public void joinGame(String gameName){
+	public ResponseType joinGame(String gameName){
 		if (socketChannel!=null){
 			this.gameName=gameName;
 			writeCommand(socketChannel,CommandType.JOIN_GAME,null);
 			ServerResponsePackage response=checkResponse(socketChannel);
 			if (response!=null){
 				if (response.response==ResponseType.GAME_JOINED){
-					
+					oppositePlayer=(String)response.object;
+					return ResponseType.GAME_JOINED;
+				} else if (response.response==ResponseType.WRONG_GAME_NAME){
+					return ResponseType.WRONG_GAME_NAME;
 				}
 			}
 		}
+		return null;
 	}
 	
 	public void newGame(String gameName, int gameRows, int rowColumns){

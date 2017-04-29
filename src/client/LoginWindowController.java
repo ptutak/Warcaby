@@ -24,10 +24,10 @@ public class LoginWindowController {
 	
 	private Stage stage;
 	private DraughtsClient client;
-	private Scene mainScene;
+	private Scene gameListScene;
 	
-	public synchronized void setMainScene(Scene mainScene) {
-		this.mainScene = mainScene;
+	public synchronized void setGameListScene(Scene gameListScene) {
+		this.gameListScene = gameListScene;
 	}
 
 	public synchronized void setStage(Stage stage) {
@@ -71,7 +71,7 @@ public class LoginWindowController {
 		if (connectionEstablished){
 			ResponseType resp=client.registerUser(login);
 			if (resp==ResponseType.USER_REGISTERED){
-				stage.setScene(mainScene);
+				stage.setScene(gameListScene);
 			} else if (resp==ResponseType.USER_EXISTS){
 				infoLabel.setText("User exists");
 			} else{

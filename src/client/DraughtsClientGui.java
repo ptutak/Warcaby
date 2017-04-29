@@ -10,7 +10,7 @@ public class DraughtsClientGui extends Application {
 	
 //	private static MainWindowController mainWindowController;
 	private LoginWindowController loginWindowController;
-	
+	private GameListWindowController gameListWindowController;
 	private static DraughtsClient client;
 	
 	public DraughtsClientGui(){
@@ -26,19 +26,30 @@ public class DraughtsClientGui extends Application {
 //		mainWindowController=loaderMain.getController();
 		Scene mainScene=new Scene(mainNode);
 
-		FXMLLoader loaderLogin=new FXMLLoader(this.getClass().getResource("mainWindow.fxml"));
+		FXMLLoader loaderLogin=new FXMLLoader(this.getClass().getResource("loginWindow.fxml"));
 		Parent loginNode=loaderLogin.load();
 		loginWindowController=loaderLogin.getController();
 		loginWindowController.setClient(client);
-		loginWindowController.setMainScene(mainScene);
 		loginWindowController.setStage(stage);
 		Scene loginScene=new Scene(loginNode);
 		
-		
+		FXMLLoader loaderList=new FXMLLoader(this.getClass().getResource("gameListWindow.fxml"));
+		Parent gameListNode=loaderList.load();
+		gameListWindowController=loaderList.getController();
+		gameListWindowController.setClient(client);
+		gameListWindowController.setStage(stage);
+		Scene gameListScene=new Scene(gameListNode);
+		loginWindowController.setGameListScene(gameListScene);
+			
 		
 		stage.setScene(loginScene);
 
 		stage.show();
+	}
+	
+	public static void main(String[] args){
+		DraughtsClientGui client=new DraughtsClientGui();
+		Application.launch(client.getClass());
 	}
 
 }
