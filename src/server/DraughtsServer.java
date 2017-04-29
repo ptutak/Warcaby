@@ -335,35 +335,15 @@ public class DraughtsServer extends Thread {
 		System.out.println("Podaj adres ip i port");
 
 		String ipS=new String();
-		try {
-			byte[] ip=new byte[16];
-			System.out.println("ip:");
-			System.in.read(ip);
-			for (int i=0;i<16;++i)
-				if((char)ip[i]!='\n')
-					ipS+=(char)ip[i];
-				else
-					break;
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		int port=-1;
-		try {
-			char [] cbuf=new char[5];
-			System.out.println("port:");
-			InputStreamReader dis=new InputStreamReader(System.in);
-			dis.read(cbuf);
-			String tmp=new String();
-			for (int i=0;i<5;++i)
-				tmp+=cbuf[i];
-			port=Integer.parseInt(tmp);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		
+		ipS=System.console().readLine();
+		port=Integer.parseInt(System.console().readLine());
+	
 		System.out.println(ipS);
 		System.out.println(Integer.toString(port));
+		new InetSocketAddress(ipS, port);
+
 		DraughtsServer server=new DraughtsServer(ipS,port);
 
 		server.establishConnection();
