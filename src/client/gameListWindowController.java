@@ -7,11 +7,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import server.GameInfo;
 
 public class gameListWindowController {
+	
+	private DraughtsClient client;
 	
 	@FXML private Label infoLabel;
 	
@@ -26,31 +29,43 @@ public class gameListWindowController {
 	@FXML private Button newGameButton;
 	@FXML private Button joinGameButton;
 	@FXML private Button refreshButton;
-	@FXML private Button cancelButton;
+	@FXML private Button quitButton;
+	
+	@FXML private TextField gameNameTextField;
 	
 	@FXML private AnchorPane gameManager;
 	
-	
+
+	public synchronized void setClient(DraughtsClient client) {
+		this.client = client;
+	}
 	public void gameAdd(GameInfo gameInfo){
 		gameList.add(gameInfo);
 	}
 	public void gameRemove(GameInfo gameInfo){
 		gameList.remove(gameInfo);
 	}
-	
-	public void newGameButtonClick(){
-		
+	public void updateList(GameInfo[] gameList){
+		this.gameList.setAll(gameList);
 	}
 	
-	public void joinGameButtonClick(){
+	@FXML
+	private void newGameButtonClick(){
+		String gameName=gameNameTextField.getText();
+		if (!gameName.equals("")){
+			
+		}
+	}
+	@FXML
+	private void joinGameButtonClick(){
 		
 	}
-	
-	public void refreshButtonClick(){
-		
+	@FXML
+	private void refreshButtonClick(){
+		updateList(client.getGameList());
 	}
-	
-	public void cancelButtonClick(){
+	@FXML
+	private void quitButtonClick(){
 		
 	}
 	@FXML public void initialize(){

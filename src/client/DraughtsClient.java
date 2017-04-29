@@ -21,6 +21,7 @@ import general.Move;
 import general.Player;
 import general.ServerResponsePackage;
 import general.UserCommandPackage;
+import server.GameInfo;
 
 public class DraughtsClient {
 
@@ -32,7 +33,7 @@ public class DraughtsClient {
 
 	private final int BUFFSIZE=4096;
 	private ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
-	private ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
+	private ByteBuffer safeBuffer=ByteBuffer.allocate(16*BUFFSIZE);
 	private ByteBuffer writeBuffer=ByteBuffer.allocate(BUFFSIZE);
 
 	private Player player=null;
@@ -82,6 +83,40 @@ public class DraughtsClient {
 				return ResponseType.USER_REGISTERED;
 			} else if(response.response==ResponseType.USER_EXISTS)
 				return ResponseType.USER_EXISTS;
+		return null;
+	}
+	
+	public void joinGame(String gameName){
+		if (socketChannel!=null){
+			this.gameName=gameName;
+			writeCommand(socketChannel,CommandType.JOIN_GAME,null);
+			ServerResponsePackage response=checkResponse(socketChannel);
+			if (response!=null){
+				if (response.response==ResponseType.GAME_JOINED){
+					
+				}
+			}
+		}
+	}
+	
+	public void newGame(String gameName, int gameRows, int rowColumns){
+		if (socketChannel!=null){
+			
+		}
+		
+	}
+	
+	public GameInfo[] getGameList(){
+		if (socketChannel!=null){
+			writeCommand(socketChannel,CommandType.AVAILABLE_GAMES,null);
+			ServerResponsePackage response=checkResponse(socketChannel);
+			if (response!=null){
+				if (response.response==ResponseType.GAME_LIST){
+					return (GameInfo[]) response.object;
+				}
+			}
+			return null;
+		}
 		return null;
 	}
 
@@ -164,6 +199,8 @@ public class DraughtsClient {
 		safeBuffer.clear();
 		return response;
 	}
+	
+
 
 	public void closeConnection(){
 		if (socketChannel!=null)

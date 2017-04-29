@@ -263,7 +263,7 @@ public class DraughtsServer extends Thread {
 				break;
 			case AVAILABLE_GAMES:
 				if (serviceChannel.isOpen()){
-					String[] gameList=(String[]) (gameMap.keySet()).toArray();
+					GameInfo[] gameList=(GameInfo[]) (gameMap.values()).toArray();
 					writeResponse(serviceChannel,ResponseType.GAME_LIST,gameList);
 					System.out.println(ResponseType.GAME_LIST);
 				}
@@ -273,14 +273,21 @@ public class DraughtsServer extends Thread {
 					if (gameMap.containsKey(command.gameName) && gameMap.get(command.gameName).getID().equals(command.gameID)){
 						if (gameMap.get(command.gameName).getGameStatus().equals(GameStatusType.GAME_WAITING)){
 							gameMap.get(command.gameName).playerGreenMove=playerMap.get(command.player).playerMove;
-							gameMap.get(command.gameName).setGameStatus(GameStatusType.GAME_READY);
+							
 							Player playerRed=gameMap.get(command.gameName).playerRedMove.player;
+							writeResponse(serviceChannel,ResponseType.GAME_JOINED,playerRed.getLogin());
 							writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
-							writeResponse(serviceChannel,ResponseType.GAME_READY,playerRed.getLogin());
+							
+							gameMap.get(command.gameName).setGameStatus(GameStatusType.GAME_READY);
+							System.out.println(ResponseType.GAME_JOINED);
 							System.out.println(ResponseType.GAME_READY);
 						}
 					}
-				}
+					else {
+						writeResponse(serviceChannel,ResponseType.WRONG_GAME_NAME,null);
+						System.out.println(ResponseType.WRONG_GAME_NAME);
+					}
+				} 
 				else {
 					writeResponse(serviceChannel,ResponseType.USER_NOT_REGISTERED,null);
 					System.out.println(ResponseType.USER_NOT_REGISTERED);
