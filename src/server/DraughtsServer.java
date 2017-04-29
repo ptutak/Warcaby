@@ -76,8 +76,6 @@ public class DraughtsServer extends Thread {
 	public DraughtsServer(String host, int port ) {
 		this.host=host;
 		this.port=port;
-
-
 	}
 
 	public void establishConnection(){

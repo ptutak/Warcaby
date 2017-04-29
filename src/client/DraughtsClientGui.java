@@ -14,9 +14,7 @@ public class DraughtsClientGui extends Application {
 	private static DraughtsClient client;
 	
 	public DraughtsClientGui(){
-		if(client==null){
-			client = new DraughtsClient();
-		}
+		client = new DraughtsClient();
 	}
 	
 	@Override

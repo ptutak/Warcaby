@@ -55,8 +55,8 @@ public class GameListWindowController {
 	public void gameRemove(GameInfo gameInfo){
 		gameList.remove(gameInfo);
 	}
-	public void updateList(GameInfo[] gameList){
-		this.gameList.setAll(gameList);
+	public void updateList(){
+		this.gameList.setAll(client.getGameList());
 	}
 	
 	@FXML
@@ -72,7 +72,7 @@ public class GameListWindowController {
 	}
 	@FXML
 	private void refreshButtonClick(){
-		updateList(client.getGameList());
+		updateList();
 	}
 	@FXML
 	private void quitButtonClick(){
@@ -85,7 +85,6 @@ public class GameListWindowController {
 		playerRedCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("playerRed"));
 		turnTimeLimitCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("turnTimeLimit"));
 		gameTimeLimitCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("gameTimeLimit"));
-		updateList(client.getGameList());
 	}
 
 }
