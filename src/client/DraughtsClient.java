@@ -236,7 +236,15 @@ public class DraughtsClient {
 	}
 	
 	public void reconnect(){
+		try {
+			socketChannel.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		socketChannel=null;
 		establishConnection(serverIp,serverPort);
+		registerUser(player.getLogin());
 	}
 
 	private void writeCommand(SocketChannel socketChannel,CommandType command,Object object){
@@ -260,6 +268,9 @@ public class DraughtsClient {
 			writeBuffer.flip();
 			socketChannel.write(writeBuffer);
 			writeBuffer.clear();
+		} catch (ClosedChannelException e){
+			reconnect();
+			e.printStackTrace();
 		} catch (IOException e){
 			e.printStackTrace();
 		}
@@ -271,7 +282,6 @@ public class DraughtsClient {
 		System.out.println(response);
 		ResponseType resp=client.registerUser("piotr");
 		System.out.println(resp);
-		
 		//		client.closeConnection();
 		while(true);
 	}

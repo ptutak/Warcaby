@@ -1,4 +1,7 @@
 package general;
+
+import java.io.Serializable;
+
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -14,7 +17,11 @@ package general;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public class BoardBounds {
+public class BoardBounds implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1917974409260687929L;
 	public int rowStart;
 	public int rowStop;
 	public int colStart;
