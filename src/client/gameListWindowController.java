@@ -3,6 +3,7 @@ package client;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -10,11 +11,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import server.GameInfo;
 
-public class gameListWindowController {
+public class GameListWindowController {
 	
 	private DraughtsClient client;
+	private Stage stage;
+	private Scene mainScene;
 	
 	@FXML private Label infoLabel;
 	
@@ -36,6 +40,12 @@ public class gameListWindowController {
 	@FXML private AnchorPane gameManager;
 	
 
+	public synchronized void setStage(Stage stage) {
+		this.stage = stage;
+	}
+	public synchronized void setMainScene(Scene mainScene) {
+		this.mainScene = mainScene;
+	}
 	public synchronized void setClient(DraughtsClient client) {
 		this.client = client;
 	}
@@ -75,6 +85,7 @@ public class gameListWindowController {
 		playerRedCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("playerRed"));
 		turnTimeLimitCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("turnTimeLimit"));
 		gameTimeLimitCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("gameTimeLimit"));
+		updateList(client.getGameList());
 	}
 
 }
