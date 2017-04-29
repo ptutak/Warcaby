@@ -109,13 +109,23 @@ public class DraughtsClient {
 		return null;
 	}
 	
-	public void newGame(String gameName, int rowNumber, int rowColumns){
+	public ResponseType newGame(String gameName, int rowNumber, int rowColumns){
 		if (socketChannel!=null){
+			this.gameName=gameName;
 			BoardInfo info=new BoardInfo();
 			writeCommand(socketChannel, CommandType.NEW_GAME, info);
-			
+			ServerResponsePackage response=checkResponse(socketChannel);
+			if (response!=null){
+				if (response.response==ResponseType.GAME_CREATED){
+					this.gameID=(UUID)response.object;
+					return ResponseType.GAME_CREATED;
+				} else if (response.response==ResponseType.GAME_EXISTS){
+					this.gameName=null;
+					return ResponseType.GAME_EXISTS;
+				}
+			}
 		}
-		
+		return null;
 	}
 	
 	public GameInfo[] getGameList(){
@@ -225,7 +235,7 @@ public class DraughtsClient {
 			}
 	}
 	
-	private void reconnect(){
+	public void reconnect(){
 		establishConnection(serverIp,serverPort);
 	}
 

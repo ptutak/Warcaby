@@ -1,5 +1,6 @@
 package client;
 
+import enums.ResponseType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -63,8 +64,14 @@ public class GameListWindowController {
 	private void newGameButtonClick(){
 		String gameName=gameNameTextField.getText();
 		if (!gameName.equals("")){
-			client.newGame(gameName, 3, 8);
-			
+			ResponseType response=client.newGame(gameName, 3, 8);
+			if (response==ResponseType.GAME_CREATED){
+				stage.setScene(mainScene);
+			} else if (response==ResponseType.GAME_EXISTS){
+				infoLabel.setText("Game with this name already exists");
+			} else {
+				infoLabel.setText("Connection error");
+			}
 		}
 	}
 	@FXML
