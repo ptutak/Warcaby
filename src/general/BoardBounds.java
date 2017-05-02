@@ -28,10 +28,10 @@ public class BoardBounds implements Serializable {
 	public int colStop;
 	
 	public BoardBounds(){
-		rowStart=1;
-		rowStop=8;
-		colStart=1;
-		colStop=8;
+		rowStart=0;
+		rowStop=7;
+		colStart=0;
+		colStop=7;
 	}
 	public BoardBounds(int rowStart, int rowStop, int colStart, int colStop){
 		this.rowStart=rowStart;

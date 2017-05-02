@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 public class DraughtsClientGui extends Application {
 	
-//	private static MainWindowController mainWindowController;
+//	private MainWindowController mainWindowController;
 	private LoginWindowController loginWindowController;
 	private GameListWindowController gameListWindowController;
 	private static DraughtsClient client;
@@ -38,9 +38,11 @@ public class DraughtsClientGui extends Application {
 		gameListWindowController.setStage(stage);
 		Scene gameListScene=new Scene(gameListNode);
 		loginWindowController.setGameListScene(gameListScene);
-			
+		gameListWindowController.setMainScene(mainScene);
 		
-		stage.setScene(loginScene);
+		stage.setResizable(false);
+
+		stage.setScene(mainScene);
 
 		stage.show();
 	}
