@@ -99,8 +99,8 @@ public class DraughtsServer extends Thread {
 	private boolean removePlayer(SocketChannel channel){
 		for (PlayerService x:playerMap.values()){
 			if (x.channel.equals(channel)){
-				playerLoginSet.remove(x.playerMove.player);
-				return playerMap.remove(x.playerMove.player, x);
+				if (playerLoginSet.remove(x.playerMove.player.getLogin()))
+					return playerMap.remove(x.playerMove.player, x);
 			}
 		}
 		return false;
@@ -315,9 +315,15 @@ public class DraughtsServer extends Thread {
 				break;
 			case END_CONNECTION:
 				if (playerMap.containsKey(command.player)){
-					playerLoginSet.remove(command.player.getLogin());
-					playerMap.remove(command.player);
 					writeResponse(serviceChannel,ResponseType.CONNECTION_ENDED,null);
+					playerLoginSet.remove(command.player.getLogin());
+					try {
+						playerMap.get(command.player).channel.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					playerMap.remove(command.player);
 					System.out.println(ResponseType.CONNECTION_ENDED);
 				}
 				break;
