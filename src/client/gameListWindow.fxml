@@ -11,7 +11,7 @@
       <Button fx:id="joinGameButton" layoutX="629.0" layoutY="322.0" mnemonicParsing="false" onMouseClicked="#joinGameButtonClick" prefHeight="38.0" prefWidth="138.0" text="Join Game" />
       <Button fx:id="refreshButton" layoutX="629.0" layoutY="401.0" mnemonicParsing="false" onMouseClicked="#refreshButtonClick" prefHeight="38.0" prefWidth="138.0" text="Refresh" />
       <Button fx:id="quitButton" layoutX="629.0" layoutY="478.0" mnemonicParsing="false" onMouseClicked="#quitButtonClick" prefHeight="38.0" prefWidth="138.0" text="Quit" />
-      <TableView fx:id="gameTableView" prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
+      <TableView fx:id="gameTableView" onMouseClicked="#tableViewClick" prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
         <columns>
           <TableColumn fx:id="gameNameCol" editable="false" prefWidth="118.0" text="Game Name" />
           <TableColumn fx:id="rowNumberCol" editable="false" prefWidth="112.0" text="Row Number" />

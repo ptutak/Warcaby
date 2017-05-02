@@ -96,9 +96,23 @@ public class DraughtsServer extends Thread {
 		serviceConnections();
 	}
 	
+	private void gameEnd(GameInfo game){
+		
+		
+	}
+	
 	private boolean removePlayer(SocketChannel channel){
 		for (PlayerService x:playerMap.values()){
 			if (x.channel.equals(channel)){
+				String[] ks = new String[gameMap.size()];
+				gameMap.keySet().toArray(ks);
+				for (String game:ks){
+					if (gameMap.containsKey(game))
+						if ((gameMap.get(game).playerRedMove.player.equals(x.playerMove.player)) || (gameMap.get(game).playerGreenMove!=null && gameMap.get(game).playerGreenMove.player.equals(x.playerMove.player))) {
+							gameEnd(gameMap.get(game));
+							gameMap.remove(game);
+						} 
+				}
 				if (playerLoginSet.remove(x.playerMove.player.getLogin()))
 					return playerMap.remove(x.playerMove.player, x);
 			}
@@ -182,10 +196,9 @@ public class DraughtsServer extends Thread {
 					}
 				}
 				else if (n==-1){
-					if (removePlayer(socketChannel)){
-						socketChannel.close();
-						System.out.println("Service Channel Closed");
-					}
+					removePlayer(socketChannel);
+					socketChannel.close();
+					System.out.println("Service Channel Closed");
 					command=null;
 					break;
 				}
@@ -196,10 +209,9 @@ public class DraughtsServer extends Thread {
 			} catch (ClosedChannelException e){
 				System.out.println("CCE");
 				try {
-					if (removePlayer(socketChannel)){
-						socketChannel.close();
-						System.out.println("Service Channel Closed");
-					}
+					removePlayer(socketChannel);
+					socketChannel.close();
+					System.out.println("Service Channel Closed");
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -209,10 +221,9 @@ public class DraughtsServer extends Thread {
 				System.out.println("IOE");
 				//				e.printStackTrace();
 				try {
-					if (removePlayer(socketChannel)){
-						socketChannel.close();
-						System.out.println("Service Channel Closed");
-					}
+					removePlayer(socketChannel);
+					socketChannel.close();
+					System.out.println("Service Channel Closed");
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -316,11 +327,19 @@ public class DraughtsServer extends Thread {
 			case END_CONNECTION:
 				if (playerMap.containsKey(command.player)){
 					writeResponse(serviceChannel,ResponseType.CONNECTION_ENDED,null);
+					String[] ks = new String[gameMap.size()];
+					gameMap.keySet().toArray(ks);
+					for (String game:ks){
+						if (gameMap.containsKey(game))
+							if ((gameMap.get(game).playerRedMove.player.equals(command.player)) || (gameMap.get(game).playerGreenMove!=null && gameMap.get(game).playerGreenMove.player.equals(command.player))) {
+								gameEnd(gameMap.get(game));
+								gameMap.remove(game);
+							} 
+					}
 					playerLoginSet.remove(command.player.getLogin());
 					try {
 						playerMap.get(command.player).channel.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					playerMap.remove(command.player);

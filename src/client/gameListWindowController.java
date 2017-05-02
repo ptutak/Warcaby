@@ -57,10 +57,13 @@ public class GameListWindowController {
 		gameList.remove(gameInfo);
 	}
 	private void updateList(){
-		this.gameList.setAll(client.getGameList());
+		GameInfo[] gameList=client.getGameList();
+		if (gameList!=null)
+			this.gameList.setAll(gameList);
 	}
 	
-	@FXML private void tableViewClick(){
+	@FXML
+	private void tableViewClick(){
 		GameInfo info = gameTableView.getSelectionModel().getSelectedItem();
 		if (info!=null)
 			gameNameTextField.setText(info.getGameName());
@@ -100,6 +103,11 @@ public class GameListWindowController {
 		playerRedCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("playerRed"));
 		turnTimeLimitCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("turnTimeLimit"));
 		gameTimeLimitCol.setCellValueFactory(new PropertyValueFactory<GameInfo,String>("gameTimeLimit"));
+		gameTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+		    if (newSelection != null) {
+		        gameNameTextField.setText(newSelection.getGameName());
+		    }
+		});
 	}
 
 }
