@@ -1,4 +1,6 @@
 package general;
+import java.io.Serializable;
+
 import enums.PlayerMoveType;
 
 /* 
@@ -16,7 +18,11 @@ import enums.PlayerMoveType;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public class PlayerMove {
+public class PlayerMove implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2382901570392446785L;
 	public Player player;
 	private PlayerMoveType playerMoveType;
 	private Move move;

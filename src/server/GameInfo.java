@@ -1,4 +1,5 @@
 package server;
+import java.io.Serializable;
 /* 
   Copyright 2017 Piotr Tutak
  
@@ -23,7 +24,11 @@ import general.ColPiece;
 import general.Player;
 import general.PlayerMove;
 
-public class GameInfo {
+public class GameInfo implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1664047110608535471L;
 	private String gameName;
 	private UUID ID;
 	private GameStatusType gameStatus;

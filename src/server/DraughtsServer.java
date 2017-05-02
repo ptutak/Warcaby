@@ -95,6 +95,16 @@ public class DraughtsServer extends Thread {
 		serverState=true;
 		serviceConnections();
 	}
+	
+	private boolean removePlayer(SocketChannel channel){
+		for (PlayerService x:playerMap.values()){
+			if (x.channel.equals(channel)){
+				playerLoginSet.remove(x.playerMove.player);
+				return playerMap.remove(x.playerMove.player, x);
+			}
+		}
+		return false;
+	}
 
 	private void serviceConnections() {
 		System.out.println("ServiceConnections");
@@ -129,7 +139,7 @@ public class DraughtsServer extends Thread {
 
 	private UserCommandPackage checkCommand(SocketChannel socketChannel){
 
-		//		System.out.println("Check func begin");
+				System.out.println("Check func begin");
 		if (!socketChannel.isOpen())
 			return null;
 		UserCommandPackage command=null;
@@ -166,14 +176,16 @@ public class DraughtsServer extends Thread {
 						//						System.out.println(command);
 						PackageLimiterType end=(PackageLimiterType)ois.readObject();
 						if (end==PackageLimiterType.PACKAGE_END){
-							//							System.out.println("package end");
+														System.out.println("package end");
 							break;
 						}	
 					}
 				}
 				else if (n==-1){
-					socketChannel.close();
-					System.out.println("Service Channel Closed");
+					if (removePlayer(socketChannel)){
+						socketChannel.close();
+						System.out.println("Service Channel Closed");
+					}
 					command=null;
 					break;
 				}
@@ -184,7 +196,10 @@ public class DraughtsServer extends Thread {
 			} catch (ClosedChannelException e){
 				System.out.println("CCE");
 				try {
-					socketChannel.close();
+					if (removePlayer(socketChannel)){
+						socketChannel.close();
+						System.out.println("Service Channel Closed");
+					}
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -194,8 +209,10 @@ public class DraughtsServer extends Thread {
 				System.out.println("IOE");
 				//				e.printStackTrace();
 				try {
-					socketChannel.close();
-					System.out.println("Service Channel Closed");
+					if (removePlayer(socketChannel)){
+						socketChannel.close();
+						System.out.println("Service Channel Closed");
+					}
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -245,8 +262,9 @@ public class DraughtsServer extends Thread {
 				if (playerMap.containsKey(command.player)){
 					if (!gameMap.containsKey(command.gameName)){
 						GameInfo newGame=new GameInfo(command.gameName);
-						newGame.setBoardBounds(((BoardInfo)command.attachment).boardBounds);
-						newGame.setRowNumber(((BoardInfo)command.attachment).rowNumber);
+						BoardInfo boardInfo=(BoardInfo)command.attachment;
+						newGame.setBoardBounds(boardInfo.boardBounds);
+						newGame.setRowNumber(boardInfo.rowNumber);
 						newGame.playerRedMove=playerMap.get(command.player).playerMove;
 						gameMap.put(command.gameName, newGame);
 						writeResponse(serviceChannel,ResponseType.GAME_CREATED,newGame.getID());
@@ -303,6 +321,7 @@ public class DraughtsServer extends Thread {
 
 
 	private void writeResponse(SocketChannel socketChannel,ResponseType response, Object object){
+
 		ByteBuffer writeBuffer=ByteBuffer.allocate(BUFFSIZE);
 
 		ServerResponsePackage responsePackage=new ServerResponsePackage();

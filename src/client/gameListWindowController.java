@@ -66,7 +66,7 @@ public class GameListWindowController {
 		if (!gameName.equals("")){
 			ResponseType response=client.newGame(gameName, 3, 8);
 			if (response==ResponseType.GAME_CREATED){
-				stage.setScene(mainScene);
+//				stage.setScene(mainScene);
 			} else if (response==ResponseType.GAME_EXISTS){
 				infoLabel.setText("Game with this name already exists");
 			} else {

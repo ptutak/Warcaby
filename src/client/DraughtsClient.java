@@ -85,7 +85,7 @@ public class DraughtsClient {
 		ServerResponsePackage response=checkResponse(socketChannel);
 		if (response!=null)
 			if (response.response==ResponseType.USER_REGISTERED){
-				player=(Player)response.object;
+//				player=(Player)response.object;
 				return ResponseType.USER_REGISTERED;
 			} else if(response.response==ResponseType.USER_EXISTS)
 				return ResponseType.USER_EXISTS;
