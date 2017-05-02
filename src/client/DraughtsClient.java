@@ -118,11 +118,10 @@ public class DraughtsClient {
 			if (response!=null){
 				if (response.response==ResponseType.GAME_CREATED){
 					this.gameID=(UUID)response.object;
-					return ResponseType.GAME_CREATED;
 				} else if (response.response==ResponseType.GAME_EXISTS){
 					this.gameName=null;
-					return ResponseType.GAME_EXISTS;
 				}
+				return response.response;
 			}
 		}
 		return null;
@@ -141,7 +140,43 @@ public class DraughtsClient {
 		}
 		return null;
 	}
+	
+	public ResponseType endConnection(){
+		if (socketChannel!=null){
+			writeCommand(socketChannel,CommandType.END_CONNECTION,null);
+			ServerResponsePackage response=checkResponse(socketChannel);
+			if (response!=null){
+				if (response.response==ResponseType.CONNECTION_ENDED){
+					closeConnection();
+				}
+				return response.response;
+			}
+		}
+		return null;
+	}
 
+	public void closeConnection(){
+		if (socketChannel!=null)
+			try {
+				socketChannel.close();
+				socketChannel=null;
+				System.out.println("Socket Channel closed");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
+	
+	public void reconnect(){
+		try {
+			socketChannel.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		socketChannel=null;
+		establishConnection(serverIp,serverPort);
+		registerUser(player.getLogin());
+	}
 	private ServerResponsePackage checkResponse(SocketChannel socketChannel){
 		System.out.println("check func");
 		if (!socketChannel.isOpen())
@@ -223,29 +258,6 @@ public class DraughtsClient {
 	}
 	
 
-
-	public void closeConnection(){
-		if (socketChannel!=null)
-			try {
-				socketChannel.close();
-				socketChannel=null;
-				System.out.println("Socket Channel closed");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-	}
-	
-	public void reconnect(){
-		try {
-			socketChannel.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		socketChannel=null;
-		establishConnection(serverIp,serverPort);
-		registerUser(player.getLogin());
-	}
 
 	private void writeCommand(SocketChannel socketChannel,CommandType command,Object object){
 		UserCommandPackage commandPackage=new UserCommandPackage();

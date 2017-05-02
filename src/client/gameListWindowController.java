@@ -60,6 +60,12 @@ public class GameListWindowController {
 		this.gameList.setAll(client.getGameList());
 	}
 	
+	@FXML private void tableViewClick(){
+		GameInfo info = gameTableView.getSelectionModel().getSelectedItem();
+		if (info!=null)
+			gameNameTextField.setText(info.getGameName());
+	}
+	
 	@FXML
 	private void newGameButtonClick(){
 		String gameName=gameNameTextField.getText();
@@ -84,6 +90,7 @@ public class GameListWindowController {
 	}
 	@FXML
 	private void quitButtonClick(){
+		client.endConnection();
 		System.exit(0);
 	}
 	@FXML public void initialize(){

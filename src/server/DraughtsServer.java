@@ -314,6 +314,12 @@ public class DraughtsServer extends Thread {
 				}
 				break;
 			case END_CONNECTION:
+				if (playerMap.containsKey(command.player)){
+					playerLoginSet.remove(command.player.getLogin());
+					playerMap.remove(command.player);
+					writeResponse(serviceChannel,ResponseType.CONNECTION_ENDED,null);
+					System.out.println(ResponseType.CONNECTION_ENDED);
+				}
 				break;
 			}
 		}
