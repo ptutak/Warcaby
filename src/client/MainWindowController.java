@@ -36,9 +36,10 @@ public class MainWindowController {
 		System.out.println(client.getOppositePlayer());
 		oppositePlayerNameLabel.setText(client.getOppositePlayer());
 		if (client.getPlayerCol()==FieldType.GREEN)
-			oppositePlayerImageView=new ImageView(redPlayer);
+			oppositePlayerImageView.setImage(redPlayer);
 		else
-			oppositePlayerImageView=new ImageView(greenPlayer);
+			oppositePlayerImageView.setImage(greenPlayer);
+		System.out.println(client.getPlayerCol());
 	}
 	
 	public void setClient(DraughtsClient client) {
@@ -48,9 +49,10 @@ public class MainWindowController {
 	public void refreshBoard(){
 		if (client!=null)
 			if (client.getBoard()!=null){
-//				System.out.println("jest");
+
 				boardGrid.getChildren().clear();
 				ArrayList<ColPiece> boardState=client.getBoard().getBoardState();
+				
 				for (ColPiece piece:boardState){
 					ImageView newPiece;
 					if (piece.field==FieldType.RED){
@@ -58,15 +60,18 @@ public class MainWindowController {
 							newPiece=new ImageView(redPawn);
 						else
 							newPiece=new ImageView(redQueen);
-//						System.out.println("red");
+
 					} else {
 						if (piece.piece.type==PieceType.PAWN)
 							newPiece=new ImageView(greenPawn);
 						else
 							newPiece=new ImageView(greenQueen);
-//						System.out.println("green");
+
 					}
-					boardGrid.add(newPiece, piece.piece.column, piece.piece.row);
+					if (client.getPlayerCol()==FieldType.GREEN)
+						boardGrid.add(newPiece, piece.piece.column, piece.piece.row);
+					else
+						boardGrid.add(newPiece, client.getBoardInfo().boardBounds.colStop-piece.piece.column,client.getBoardInfo().boardBounds.rowStop-piece.piece.row );
 					GridPane.setHalignment(newPiece, HPos.CENTER);
 				}
 				/*
