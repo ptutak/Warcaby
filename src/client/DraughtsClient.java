@@ -198,7 +198,6 @@ public class DraughtsClient {
 		try {
 			socketChannel.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		socketChannel=null;

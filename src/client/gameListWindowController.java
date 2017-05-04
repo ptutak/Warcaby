@@ -39,7 +39,6 @@ public class GameListWindowController {
 	@FXML private TextField gameNameTextField;
 	
 	@FXML private AnchorPane gameManager;
-	
 
 	public synchronized void setStage(Stage stage) {
 		this.stage = stage;
@@ -56,13 +55,13 @@ public class GameListWindowController {
 	public void gameRemove(GameInfo gameInfo){
 		gameList.remove(gameInfo);
 	}
+	
 	private void updateList(){
 		GameInfo[] gameList=client.getGameList();
 		if (gameList!=null)
 			this.gameList.setAll(gameList);
 	}
 	
-
 	@FXML
 	private void newGameButtonClick(){
 		String gameName=gameNameTextField.getText();

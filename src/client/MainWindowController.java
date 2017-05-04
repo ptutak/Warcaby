@@ -31,12 +31,11 @@ public class MainWindowController {
 	public void setClient(DraughtsClient client) {
 		this.client = client;
 	}
-	
-	
 
 	public void refreshBoard(){
 		if (client!=null)
 			if (client.getBoard()!=null){
+//				System.out.println("jest");
 				boardGrid.getChildren().clear();
 				ArrayList<ColPiece> boardState=client.getBoard().getBoardState();
 				for (ColPiece piece:boardState){
@@ -46,11 +45,13 @@ public class MainWindowController {
 							newPiece=new ImageView(redPawn);
 						else
 							newPiece=new ImageView(redQueen);
+//						System.out.println("red");
 					} else {
 						if (piece.piece.type==PieceType.PAWN)
 							newPiece=new ImageView(greenPawn);
 						else
 							newPiece=new ImageView(greenQueen);
+//						System.out.println("green");
 					}
 					boardGrid.add(newPiece, piece.piece.column, piece.piece.row);
 					GridPane.setHalignment(newPiece, HPos.CENTER);
