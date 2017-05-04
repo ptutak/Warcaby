@@ -62,20 +62,14 @@ public class GameListWindowController {
 			this.gameList.setAll(gameList);
 	}
 	
-	@FXML
-	private void tableViewClick(){
-		GameInfo info = gameTableView.getSelectionModel().getSelectedItem();
-		if (info!=null)
-			gameNameTextField.setText(info.getGameName());
-	}
-	
+
 	@FXML
 	private void newGameButtonClick(){
 		String gameName=gameNameTextField.getText();
 		if (!gameName.equals("")){
 			ResponseType response=client.newGame(gameName, 3, 8);
 			if (response==ResponseType.GAME_CREATED){
-//				stage.setScene(mainScene);
+				stage.setScene(mainScene);
 			} else if (response==ResponseType.GAME_EXISTS){
 				infoLabel.setText("Game with this name already exists");
 			} else {
@@ -86,6 +80,16 @@ public class GameListWindowController {
 	@FXML
 	private void joinGameButtonClick(){
 		String gameName=gameNameTextField.getText();
+		if (!gameName.equals("")){
+			ResponseType response=client.joinGame(gameName);
+			if (response==ResponseType.GAME_JOINED){
+				stage.setScene(mainScene);
+			} else if(response==ResponseType.WRONG_GAME_NAME){
+				infoLabel.setText("Wrong game name");
+			} else {
+				infoLabel.setText("Connection error");
+			}
+		}
 	}
 	@FXML
 	private void refreshButtonClick(){

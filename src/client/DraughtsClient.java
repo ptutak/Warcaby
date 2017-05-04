@@ -14,9 +14,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import enums.CommandType;
+import enums.FieldType;
 import enums.PackageLimiterType;
 import enums.PlayerMoveType;
 import enums.ResponseType;
+import general.Board;
 import general.BoardInfo;
 import general.Move;
 import general.Player;
@@ -38,12 +40,23 @@ public class DraughtsClient {
 	private ByteBuffer writeBuffer=ByteBuffer.allocate(BUFFSIZE);
 
 	private Player player=null;
+	private FieldType playerCol=null;
 	private String gameName=null;
 	private UUID gameID=null;
+	private Board board=null;
+	private BoardInfo boardInfo=null;
 	private PlayerMoveType playerMoveType=null;
 	private Move move=null;
 
 	private String oppositePlayer;
+
+	public Board getBoard() {
+		return board;
+	}
+
+	public BoardInfo getBoardInfo() {
+		return boardInfo;
+	}
 
 	public String getOppositePlayer() {
 		return oppositePlayer;
@@ -99,11 +112,16 @@ public class DraughtsClient {
 			ServerResponsePackage response=checkResponse(socketChannel);
 			if (response!=null){
 				if (response.response==ResponseType.GAME_JOINED){
-					oppositePlayer=(String)response.object;
-					return ResponseType.GAME_JOINED;
-				} else if (response.response==ResponseType.WRONG_GAME_NAME){
-					return ResponseType.WRONG_GAME_NAME;
+					GameInfo info=(GameInfo)response.object;
+					oppositePlayer=info.getPlayerRed();
+					boardInfo.boardBounds=info.getBoardBounds();
+					boardInfo.rowNumber=info.getRowNumber();
+					boardInfo.turnTimeLimit=info.getTurnTimeLimit();
+					boardInfo.gameTimeLimit=info.getGameTimeLimit();
+					playerCol=FieldType.GREEN;
+					initBoard();
 				}
+				return response.response;
 			}
 		}
 		return null;
@@ -118,6 +136,9 @@ public class DraughtsClient {
 			if (response!=null){
 				if (response.response==ResponseType.GAME_CREATED){
 					this.gameID=(UUID)response.object;
+					boardInfo=info;
+					playerCol=FieldType.RED;
+					initBoard();
 				} else if (response.response==ResponseType.GAME_EXISTS){
 					this.gameName=null;
 				}
@@ -125,6 +146,13 @@ public class DraughtsClient {
 			}
 		}
 		return null;
+	}
+	
+	private void initBoard(){
+		if (boardInfo!=null){
+			board=new Board(boardInfo.boardBounds);
+			board.setNRowGame(boardInfo.rowNumber);
+		}
 	}
 	
 	public GameInfo[] getGameList(){

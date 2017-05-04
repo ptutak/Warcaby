@@ -301,12 +301,14 @@ public class DraughtsServer extends Thread {
 							gameMap.get(command.gameName).playerGreenMove=playerMap.get(command.player).playerMove;
 							
 							Player playerRed=gameMap.get(command.gameName).playerRedMove.player;
-							writeResponse(serviceChannel,ResponseType.GAME_JOINED,playerRed.getLogin());
-							writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
 							
-							gameMap.get(command.gameName).setGameStatus(GameStatusType.GAME_READY);
+							writeResponse(serviceChannel,ResponseType.GAME_JOINED,gameMap.get(command.gameName));
+							writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
 							System.out.println(ResponseType.GAME_JOINED);
 							System.out.println(ResponseType.GAME_READY);
+							
+							gameMap.get(command.gameName).setGameStatus(GameStatusType.GAME_READY);
+
 						}
 					}
 					else {
