@@ -34,5 +34,6 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
       </GridPane>
+      <Button fx:id="startGameButton" layoutX="924.0" layoutY="35.0" mnemonicParsing="false" onMouseClicked="#startGameButtonClick" text="Start Game" />
    </children>
 </AnchorPane>
