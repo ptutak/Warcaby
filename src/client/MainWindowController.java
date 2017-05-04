@@ -25,8 +25,8 @@ public class MainWindowController {
 
 	@FXML public void initialize(){
 
-		boardGrid.add(pawnImageView, 0, 0);
-		GridPane.setHalignment(pawnImageView,HPos.CENTER);
+//		boardGrid.add(pawnImageView, 0, 0);
+//		GridPane.setHalignment(pawnImageView,HPos.CENTER);
 	}
 
 }
