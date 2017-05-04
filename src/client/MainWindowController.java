@@ -1,6 +1,11 @@
 package client;
 
+import java.util.ArrayList;
+
+import enums.FieldType;
+import enums.PieceType;
 import general.Board;
+import general.ColPiece;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.image.Image;
@@ -9,9 +14,12 @@ import javafx.scene.layout.GridPane;
 
 public class MainWindowController {
 	
-	Board board;
-	Image greenPaw=new Image("File./img/green-paw.png");
-	Image redPaw=new Image("File./img/red-paw.png");
+	private Board board=null;
+	private Image greenPawn=new Image("File./img/green-pawn.png");
+	private Image redPawn=new Image("File./img/red-pawn.png");
+	private Image greenQueen=new Image("File./img/green-queen.png");
+	private Image redQueen=new Image("File./img/red-queen.png");
+	private Image blank=new Image("File./img/blank.png");
 
 	@FXML GridPane boardGrid;
 	
@@ -22,11 +30,40 @@ public class MainWindowController {
 	public synchronized void setBoard(Board board) {
 		this.board = board;
 	}
+	
+	public void refreshBoard(){
+		if (board!=null){
+			boardGrid.getChildren().clear();
+			ArrayList<ColPiece> boardState=getBoard().getBoardState();
+			for (ColPiece piece:boardState){
+				ImageView newPiece;
+				if (piece.field==FieldType.RED){
+					if (piece.piece.type==PieceType.PAWN)
+						newPiece=new ImageView(redPawn);
+					else
+						newPiece=new ImageView(redQueen);
+				} else {
+					if (piece.piece.type==PieceType.PAWN)
+						newPiece=new ImageView(greenPawn);
+					else
+						newPiece=new ImageView(greenQueen);
+				}
+				boardGrid.add(newPiece, piece.piece.column, piece.piece.row);
+				GridPane.setHalignment(newPiece, HPos.CENTER);
+			}
+			/*
+			for (int i=0; i<board.getRowStop()-board.getRowStart()+1;i++){
+				for (int j=0;j<board.getColStop()-board.getColStart()+1;j++){
+					
+					
+				}
+			}
+			*/
+		}
+	}
 
 	@FXML public void initialize(){
-
-//		boardGrid.add(pawnImageView, 0, 0);
-//		GridPane.setHalignment(pawnImageView,HPos.CENTER);
+		
 	}
 
 }

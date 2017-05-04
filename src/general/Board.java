@@ -55,7 +55,7 @@ public class Board{
 		return new BoardBounds(rowStart,rowStop,colStart,colStop);
 	}
 	
-	void setGameBounds(int rowStart,int rowStop,int colStart,int colStop){
+	public void setGameBounds(int rowStart,int rowStop,int colStart,int colStop){
 		this.rowStart=rowStart;
 		this.rowStop=rowStop;
 		this.colStart=colStart;
