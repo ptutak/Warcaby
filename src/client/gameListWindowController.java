@@ -20,7 +20,8 @@ public class GameListWindowController {
 	private DraughtsClient client;
 	private Stage stage;
 	private Scene mainScene;
-	
+	private MainWindowController mainController;
+
 	@FXML private Label infoLabel;
 	
 	private ObservableList<GameInfo> gameList=FXCollections.observableArrayList();
@@ -39,7 +40,11 @@ public class GameListWindowController {
 	@FXML private TextField gameNameTextField;
 	
 	@FXML private AnchorPane gameManager;
-
+	
+	public synchronized void setMainController(MainWindowController mainController) {
+		this.mainController = mainController;
+	}
+	
 	public synchronized void setStage(Stage stage) {
 		this.stage = stage;
 	}
@@ -68,6 +73,8 @@ public class GameListWindowController {
 		if (!gameName.equals("")){
 			ResponseType response=client.newGame(gameName, 3, 8);
 			if (response==ResponseType.GAME_CREATED){
+				mainController.refreshBoard();
+				mainController.initImages();
 				stage.setScene(mainScene);
 			} else if (response==ResponseType.GAME_EXISTS){
 				infoLabel.setText("Game with this name already exists");
@@ -82,6 +89,8 @@ public class GameListWindowController {
 		if (!gameName.equals("")){
 			ResponseType response=client.joinGame(gameName);
 			if (response==ResponseType.GAME_JOINED){
+				mainController.refreshBoard();
+				mainController.initImages();
 				stage.setScene(mainScene);
 			} else if(response==ResponseType.WRONG_GAME_NAME){
 				infoLabel.setText("Wrong game name");

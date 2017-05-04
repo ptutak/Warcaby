@@ -8,6 +8,7 @@ import general.ColPiece;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -20,12 +21,24 @@ public class MainWindowController {
 	private Image greenQueen=new Image("File:./img/green-queen.png");
 	private Image redQueen=new Image("File:./img/red-queen.png");
 //	private Image blank=new Image("File:./img/blank.png");
+	private Image greenPlayer=new Image("File:./img/green-player.png");
+	private Image redPlayer=new Image("File:./img/red-player.png");
 
 	@FXML private Button startGameButton;
 	@FXML private GridPane boardGrid;
+	@FXML private Label oppositePlayerNameLabel;
+	@FXML private ImageView oppositePlayerImageView;
 
 	@FXML private void startGameButtonClick(){
-		refreshBoard();
+	}
+	
+	public void initImages(){
+		System.out.println(client.getOppositePlayer());
+		oppositePlayerNameLabel.setText(client.getOppositePlayer());
+		if (client.getPlayerCol()==FieldType.GREEN)
+			oppositePlayerImageView=new ImageView(redPlayer);
+		else
+			oppositePlayerImageView=new ImageView(greenPlayer);
 	}
 	
 	public void setClient(DraughtsClient client) {

@@ -54,6 +54,10 @@ public class DraughtsClient {
 		return board;
 	}
 
+	public FieldType getPlayerCol() {
+		return playerCol;
+	}
+
 	public BoardInfo getBoardInfo() {
 		return boardInfo;
 	}

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
@@ -39,6 +40,16 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
       </GridPane>
-      <Button fx:id="startGameButton" layoutX="924.0" layoutY="35.0" mnemonicParsing="false" onMouseClicked="#startGameButtonClick" text="Start Game" />
+      <Button fx:id="startGameButton" layoutX="845.0" layoutY="631.0" mnemonicParsing="false" onMouseClicked="#startGameButtonClick" prefHeight="63.0" prefWidth="213.0" text="Start Game" />
+      <Button fx:id="pauseButton" layoutX="845.0" layoutY="749.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="58.0" text="Pause" />
+      <Button fx:id="exitButton" layoutX="1000.0" layoutY="749.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="58.0" text="Exit" />
+      <Button fx:id="gameListButton" layoutX="918.0" layoutY="749.0" mnemonicParsing="false" text="Game List" />
+      <Label layoutX="897.0" layoutY="34.0" prefHeight="17.0" prefWidth="110.0" text="Opposite Player:" />
+      <ImageView fx:id="oppositePlayerImageView" fitHeight="100.0" fitWidth="100.0" layoutX="818.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true" />
+      <Label fx:id="oppositePlayerNameLabel" layoutX="952.0" layoutY="62.0" prefHeight="100.0" prefWidth="110.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
