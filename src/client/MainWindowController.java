@@ -95,10 +95,7 @@ public class MainWindowController {
 	public void refreshBoard(){
 		if (client!=null)
 			if (client.getBoard()!=null){
-
 				boardGrid.getChildren().clear();
-//				System.out.println(boardGrid.getChildren().size());
-
 				ArrayList<ColPiece> boardState=client.getBoard().getBoardState();
 
 				for (ColPiece piece:boardState){
@@ -120,7 +117,7 @@ public class MainWindowController {
 						if (rowFrom==null){
 							rowFrom=GridPane.getRowIndex(newPiece);
 							colFrom=GridPane.getColumnIndex(newPiece);
-							System.out.println("Source: "+rowFrom.toString()+" "+colFrom.toString());
+	//						System.out.println("Source: "+rowFrom.toString()+" "+colFrom.toString());
 						}
 					});
 					if (client.getPlayerCol()==FieldType.GREEN){
@@ -149,7 +146,7 @@ public class MainWindowController {
 							if (rowFrom!=null){
 								rowTo=GridPane.getRowIndex(blankImg);
 								colTo=GridPane.getColumnIndex(blankImg);
-								System.out.println("Destination:"+rowTo.toString()+" "+colTo.toString());
+//								System.out.println("Destination:"+rowTo.toString()+" "+colTo.toString());
 								move();
 								rowFrom=null;
 							}
