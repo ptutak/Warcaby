@@ -106,9 +106,11 @@ public class DraughtsServer extends Thread {
 		if (gameMap.get(gameName).containsPlayer(nextPlayer) && gameMap.get(gameName).containsPlayer(responsePlayer)){
 			SocketChannel responseSC=playerMap.get(responsePlayer).channel;
 			writeResponse(responseSC,response,moveType);
+			System.out.println(response);
 			if (next!=null){
 				SocketChannel nextSC = playerMap.get(nextPlayer).channel;
 				writeResponse(nextSC,next,moveForNext);
+				System.out.println(next);
 			}
 		}
 	}
@@ -249,35 +251,35 @@ public class DraughtsServer extends Thread {
 	}
 
 
-	private void serviceRequest(SocketChannel serviceChannel) {
-		UserCommandPackage command=checkCommand(serviceChannel);
+	private void serviceRequest(SocketChannel socketChannel) {
+		UserCommandPackage command=checkCommand(socketChannel);
 		if (command==null){
 		}
 		else{
 			switch(command.command){
 			case REGISTER_NEW_USER:
 				if (playerLoginSet.contains(command.player.getLogin())){
-					writeResponse(serviceChannel,ResponseType.USER_EXISTS,null);
+					writeResponse(socketChannel,ResponseType.USER_EXISTS,null);
 					System.out.println(ResponseType.USER_EXISTS);
 				} else{
-					playerMap.put(command.player,new PlayerService(serviceChannel, new PlayerWithMove(command.player,null)));
+					playerMap.put(command.player,new PlayerService(socketChannel, new PlayerWithMove(command.player,null)));
 					playerLoginSet.add(command.player.getLogin());
-					writeResponse(serviceChannel,ResponseType.USER_REGISTERED,null);
+					writeResponse(socketChannel,ResponseType.USER_REGISTERED,null);
 					System.out.println(ResponseType.USER_REGISTERED);
 				}
 				break;
 			case USER_RECONNECT:
 				if (playerLoginSet.contains(command.player.getLogin())){
 					if (playerMap.containsKey(command.player)){
-						playerMap.get(command.player).channel=serviceChannel;
-						writeResponse(serviceChannel,ResponseType.USER_RECONNECTED,null);
+						playerMap.get(command.player).channel=socketChannel;
+						writeResponse(socketChannel,ResponseType.USER_RECONNECTED,null);
 						System.out.println(ResponseType.USER_RECONNECTED);
 					} else{
-						writeResponse(serviceChannel,ResponseType.USER_NOT_REGISTERED,null);
+						writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
 						System.out.println(ResponseType.USER_NOT_REGISTERED);
 					}
 				} else{
-					writeResponse(serviceChannel,ResponseType.USER_NOT_REGISTERED,null);
+					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
 					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}
 				break;
@@ -290,20 +292,26 @@ public class DraughtsServer extends Thread {
 						newGame.setRowNumber(boardInfo.rowNumber);
 						newGame.playerRedMove=playerMap.get(command.player).playerWithMove;
 						gameMap.put(command.gameName, newGame);
-						writeResponse(serviceChannel,ResponseType.GAME_CREATED,newGame.getID());
+						writeResponse(socketChannel,ResponseType.GAME_CREATED,newGame.getID());
 						System.out.println(ResponseType.GAME_CREATED);
 					}
 					else{
-						writeResponse(serviceChannel,ResponseType.GAME_EXISTS,null);
+						writeResponse(socketChannel,ResponseType.GAME_EXISTS,null);
 						System.out.println(ResponseType.GAME_EXISTS);
 					}
+				}else{
+					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
+					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}
 				break;
 			case AVAILABLE_GAMES:
-				if (serviceChannel.isOpen()){
+				if (playerMap.containsKey(command.player)){
 					GameInfo[] gameList=gameMap.values().toArray(new GameInfo[0]);
-					writeResponse(serviceChannel,ResponseType.GAME_LIST,gameList);
+					writeResponse(socketChannel,ResponseType.GAME_LIST,gameList);
 					System.out.println(ResponseType.GAME_LIST);
+				}else{
+					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
+					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}
 				break;
 			case JOIN_GAME:
@@ -314,7 +322,7 @@ public class DraughtsServer extends Thread {
 
 							Player playerRed=gameMap.get(command.gameName).playerRedMove.player;
 
-							writeResponse(serviceChannel,ResponseType.GAME_JOINED,gameMap.get(command.gameName));
+							writeResponse(socketChannel,ResponseType.GAME_JOINED,gameMap.get(command.gameName));
 							writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
 							System.out.println(ResponseType.GAME_JOINED);
 							System.out.println(ResponseType.GAME_READY);
@@ -324,23 +332,33 @@ public class DraughtsServer extends Thread {
 						}
 					}
 					else {
-						writeResponse(serviceChannel,ResponseType.WRONG_GAME_NAME,null);
+						writeResponse(socketChannel,ResponseType.WRONG_GAME_NAME,null);
 						System.out.println(ResponseType.WRONG_GAME_NAME);
 					}
 				} 
 				else {
-					writeResponse(serviceChannel,ResponseType.USER_NOT_REGISTERED,null);
+					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
 					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}
 				break;
-			case GAME_MOVE:
-				if (playerMap.containsKey(command.player) && gameMap.get(command.gameName).getID().equals(command.gameID)){
-
+			case GAME_MOVE:{
+				GameInfo game=gameMap.get(command.gameName);
+				if (playerMap.containsKey(command.player) && game!=null && game.getID().equals(command.gameID) && game.containsPlayer(command.player)){
+					if (game.getGameStatus().equals(GameStatusType.GAME_RUNNING)){
+						playerMap.get(command.player).playerWithMove.setMove(command.move);
+					} else {
+						writeResponse(socketChannel,ResponseType.GAME_NOT_RUNNING,null);
+						System.out.println(ResponseType.GAME_NOT_RUNNING);
+					}
+				} else{
+					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
+					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}
 				break;
+			}
 			case END_CONNECTION:
 				if (playerMap.containsKey(command.player)){
-					writeResponse(serviceChannel,ResponseType.CONNECTION_ENDED,null);
+					writeResponse(socketChannel,ResponseType.CONNECTION_ENDED,null);
 					String[] ks = new String[gameMap.size()];
 					gameMap.keySet().toArray(ks);
 					for (String game:ks){

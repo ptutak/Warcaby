@@ -36,23 +36,46 @@ public class MainWindowController {
 	@FXML private GridPane boardGrid;
 	@FXML private Label oppositePlayerNameLabel;
 	@FXML private ImageView oppositePlayerImageView;
+	@FXML private Label playerNameLabel;
+	@FXML private ImageView playerImageView;
 
 	boolean gameStarted=false;
 
 	@FXML private void startGameButtonClick(){
-		gameStarted=true;
+		if (client.getOppositePlayer()!=null)
+			gameStarted=true;
 	}
-
+	
+	@FXML private void exitButtonClick(){
+		ResponseType response=null;
+		if (client!=null)
+			response=client.endConnection();
+		System.out.println(response);
+		if (response==ResponseType.CONNECTION_ENDED)
+			System.exit(0);
+		else{
+			System.out.println("ABORT");
+			System.exit(-1);
+		}
+			
+	}
 
 	public void initImages(){
-		//		System.out.println(client.getOppositePlayer());
-		oppositePlayerNameLabel.setText(client.getOppositePlayer());
+		if (client.getOppositePlayer()!=null){
+			oppositePlayerNameLabel.setText(client.getOppositePlayer());
+			if (client.getPlayerCol()==FieldType.GREEN)
+				oppositePlayerImageView.setImage(redPlayer);
+			else
+				oppositePlayerImageView.setImage(greenPlayer);
+		} else
+			oppositePlayerNameLabel.setText("No player");
 		if (client.getPlayerCol()==FieldType.GREEN)
-			oppositePlayerImageView.setImage(redPlayer);
+			playerImageView.setImage(greenPlayer);
 		else
-			oppositePlayerImageView.setImage(greenPlayer);
-		//		System.out.println(client.getPlayerCol());
+			playerImageView.setImage(redPlayer);
+		playerNameLabel.setText(client.getPlayerName());
 	}
+	
 
 	public void setClient(DraughtsClient client) {
 		this.client = client;
@@ -60,15 +83,12 @@ public class MainWindowController {
 
 	private void move(){
 		if (gameStarted){
+			ResponseType response;
 			if (client.getPlayerCol()==FieldType.GREEN)
-				client.move(rowFrom, colFrom, rowTo, colTo);
+				response=client.move(rowFrom, colFrom, rowTo, colTo);
 			else
-				client.move(client.getBoardInfo().boardBounds.rowStop-rowFrom, client.getBoardInfo().boardBounds.colStop-colFrom, client.getBoardInfo().boardBounds.rowStop-rowTo, client.getBoardInfo().boardBounds.colStop-colTo);
-			ResponseType response=client.waitForResponseMove();
-			if (response==ResponseType.GAME_OPPOSITE_MOVE_CONTINUE || response==ResponseType.GAME_OPPOSITE_MOVE_FINAL)
-				System.out.println(response);
-			else
-				System.out.println(response);
+				response=client.move(client.getBoardInfo().boardBounds.rowStop-rowFrom, client.getBoardInfo().boardBounds.colStop-colFrom, client.getBoardInfo().boardBounds.rowStop-rowTo, client.getBoardInfo().boardBounds.colStop-colTo);
+			System.out.println(response);
 		}
 	}
 
@@ -77,10 +97,9 @@ public class MainWindowController {
 			if (client.getBoard()!=null){
 
 				boardGrid.getChildren().clear();
-				System.out.println(boardGrid.getChildren().size());
+//				System.out.println(boardGrid.getChildren().size());
 
 				ArrayList<ColPiece> boardState=client.getBoard().getBoardState();
-
 
 				for (ColPiece piece:boardState){
 					ImageView newPiece;

@@ -66,6 +66,10 @@ public class DraughtsClient {
 	public String getOppositePlayer() {
 		return oppositePlayer;
 	}
+	
+	public String getPlayerName(){
+		return player.getLogin();
+	}
 
 	public boolean establishConnection(String ip, int port){
 		try {
@@ -188,7 +192,7 @@ public class DraughtsClient {
 		return null;
 	}
 	
-	public MoveType move(int rowFrom, int colFrom, int rowTo, int colTo){
+	public ResponseType move(int rowFrom, int colFrom, int rowTo, int colTo){
 		if (socketChannel!=null){
 			move=board.getMove(rowFrom, colFrom, rowTo, colTo);
 			writeCommand(socketChannel,CommandType.GAME_MOVE,null);
@@ -198,8 +202,10 @@ public class DraughtsClient {
 					MoveType move=(MoveType)response.attachment;
 					if (move==MoveType.KILL || move==MoveType.MOVE)
 						board.movePiece(board.fieldState(rowFrom, colFrom).piece, rowTo, colTo);
+					ResponseType responseMoveResponse=waitForResponseMove();
+					return responseMoveResponse;
 				}
-				return (MoveType)response.attachment;
+				return response.response;
 			}
 		}
 		return null;
@@ -219,7 +225,7 @@ public class DraughtsClient {
 		return null;
 	}
 
-	public void closeConnection(){
+	private void closeConnection(){
 		if (socketChannel!=null)
 			try {
 				socketChannel.close();

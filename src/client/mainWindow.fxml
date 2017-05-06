@@ -42,11 +42,11 @@
       </GridPane>
       <Button fx:id="startGameButton" layoutX="845.0" layoutY="631.0" mnemonicParsing="false" onMouseClicked="#startGameButtonClick" prefHeight="63.0" prefWidth="213.0" text="Start Game" />
       <Button fx:id="pauseButton" layoutX="845.0" layoutY="749.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="58.0" text="Pause" />
-      <Button fx:id="exitButton" layoutX="1000.0" layoutY="749.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="58.0" text="Exit" />
+      <Button fx:id="exitButton" layoutX="1000.0" layoutY="749.0" mnemonicParsing="false" onMouseClicked="#exitButtonClick" prefHeight="25.0" prefWidth="58.0" text="Exit" />
       <Button fx:id="gameListButton" layoutX="918.0" layoutY="749.0" mnemonicParsing="false" text="Game List" />
-      <Label layoutX="897.0" layoutY="34.0" prefHeight="17.0" prefWidth="110.0" text="Opposite Player:">
+      <Label layoutX="879.0" layoutY="35.0" prefHeight="27.0" prefWidth="138.0" text="Opposite Player:">
          <font>
-            <Font size="14.0" />
+            <Font size="18.0" />
          </font>
       </Label>
       <Label fx:id="oppositePlayerNameLabel" layoutX="952.0" layoutY="62.0" prefHeight="100.0" prefWidth="110.0">
@@ -55,5 +55,16 @@
          </font>
       </Label>
       <ImageView fx:id="oppositePlayerImageView" fitHeight="100.0" fitWidth="100.0" layoutX="824.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="playerImageView" fitHeight="100.0" fitWidth="100.0" layoutX="833.0" layoutY="481.0" pickOnBounds="true" preserveRatio="true" />
+      <Label fx:id="playerNameLabel" layoutX="961.0" layoutY="481.0" prefHeight="100.0" prefWidth="110.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="928.0" layoutY="455.0" prefHeight="27.0" prefWidth="40.0" text="You:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
