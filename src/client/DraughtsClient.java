@@ -204,6 +204,20 @@ public class DraughtsClient {
 		}
 		return null;
 	}
+	
+	public ResponseType waitForResponseMove(){
+		while (socketChannel!=null){
+			ServerResponsePackage response=checkResponse(socketChannel);
+			if (response!=null){
+				if (response.response==ResponseType.GAME_OPPOSITE_MOVE_FINAL || response.response==ResponseType.GAME_OPPOSITE_MOVE_CONTINUE){
+					Move move=(Move)response.attachment;
+					board.movePiece(move.moveFrom.piece, move.moveTo.piece.row, move.moveTo.piece.column);
+				}
+				return response.response;
+			}
+		}
+		return null;
+	}
 
 	public void closeConnection(){
 		if (socketChannel!=null)
@@ -324,6 +338,7 @@ public class DraughtsClient {
 			oos.writeObject(commandPackage);
 			oos.writeObject(PackageLimiterType.PACKAGE_END);
 			oos.flush();
+			System.out.println(bos.toByteArray().length);
 			writeBuffer.putInt(bos.toByteArray().length);
 			writeBuffer.put(bos.toByteArray());
 			writeBuffer.flip();

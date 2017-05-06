@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
@@ -97,17 +96,23 @@ public class DraughtsServer extends Thread {
 		serverState=true;
 		serviceConnections();
 	}
-	
+
 	private void gameEnd(GameInfo game){
-		
-		
+
+
 	}
-	
-	public void moveResponseAndForNext(Player responsePlayer, Player nextPlayer,MoveType moveType, Move moveForNext){
-		
-		
+
+	public void moveResponseAndForNext(String gameName, Player responsePlayer, Player nextPlayer,ResponseType response,ResponseType next,MoveType moveType, Move moveForNext){
+		if (gameMap.get(gameName).containsPlayer(nextPlayer) && gameMap.get(gameName).containsPlayer(responsePlayer)){
+			SocketChannel responseSC=playerMap.get(responsePlayer).channel;
+			writeResponse(responseSC,response,moveType);
+			if (next!=null){
+				SocketChannel nextSC = playerMap.get(nextPlayer).channel;
+				writeResponse(nextSC,next,moveForNext);
+			}
+		}
 	}
-	
+
 	private boolean removePlayer(SocketChannel channel){
 		for (PlayerService x:playerMap.values()){
 			if (x.channel.equals(channel)){
@@ -160,7 +165,7 @@ public class DraughtsServer extends Thread {
 
 	private UserCommandPackage checkCommand(SocketChannel socketChannel){
 
-				System.out.println("Check func begin");
+		System.out.println("Check func begin");
 		if (!socketChannel.isOpen())
 			return null;
 		UserCommandPackage command=null;
@@ -197,7 +202,7 @@ public class DraughtsServer extends Thread {
 						//						System.out.println(command);
 						PackageLimiterType end=(PackageLimiterType)ois.readObject();
 						if (end==PackageLimiterType.PACKAGE_END){
-														System.out.println("package end");
+							System.out.println("package end");
 							break;
 						}	
 					}
@@ -306,14 +311,14 @@ public class DraughtsServer extends Thread {
 					if (gameMap.containsKey(command.gameName) && gameMap.get(command.gameName).getID().equals(command.gameID)){
 						if (gameMap.get(command.gameName).getGameStatus().equals(GameStatusType.GAME_WAITING)){
 							gameMap.get(command.gameName).playerGreenMove=playerMap.get(command.player).playerWithMove;
-							
+
 							Player playerRed=gameMap.get(command.gameName).playerRedMove.player;
-							
+
 							writeResponse(serviceChannel,ResponseType.GAME_JOINED,gameMap.get(command.gameName));
 							writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
 							System.out.println(ResponseType.GAME_JOINED);
 							System.out.println(ResponseType.GAME_READY);
-							
+
 							gameMap.get(command.gameName).setGameStatus(GameStatusType.GAME_READY);
 
 						}
@@ -394,14 +399,14 @@ public class DraughtsServer extends Thread {
 
 		String ipS=new String("127.0.0.1");
 		int port=50000;
-		
-/*		ipS=System.console().readLine();
+
+		/*		ipS=System.console().readLine();
 		port=Integer.parseInt(System.console().readLine());
-	
+
 		System.out.println(ipS);
 		System.out.println(Integer.toString(port));
 		new InetSocketAddress(ipS, port);
-*/
+		 */
 		DraughtsServer server=new DraughtsServer(ipS,port);
 
 		server.establishConnection();

@@ -2,16 +2,18 @@ package server;
 
 import enums.FieldType;
 import enums.GameStatusType;
+import enums.MoveType;
 import enums.GameDecisionType;
 import general.Board;
 import general.ColPiece;
 import general.Move;
 import general.Player;
 import enums.PieceType;
+import enums.ResponseType;
 
 /* 
   Copyright 2017 Piotr Tutak
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
@@ -23,14 +25,14 @@ import enums.PieceType;
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 public class Play extends Thread {
 	private GameInfo gameInfo;
 	private TurnInfo turnInfo;
 	private Board gameBoard;
 	private Timer timer;
 	private DraughtsServer server;
-	
+
 	Play(Board gameBoard, GameInfo gameInfo,Timer timer, TurnInfo turnInfo, DraughtsServer server){
 		this.gameBoard=gameBoard;
 		this.timer=timer;
@@ -38,7 +40,7 @@ public class Play extends Thread {
 		this.gameInfo=gameInfo;
 		this.server=server;
 	}
-	
+
 	public void gameSurrender(){
 		turnInfo.setTimerOn(false);
 		if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
@@ -70,9 +72,9 @@ public class Play extends Thread {
 			gameInfo.playerRedMove.player.getPlayerInfo().mainPoints+=3;
 		}
 	}
-	
+
 	private void gameWin(Player winner){
-		
+
 		int points=0;
 		for (ColPiece x:gameBoard.getBoardState()){
 			if (x.piece.type==PieceType.PAWN)
@@ -117,7 +119,7 @@ public class Play extends Thread {
 			turnInfo.setActivePlayer(gameInfo.playerGreenMove.player);
 		timer.nextTurn();
 	}
-	
+
 	public void run(){
 		while(!turnInfo.isTimerOn()){
 			try{
@@ -132,47 +134,70 @@ public class Play extends Thread {
 			}
 			else{
 				Move move;
-				GameDecisionType moveType;
+				GameDecisionType gameDecision;
 				if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
 					move=gameInfo.playerRedMove.getMove();
-					moveType=gameInfo.playerRedMove.getGameDecisionType();
-					if (moveType==GameDecisionType.SURRENDER)
+					gameDecision=gameInfo.playerRedMove.getGameDecisionType();
+					if (gameDecision==GameDecisionType.SURRENDER)
 						gameSurrender();
-					else if (moveType==GameDecisionType.DRAW)
+					else if (gameDecision==GameDecisionType.DRAW)
 						gameDraw();
 					if (move.moveFrom.field==FieldType.GREEN)
 						continue;
 				}
 				else {
 					move=gameInfo.playerGreenMove.getMove();
-					moveType=gameInfo.playerGreenMove.getGameDecisionType();
-					if (moveType==GameDecisionType.SURRENDER)
+					gameDecision=gameInfo.playerGreenMove.getGameDecisionType();
+					if (gameDecision==GameDecisionType.SURRENDER)
 						gameSurrender();
-					else if (moveType==GameDecisionType.DRAW)
+					else if (gameDecision==GameDecisionType.DRAW)
 						gameDraw();
 					if (move.moveFrom.field==FieldType.RED)
 						continue;
 				}
-					
+
 				switch(gameBoard.movePiece(move.moveFrom.piece, move.moveTo.piece.row, move.moveTo.piece.column)){
-				case MOVE:
+				case MOVE:{
+					Player responsePlayer=turnInfo.getActivePlayer();
+					Player nextPlayer;
+					if (gameInfo.playerRedMove.player.equals(responsePlayer))
+						nextPlayer=gameInfo.playerGreenMove.player;
+					else
+						nextPlayer=gameInfo.playerRedMove.player;
+					server.moveResponseAndForNext(gameInfo.getGameName(), responsePlayer, nextPlayer, ResponseType.GAME_MOVE_FINAL, ResponseType.GAME_OPPOSITE_MOVE_FINAL, MoveType.MOVE, move);
 					nextPlayer();
 					break;
-				case KILL:
+				}
+				case KILL:{
+					Player responsePlayer=turnInfo.getActivePlayer();
+					Player nextPlayer;
+					if (gameInfo.playerRedMove.player.equals(responsePlayer))
+						nextPlayer=gameInfo.playerGreenMove.player;
+					else
+						nextPlayer=gameInfo.playerRedMove.player;
+					server.moveResponseAndForNext(gameInfo.getGameName(), responsePlayer, nextPlayer, ResponseType.GAME_MOVE_FINAL, ResponseType.GAME_OPPOSITE_MOVE_FINAL, MoveType.KILL, move);
 					if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
 						nextPlayer();
-						break;
 					}
 					else if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.getActivePlayer().equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
 						nextPlayer();
-						break;
-					}
-					timer.nextTurn();
-					break;
-				case BAD:
+					} else
+						nextPlayer();
+
 					break;
 				}
-				
+				case BAD:{
+					Player responsePlayer=turnInfo.getActivePlayer();
+					Player nextPlayer;
+					if (gameInfo.playerRedMove.player.equals(responsePlayer))
+						nextPlayer=gameInfo.playerGreenMove.player;
+					else
+						nextPlayer=gameInfo.playerRedMove.player;
+					server.moveResponseAndForNext(gameInfo.getGameName(), responsePlayer, nextPlayer, ResponseType.GAME_MOVE_CONTINUE, null, MoveType.BAD, null);
+					break;
+				}
+				}
+
 				switch (gameBoard.checkWinner()){
 				case GREEN:
 					gameInfo.setGameStatus(GameStatusType.GAME_END);

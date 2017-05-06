@@ -54,7 +54,11 @@ public class GameInfo implements Serializable {
 		turnTimeLimit=0;
 		gameTimeLimit=0;
 	}
-	
+	public boolean containsPlayer(Player player){
+		if (playerRedMove.player.equals(player) || playerGreenMove.player.equals(player))
+			return true;
+		return false;
+	}
 	public int getTurnTimeLimit() {
 		return turnTimeLimit;
 	}

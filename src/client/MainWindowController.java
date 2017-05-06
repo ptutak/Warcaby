@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import enums.FieldType;
 import enums.PieceType;
+import enums.ResponseType;
 import general.ColPiece;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -36,30 +37,39 @@ public class MainWindowController {
 	@FXML private Label oppositePlayerNameLabel;
 	@FXML private ImageView oppositePlayerImageView;
 
+	boolean gameStarted=false;
+
 	@FXML private void startGameButtonClick(){
+		gameStarted=true;
 	}
 
 
 	public void initImages(){
-//		System.out.println(client.getOppositePlayer());
+		//		System.out.println(client.getOppositePlayer());
 		oppositePlayerNameLabel.setText(client.getOppositePlayer());
 		if (client.getPlayerCol()==FieldType.GREEN)
 			oppositePlayerImageView.setImage(redPlayer);
 		else
 			oppositePlayerImageView.setImage(greenPlayer);
-//		System.out.println(client.getPlayerCol());
+		//		System.out.println(client.getPlayerCol());
 	}
 
 	public void setClient(DraughtsClient client) {
 		this.client = client;
 	}
-	
+
 	private void move(){
-		if (client.getPlayerCol()==FieldType.GREEN)
-			client.move(rowFrom, colFrom, rowTo, colTo);
-		else
-			client.move(client.getBoardInfo().boardBounds.rowStop-rowFrom, client.getBoardInfo().boardBounds.colStop-colFrom, client.getBoardInfo().boardBounds.rowStop-rowTo, client.getBoardInfo().boardBounds.colStop-colTo);
-		
+		if (gameStarted){
+			if (client.getPlayerCol()==FieldType.GREEN)
+				client.move(rowFrom, colFrom, rowTo, colTo);
+			else
+				client.move(client.getBoardInfo().boardBounds.rowStop-rowFrom, client.getBoardInfo().boardBounds.colStop-colFrom, client.getBoardInfo().boardBounds.rowStop-rowTo, client.getBoardInfo().boardBounds.colStop-colTo);
+			ResponseType response=client.waitForResponseMove();
+			if (response==ResponseType.GAME_OPPOSITE_MOVE_CONTINUE || response==ResponseType.GAME_OPPOSITE_MOVE_FINAL)
+				System.out.println(response);
+			else
+				System.out.println(response);
+		}
 	}
 
 	public void refreshBoard(){
@@ -68,7 +78,7 @@ public class MainWindowController {
 
 				boardGrid.getChildren().clear();
 				System.out.println(boardGrid.getChildren().size());
-				
+
 				ArrayList<ColPiece> boardState=client.getBoard().getBoardState();
 
 
@@ -105,7 +115,7 @@ public class MainWindowController {
 				for (int i=0; i<boardGrid.getRowConstraints().size();i++){
 					for (int j=0;j<boardGrid.getColumnConstraints().size();j++){
 						boolean contains=false;
-					
+
 						for (Node node : boardGrid.getChildren()) {
 							if (GridPane.getColumnIndex(node).intValue() == j && GridPane.getRowIndex(node).intValue() == i){
 								contains=true;
