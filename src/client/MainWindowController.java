@@ -113,7 +113,10 @@ public class MainWindowController {
 								rowTo=GridPane.getRowIndex(blankImg);
 								colTo=GridPane.getColumnIndex(blankImg);
 								System.out.println("Destination:"+rowTo.toString()+" "+colTo.toString());
-//								client.move(rowFrom, colFrom, rowTo, colTo);
+								if (client.getPlayerCol()==FieldType.GREEN)
+									client.move(rowFrom, colFrom, rowTo, colTo);
+								else
+									client.move(client.getBoardInfo().boardBounds.rowStop-rowFrom, client.getBoardInfo().boardBounds.colStop-colFrom, client.getBoardInfo().boardBounds.rowStop-rowTo, client.getBoardInfo().boardBounds.colStop-colTo);
 								rowFrom=null;
 							}
 						});
