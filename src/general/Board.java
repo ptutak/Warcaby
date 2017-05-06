@@ -230,9 +230,16 @@ public class Board{
 		}
 		return true;
 	}
-		
+	
+	public Move getMove(int rowFrom, int colFrom, int rowTo, int colTo){
+		ColPiece moveFrom=fieldState(rowFrom,colFrom);
+		ColPiece moveTo=fieldState(rowTo,colTo);
+		return new Move(moveFrom,moveTo);
+	}
 	
 	public MoveType movePiece(Piece piece,int row, int column){
+		if (piece==null)
+			return MoveType.BAD;
 		if (fieldState(row,column).field!=FieldType.FREE)
 			return MoveType.BAD;
 		ArrayList<ColPiece> vMove=validMove(piece);

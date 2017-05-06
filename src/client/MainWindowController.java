@@ -7,10 +7,12 @@ import enums.PieceType;
 import general.ColPiece;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 
 public class MainWindowController {
@@ -20,9 +22,14 @@ public class MainWindowController {
 	private Image redPawn=new Image("File:./img/red-pawn.png");
 	private Image greenQueen=new Image("File:./img/green-queen.png");
 	private Image redQueen=new Image("File:./img/red-queen.png");
-//	private Image blank=new Image("File:./img/blank.png");
+	private Image blank=new Image("File:./img/blank.png");
 	private Image greenPlayer=new Image("File:./img/green-player.png");
 	private Image redPlayer=new Image("File:./img/red-player.png");
+
+	private Integer rowFrom=null;
+	private Integer colFrom=null;
+	private Integer rowTo=null;
+	private Integer colTo=null;
 
 	@FXML private Button startGameButton;
 	@FXML private GridPane boardGrid;
@@ -31,17 +38,18 @@ public class MainWindowController {
 
 	@FXML private void startGameButtonClick(){
 	}
-	
+
+
 	public void initImages(){
-		System.out.println(client.getOppositePlayer());
+//		System.out.println(client.getOppositePlayer());
 		oppositePlayerNameLabel.setText(client.getOppositePlayer());
 		if (client.getPlayerCol()==FieldType.GREEN)
 			oppositePlayerImageView.setImage(redPlayer);
 		else
 			oppositePlayerImageView.setImage(greenPlayer);
-		System.out.println(client.getPlayerCol());
+//		System.out.println(client.getPlayerCol());
 	}
-	
+
 	public void setClient(DraughtsClient client) {
 		this.client = client;
 	}
@@ -51,8 +59,11 @@ public class MainWindowController {
 			if (client.getBoard()!=null){
 
 				boardGrid.getChildren().clear();
-				ArrayList<ColPiece> boardState=client.getBoard().getBoardState();
+				System.out.println(boardGrid.getChildren().size());
 				
+				ArrayList<ColPiece> boardState=client.getBoard().getBoardState();
+
+
 				for (ColPiece piece:boardState){
 					ImageView newPiece;
 					if (piece.field==FieldType.RED){
@@ -68,25 +79,54 @@ public class MainWindowController {
 							newPiece=new ImageView(greenQueen);
 
 					}
-					if (client.getPlayerCol()==FieldType.GREEN)
+					newPiece.addEventFilter(MouseEvent.MOUSE_PRESSED, (event)->{
+						if (rowFrom==null){
+							rowFrom=GridPane.getRowIndex(newPiece);
+							colFrom=GridPane.getColumnIndex(newPiece);
+							System.out.println("Source: "+rowFrom.toString()+" "+colFrom.toString());
+						}
+					});
+					if (client.getPlayerCol()==FieldType.GREEN){
 						boardGrid.add(newPiece, piece.piece.column, piece.piece.row);
-					else
+					} else
 						boardGrid.add(newPiece, client.getBoardInfo().boardBounds.colStop-piece.piece.column,client.getBoardInfo().boardBounds.rowStop-piece.piece.row );
 					GridPane.setHalignment(newPiece, HPos.CENTER);
 				}
-				/*
-			for (int i=0; i<board.getRowStop()-board.getRowStart()+1;i++){
-				for (int j=0;j<board.getColStop()-board.getColStart()+1;j++){
 
 
+				for (int i=0; i<boardGrid.getRowConstraints().size();i++){
+					for (int j=0;j<boardGrid.getColumnConstraints().size();j++){
+						boolean contains=false;
+					
+						for (Node node : boardGrid.getChildren()) {
+							if (GridPane.getColumnIndex(node).intValue() == j && GridPane.getRowIndex(node).intValue() == i){
+								contains=true;
+								break;
+							} 	
+						}
+						if (contains)
+							continue;
+						ImageView blankImg=new ImageView(blank);
+						blankImg.setPickOnBounds(true);
+						blankImg.addEventFilter(MouseEvent.MOUSE_PRESSED, (event)->{
+							if (rowFrom!=null){
+								rowTo=GridPane.getRowIndex(blankImg);
+								colTo=GridPane.getColumnIndex(blankImg);
+								System.out.println("Destination:"+rowTo.toString()+" "+colTo.toString());
+//								client.move(rowFrom, colFrom, rowTo, colTo);
+								rowFrom=null;
+							}
+						});
+						boardGrid.add(blankImg, j, i);
+						GridPane.setHalignment(blankImg, HPos.CENTER);
+					}
 				}
-			}
-				 */
 			}
 	}
 
 	@FXML public void initialize(){
 		//		board=new Board(new BoardBounds());
+
 	}
 
 }

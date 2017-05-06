@@ -14,7 +14,7 @@ package enums;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public enum PlayerMoveType {
+public enum GameDecisionType {
 	SURRENDER,
 	PAUSE,
 	DRAW,

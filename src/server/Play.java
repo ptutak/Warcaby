@@ -2,7 +2,7 @@ package server;
 
 import enums.FieldType;
 import enums.GameStatusType;
-import enums.PlayerMoveType;
+import enums.GameDecisionType;
 import general.Board;
 import general.ColPiece;
 import general.Move;
@@ -132,13 +132,13 @@ public class Play extends Thread {
 			}
 			else{
 				Move move;
-				PlayerMoveType moveType;
+				GameDecisionType moveType;
 				if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
 					move=gameInfo.playerRedMove.getMove();
 					moveType=gameInfo.playerRedMove.getPlayerMoveType();
-					if (moveType==PlayerMoveType.SURRENDER)
+					if (moveType==GameDecisionType.SURRENDER)
 						gameSurrender();
-					else if (moveType==PlayerMoveType.DRAW)
+					else if (moveType==GameDecisionType.DRAW)
 						gameDraw();
 					if (move.moveFrom.field==FieldType.GREEN)
 						continue;
@@ -146,9 +146,9 @@ public class Play extends Thread {
 				else {
 					move=gameInfo.playerGreenMove.getMove();
 					moveType=gameInfo.playerGreenMove.getPlayerMoveType();
-					if (moveType==PlayerMoveType.SURRENDER)
+					if (moveType==GameDecisionType.SURRENDER)
 						gameSurrender();
-					else if (moveType==PlayerMoveType.DRAW)
+					else if (moveType==GameDecisionType.DRAW)
 						gameDraw();
 					if (move.moveFrom.field==FieldType.RED)
 						continue;

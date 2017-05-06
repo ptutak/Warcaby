@@ -1,7 +1,7 @@
 package general;
 import java.io.Serializable;
 
-import enums.PlayerMoveType;
+import enums.GameDecisionType;
 
 /* 
   Copyright 2017 Piotr Tutak
@@ -24,7 +24,7 @@ public class PlayerMove implements Serializable {
 	 */
 	private static final long serialVersionUID = 2382901570392446785L;
 	public Player player;
-	private PlayerMoveType playerMoveType;
+	private GameDecisionType gameDecisionType;
 	private Move move;
 	private boolean moveDone;
 	
@@ -33,12 +33,12 @@ public class PlayerMove implements Serializable {
 		this.move = move;
 	}
 
-	public synchronized PlayerMoveType getPlayerMoveType() {
-		return playerMoveType;
+	public synchronized GameDecisionType getPlayerMoveType() {
+		return gameDecisionType;
 	}
 
-	public synchronized void setPlayerMoveType(PlayerMoveType playerMoveType) {
-		this.playerMoveType = playerMoveType;
+	public synchronized void setPlayerMoveType(GameDecisionType gameDecisionType) {
+		this.gameDecisionType = gameDecisionType;
 	}
 
 	public synchronized Move getMove() {

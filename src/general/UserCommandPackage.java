@@ -18,7 +18,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import enums.CommandType;
-import enums.PlayerMoveType;
+import enums.GameDecisionType;
 
 public class UserCommandPackage implements Serializable{
 
@@ -27,7 +27,7 @@ public class UserCommandPackage implements Serializable{
 	public Player player;
 	public String gameName;
 	public UUID gameID;
-	public PlayerMoveType playerMoveType;
+	public GameDecisionType gameDecisionType;
 	public Move move;	
 	public Object attachment;
 }

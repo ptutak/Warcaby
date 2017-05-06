@@ -15,8 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 import enums.CommandType;
 import enums.FieldType;
+import enums.MoveType;
 import enums.PackageLimiterType;
-import enums.PlayerMoveType;
+import enums.GameDecisionType;
 import enums.ResponseType;
 import general.Board;
 import general.BoardInfo;
@@ -45,7 +46,7 @@ public class DraughtsClient {
 	private UUID gameID=null;
 	private Board board=null;
 	private BoardInfo boardInfo=null;
-	private PlayerMoveType playerMoveType=null;
+	private GameDecisionType gameDecisionType=null;
 	private Move move=null;
 
 	private String oppositePlayer;
@@ -186,6 +187,17 @@ public class DraughtsClient {
 		}
 		return null;
 	}
+	
+	public MoveType move(int rowFrom, int colFrom, int rowTo, int colTo){
+		if (socketChannel!=null){
+			move=board.getMove(rowFrom, colFrom, rowTo, colTo);
+			writeCommand(socketChannel,CommandType.GAME_MOVE,null);
+			ServerResponsePackage response=checkResponse(socketChannel);
+			if (response!=null){
+			}
+		}
+		return null;
+	}
 
 	public void closeConnection(){
 		if (socketChannel!=null)
@@ -298,7 +310,7 @@ public class DraughtsClient {
 		commandPackage.gameName=gameName;
 		commandPackage.gameID=gameID;
 		commandPackage.move=move;
-		commandPackage.playerMoveType=playerMoveType;
+		commandPackage.gameDecisionType=gameDecisionType;
 		try {
 			ByteArrayOutputStream bos=new ByteArrayOutputStream();
 			ObjectOutputStream oos=new ObjectOutputStream(bos);
