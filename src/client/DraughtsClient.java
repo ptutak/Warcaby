@@ -117,7 +117,7 @@ public class DraughtsClient {
 			ServerResponsePackage response=checkResponse(socketChannel);
 			if (response!=null){
 				if (response.response==ResponseType.GAME_JOINED){
-					GameInfo info=(GameInfo)response.object;
+					GameInfo info=(GameInfo)response.attachment;
 					oppositePlayer=info.getPlayerRed();
 					boardInfo.boardBounds=info.getBoardBounds();
 					boardInfo.rowNumber=info.getRowNumber();
@@ -140,7 +140,7 @@ public class DraughtsClient {
 			ServerResponsePackage response=checkResponse(socketChannel);
 			if (response!=null){
 				if (response.response==ResponseType.GAME_CREATED){
-					this.gameID=(UUID)response.object;
+					this.gameID=(UUID)response.attachment;
 					boardInfo=info;
 					playerCol=FieldType.RED;
 					initBoard();
@@ -166,7 +166,7 @@ public class DraughtsClient {
 			ServerResponsePackage response=checkResponse(socketChannel);
 			if (response!=null){
 				if (response.response==ResponseType.GAME_LIST){
-					return (GameInfo[]) response.object;
+					return (GameInfo[]) response.attachment;
 				}
 			}
 			return null;
@@ -194,6 +194,12 @@ public class DraughtsClient {
 			writeCommand(socketChannel,CommandType.GAME_MOVE,null);
 			ServerResponsePackage response=checkResponse(socketChannel);
 			if (response!=null){
+				if (response.response==ResponseType.GAME_MOVE_FINAL || response.response==ResponseType.GAME_MOVE_CONTINUE){
+					MoveType move=(MoveType)response.attachment;
+					if (move==MoveType.KILL || move==MoveType.MOVE)
+						board.movePiece(board.fieldState(rowFrom, colFrom).piece, rowTo, colTo);
+				}
+				return (MoveType)response.attachment;
 			}
 		}
 		return null;
@@ -304,7 +310,7 @@ public class DraughtsClient {
 
 	private void writeCommand(SocketChannel socketChannel,CommandType command,Object object){
 		UserCommandPackage commandPackage=new UserCommandPackage();
-		commandPackage.commandType=command;
+		commandPackage.command=command;
 		commandPackage.player=player;
 		commandPackage.attachment=object;
 		commandPackage.gameName=gameName;

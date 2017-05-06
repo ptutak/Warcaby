@@ -18,7 +18,7 @@ import enums.GameDecisionType;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-public class PlayerMove implements Serializable {
+public class PlayerWithMove implements Serializable {
 	/**
 	 * 
 	 */
@@ -28,16 +28,16 @@ public class PlayerMove implements Serializable {
 	private Move move;
 	private boolean moveDone;
 	
-	public PlayerMove(Player player, Move move) {
+	public PlayerWithMove(Player player, Move move) {
 		this.player = player;
 		this.move = move;
 	}
 
-	public synchronized GameDecisionType getPlayerMoveType() {
+	public synchronized GameDecisionType getGameDecisionType() {
 		return gameDecisionType;
 	}
 
-	public synchronized void setPlayerMoveType(GameDecisionType gameDecisionType) {
+	public synchronized void setGameDecisionType(GameDecisionType gameDecisionType) {
 		this.gameDecisionType = gameDecisionType;
 	}
 

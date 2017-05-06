@@ -23,5 +23,5 @@ public class ServerResponsePackage implements Serializable {
 	private static final long serialVersionUID = -7196969330105075920L;
 	
 	public ResponseType response;
-	public Object object;
+	public Object attachment;
 }

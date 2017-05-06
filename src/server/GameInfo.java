@@ -22,7 +22,7 @@ import enums.GameStatusType;
 import general.BoardBounds;
 import general.ColPiece;
 import general.Player;
-import general.PlayerMove;
+import general.PlayerWithMove;
 
 public class GameInfo implements Serializable {
 	/**
@@ -38,8 +38,8 @@ public class GameInfo implements Serializable {
 	private int turnTimeLimit;
 	private int gameTimeLimit;
 
-	public PlayerMove playerRedMove;
-	public PlayerMove playerGreenMove;
+	public PlayerWithMove playerRedMove;
+	public PlayerWithMove playerGreenMove;
 	public Player winner;
 	
 	GameInfo(String gameName){

@@ -135,7 +135,7 @@ public class Play extends Thread {
 				GameDecisionType moveType;
 				if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
 					move=gameInfo.playerRedMove.getMove();
-					moveType=gameInfo.playerRedMove.getPlayerMoveType();
+					moveType=gameInfo.playerRedMove.getGameDecisionType();
 					if (moveType==GameDecisionType.SURRENDER)
 						gameSurrender();
 					else if (moveType==GameDecisionType.DRAW)
@@ -145,7 +145,7 @@ public class Play extends Thread {
 				}
 				else {
 					move=gameInfo.playerGreenMove.getMove();
-					moveType=gameInfo.playerGreenMove.getPlayerMoveType();
+					moveType=gameInfo.playerGreenMove.getGameDecisionType();
 					if (moveType==GameDecisionType.SURRENDER)
 						gameSurrender();
 					else if (moveType==GameDecisionType.DRAW)

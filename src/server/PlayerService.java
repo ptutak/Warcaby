@@ -16,14 +16,14 @@ Copyright 2017 Piotr Tutak
 */
 import java.nio.channels.SocketChannel;
 
-import general.PlayerMove;
+import general.PlayerWithMove;
 
 public class PlayerService {
 	public SocketChannel channel;
-	public PlayerMove playerMove;
+	public PlayerWithMove playerWithMove;
 	
-	public PlayerService(SocketChannel channel, PlayerMove playerMove){
+	public PlayerService(SocketChannel channel, PlayerWithMove playerWithMove){
 		this.channel=channel;
-		this.playerMove=playerMove;
+		this.playerWithMove=playerWithMove;
 	}
 }

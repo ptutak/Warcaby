@@ -71,7 +71,7 @@ public class Board{
 		return null;
 	}
 	
-	private ColPiece fieldState(int row, int column){
+	public ColPiece fieldState(int row, int column){
 		for (Piece x:red){
 			if (x.row==row && x.column==column)
 				return new ColPiece(x,FieldType.RED);

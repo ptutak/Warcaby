@@ -53,6 +53,14 @@ public class MainWindowController {
 	public void setClient(DraughtsClient client) {
 		this.client = client;
 	}
+	
+	private void move(){
+		if (client.getPlayerCol()==FieldType.GREEN)
+			client.move(rowFrom, colFrom, rowTo, colTo);
+		else
+			client.move(client.getBoardInfo().boardBounds.rowStop-rowFrom, client.getBoardInfo().boardBounds.colStop-colFrom, client.getBoardInfo().boardBounds.rowStop-rowTo, client.getBoardInfo().boardBounds.colStop-colTo);
+		
+	}
 
 	public void refreshBoard(){
 		if (client!=null)
@@ -113,10 +121,7 @@ public class MainWindowController {
 								rowTo=GridPane.getRowIndex(blankImg);
 								colTo=GridPane.getColumnIndex(blankImg);
 								System.out.println("Destination:"+rowTo.toString()+" "+colTo.toString());
-								if (client.getPlayerCol()==FieldType.GREEN)
-									client.move(rowFrom, colFrom, rowTo, colTo);
-								else
-									client.move(client.getBoardInfo().boardBounds.rowStop-rowFrom, client.getBoardInfo().boardBounds.colStop-colFrom, client.getBoardInfo().boardBounds.rowStop-rowTo, client.getBoardInfo().boardBounds.colStop-colTo);
+								move();
 								rowFrom=null;
 							}
 						});

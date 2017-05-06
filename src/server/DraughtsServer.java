@@ -36,11 +36,13 @@ import java.util.Set;
 
 import enums.ResponseType;
 import general.Player;
-import general.PlayerMove;
+import general.PlayerWithMove;
 import general.ServerResponsePackage;
 import general.UserCommandPackage;
 import general.BoardInfo;
+import general.Move;
 import enums.GameStatusType;
+import enums.MoveType;
 import enums.PackageLimiterType;
 
 
@@ -101,6 +103,11 @@ public class DraughtsServer extends Thread {
 		
 	}
 	
+	public void moveResponseAndForNext(Player responsePlayer, Player nextPlayer,MoveType moveType, Move moveForNext){
+		
+		
+	}
+	
 	private boolean removePlayer(SocketChannel channel){
 		for (PlayerService x:playerMap.values()){
 			if (x.channel.equals(channel)){
@@ -108,13 +115,13 @@ public class DraughtsServer extends Thread {
 				gameMap.keySet().toArray(ks);
 				for (String game:ks){
 					if (gameMap.containsKey(game))
-						if ((gameMap.get(game).playerRedMove.player.equals(x.playerMove.player)) || (gameMap.get(game).playerGreenMove!=null && gameMap.get(game).playerGreenMove.player.equals(x.playerMove.player))) {
+						if ((gameMap.get(game).playerRedMove.player.equals(x.playerWithMove.player)) || (gameMap.get(game).playerGreenMove!=null && gameMap.get(game).playerGreenMove.player.equals(x.playerWithMove.player))) {
 							gameEnd(gameMap.get(game));
 							gameMap.remove(game);
 						} 
 				}
-				if (playerLoginSet.remove(x.playerMove.player.getLogin()))
-					return playerMap.remove(x.playerMove.player, x);
+				if (playerLoginSet.remove(x.playerWithMove.player.getLogin()))
+					return playerMap.remove(x.playerWithMove.player, x);
 			}
 		}
 		return false;
@@ -242,13 +249,13 @@ public class DraughtsServer extends Thread {
 		if (command==null){
 		}
 		else{
-			switch(command.commandType){
+			switch(command.command){
 			case REGISTER_NEW_USER:
 				if (playerLoginSet.contains(command.player.getLogin())){
 					writeResponse(serviceChannel,ResponseType.USER_EXISTS,null);
 					System.out.println(ResponseType.USER_EXISTS);
 				} else{
-					playerMap.put(command.player,new PlayerService(serviceChannel, new PlayerMove(command.player,null)));
+					playerMap.put(command.player,new PlayerService(serviceChannel, new PlayerWithMove(command.player,null)));
 					playerLoginSet.add(command.player.getLogin());
 					writeResponse(serviceChannel,ResponseType.USER_REGISTERED,null);
 					System.out.println(ResponseType.USER_REGISTERED);
@@ -276,7 +283,7 @@ public class DraughtsServer extends Thread {
 						BoardInfo boardInfo=(BoardInfo)command.attachment;
 						newGame.setBoardBounds(boardInfo.boardBounds);
 						newGame.setRowNumber(boardInfo.rowNumber);
-						newGame.playerRedMove=playerMap.get(command.player).playerMove;
+						newGame.playerRedMove=playerMap.get(command.player).playerWithMove;
 						gameMap.put(command.gameName, newGame);
 						writeResponse(serviceChannel,ResponseType.GAME_CREATED,newGame.getID());
 						System.out.println(ResponseType.GAME_CREATED);
@@ -298,7 +305,7 @@ public class DraughtsServer extends Thread {
 				if (playerMap.containsKey(command.player)){
 					if (gameMap.containsKey(command.gameName) && gameMap.get(command.gameName).getID().equals(command.gameID)){
 						if (gameMap.get(command.gameName).getGameStatus().equals(GameStatusType.GAME_WAITING)){
-							gameMap.get(command.gameName).playerGreenMove=playerMap.get(command.player).playerMove;
+							gameMap.get(command.gameName).playerGreenMove=playerMap.get(command.player).playerWithMove;
 							
 							Player playerRed=gameMap.get(command.gameName).playerRedMove.player;
 							
@@ -353,13 +360,13 @@ public class DraughtsServer extends Thread {
 	}
 
 
-	private void writeResponse(SocketChannel socketChannel,ResponseType response, Object object){
+	private void writeResponse(SocketChannel socketChannel,ResponseType response, Object attachment){
 
 		ByteBuffer writeBuffer=ByteBuffer.allocate(BUFFSIZE);
 
 		ServerResponsePackage responsePackage=new ServerResponsePackage();
 		responsePackage.response=response;
-		responsePackage.object=object;
+		responsePackage.attachment=attachment;
 		try {
 			ByteArrayOutputStream bos=new ByteArrayOutputStream();
 			ObjectOutputStream oos=new ObjectOutputStream(bos);

@@ -23,7 +23,7 @@ import enums.GameDecisionType;
 public class UserCommandPackage implements Serializable{
 
 	private static final long serialVersionUID = -1294021581015850208L;
-	public CommandType commandType;
+	public CommandType command;
 	public Player player;
 	public String gameName;
 	public UUID gameID;
