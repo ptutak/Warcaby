@@ -6,6 +6,7 @@ import enums.FieldType;
 import enums.PieceType;
 import enums.ResponseType;
 import general.ColPiece;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
@@ -40,6 +41,21 @@ public class MainWindowController {
 	@FXML private ImageView playerImageView;
 
 	boolean gameStarted=false;
+	
+	public void waitForGameReady(){
+		Runnable waitForGameReady=new Runnable(){
+			@Override
+			public void run(){
+				while(true){
+					if (client.getOppositePlayer()!=null){
+						initImages();
+						break;
+					}
+				}
+			}
+		};
+		Platform.runLater(waitForGameReady);
+	}
 
 	@FXML private void startGameButtonClick(){
 		if (client.getOppositePlayer()!=null)

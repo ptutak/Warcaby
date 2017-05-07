@@ -75,6 +75,7 @@ public class GameListWindowController {
 			if (response==ResponseType.GAME_CREATED){
 				mainController.refreshBoard();
 				mainController.initImages();
+				mainController.waitForGameReady();
 				stage.setScene(mainScene);
 			} else if (response==ResponseType.GAME_EXISTS){
 				infoLabel.setText("Game with this name already exists");

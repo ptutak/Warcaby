@@ -51,8 +51,6 @@ public class DraughtsServer extends Thread {
 	private int port;
 
 	final int BUFFSIZE=4096;
-	ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
-	ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
 
 	long responseTime=500;
 
@@ -166,6 +164,8 @@ public class DraughtsServer extends Thread {
 	}
 
 	private UserCommandPackage checkCommand(SocketChannel socketChannel){
+		ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
+		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
 
 		System.out.println("Check func begin");
 		if (!socketChannel.isOpen())
@@ -316,7 +316,7 @@ public class DraughtsServer extends Thread {
 				break;
 			case JOIN_GAME:
 				if (playerMap.containsKey(command.player)){
-					if (gameMap.containsKey(command.gameName) && gameMap.get(command.gameName).getID().equals(command.gameID)){
+					if (gameMap.containsKey(command.gameName)){
 						if (gameMap.get(command.gameName).getGameStatus().equals(GameStatusType.GAME_WAITING)){
 							gameMap.get(command.gameName).playerGreenMove=playerMap.get(command.player).playerWithMove;
 
@@ -343,14 +343,24 @@ public class DraughtsServer extends Thread {
 				break;
 			case GAME_MOVE:{
 				GameInfo game=gameMap.get(command.gameName);
-				if (playerMap.containsKey(command.player) && game!=null && game.getID().equals(command.gameID) && game.containsPlayer(command.player)){
-					if (game.getGameStatus().equals(GameStatusType.GAME_RUNNING)){
-						playerMap.get(command.player).playerWithMove.setMove(command.move);
+				if (playerMap.containsKey(command.player)){
+					if (game!=null && game.getID().equals(command.gameID)){
+						if(game.containsPlayer(command.player)){
+							if (game.getGameStatus().equals(GameStatusType.GAME_RUNNING)){
+								playerMap.get(command.player).playerWithMove.setMove(command.move);
+							} else {
+								writeResponse(socketChannel,ResponseType.GAME_NOT_RUNNING,null);
+								System.out.println(ResponseType.GAME_NOT_RUNNING);
+							}
+						}else{
+							writeResponse(socketChannel,ResponseType.USER_NOT_IN_GAME,null);
+							System.out.println(ResponseType.USER_NOT_IN_GAME);
+						}
 					} else {
-						writeResponse(socketChannel,ResponseType.GAME_NOT_RUNNING,null);
-						System.out.println(ResponseType.GAME_NOT_RUNNING);
+						writeResponse(socketChannel,ResponseType.WRONG_GAME_NAME,null);
+						System.out.println(ResponseType.WRONG_GAME_NAME);
 					}
-				} else{
+				}else{
 					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
 					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}

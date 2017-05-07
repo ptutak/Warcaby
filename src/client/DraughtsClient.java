@@ -49,7 +49,22 @@ public class DraughtsClient {
 	private GameDecisionType gameDecisionType=null;
 	private Move move=null;
 
-	private String oppositePlayer;
+	private String oppositePlayer=null;
+
+	private Runnable waitForGameReady=new Runnable(){
+		@Override
+		public void run(){
+			while (true){
+				ServerResponsePackage response=checkResponse(socketChannel);
+				if (response!=null){
+					if (response.response==ResponseType.GAME_READY){
+						setOppositePlayer((String)response.attachment);
+						break;
+					}
+				}
+			}
+		}
+	};
 
 	public Board getBoard() {
 		return board;
@@ -63,10 +78,14 @@ public class DraughtsClient {
 		return boardInfo;
 	}
 
-	public String getOppositePlayer() {
+	public synchronized String getOppositePlayer() {
 		return oppositePlayer;
 	}
 	
+	public synchronized void setOppositePlayer(String oppositePlayer){
+		this.oppositePlayer=oppositePlayer;
+	}
+
 	public String getPlayerName(){
 		return player.getLogin();
 	}
@@ -107,13 +126,13 @@ public class DraughtsClient {
 		ServerResponsePackage response=checkResponse(socketChannel);
 		if (response!=null)
 			if (response.response==ResponseType.USER_REGISTERED){
-//				player=(Player)response.object;
+				//				player=(Player)response.object;
 				return ResponseType.USER_REGISTERED;
 			} else if(response.response==ResponseType.USER_EXISTS)
 				return ResponseType.USER_EXISTS;
 		return null;
 	}
-	
+
 	public ResponseType joinGame(String gameName){
 		if (socketChannel!=null){
 			this.gameName=gameName;
@@ -123,10 +142,12 @@ public class DraughtsClient {
 				if (response.response==ResponseType.GAME_JOINED){
 					GameInfo info=(GameInfo)response.attachment;
 					oppositePlayer=info.getPlayerRed();
+					boardInfo=new BoardInfo();
 					boardInfo.boardBounds=info.getBoardBounds();
 					boardInfo.rowNumber=info.getRowNumber();
 					boardInfo.turnTimeLimit=info.getTurnTimeLimit();
 					boardInfo.gameTimeLimit=info.getGameTimeLimit();
+					gameID=info.getID();
 					playerCol=FieldType.GREEN;
 					initBoard();
 				}
@@ -135,7 +156,7 @@ public class DraughtsClient {
 		}
 		return null;
 	}
-	
+
 	public ResponseType newGame(String gameName, int rowNumber, int rowColumns){
 		if (socketChannel!=null){
 			this.gameName=gameName;
@@ -148,6 +169,7 @@ public class DraughtsClient {
 					boardInfo=info;
 					playerCol=FieldType.RED;
 					initBoard();
+					new Thread(waitForGameReady).start();
 				} else if (response.response==ResponseType.GAME_EXISTS){
 					this.gameName=null;
 				}
@@ -156,14 +178,14 @@ public class DraughtsClient {
 		}
 		return null;
 	}
-	
+
 	private void initBoard(){
 		if (boardInfo!=null){
 			board=new Board(boardInfo.boardBounds);
 			board.setNRowGame(boardInfo.rowNumber);
 		}
 	}
-	
+
 	public GameInfo[] getGameList(){
 		if (socketChannel!=null){
 			writeCommand(socketChannel,CommandType.AVAILABLE_GAMES,null);
@@ -177,7 +199,7 @@ public class DraughtsClient {
 		}
 		return null;
 	}
-	
+
 	public ResponseType endConnection(){
 		if (socketChannel!=null){
 			writeCommand(socketChannel,CommandType.END_CONNECTION,null);
@@ -191,7 +213,7 @@ public class DraughtsClient {
 		}
 		return null;
 	}
-	
+
 	public ResponseType move(int rowFrom, int colFrom, int rowTo, int colTo){
 		if (socketChannel!=null){
 			move=board.getMove(rowFrom, colFrom, rowTo, colTo);
@@ -210,7 +232,7 @@ public class DraughtsClient {
 		}
 		return null;
 	}
-	
+
 	public ResponseType waitForResponseMove(){
 		while (socketChannel!=null){
 			ServerResponsePackage response=checkResponse(socketChannel);
@@ -235,7 +257,7 @@ public class DraughtsClient {
 				e.printStackTrace();
 			}
 	}
-	
+
 	public void reconnect(){
 		try {
 			socketChannel.close();
@@ -311,7 +333,7 @@ public class DraughtsClient {
 				break;
 			} catch (IOException e) {
 				System.out.println("IOE");
-//				e.printStackTrace();
+				//				e.printStackTrace();
 				try {
 					socketChannel.close();
 					System.out.println("Service Channel Closed");
@@ -325,7 +347,7 @@ public class DraughtsClient {
 		safeBuffer.clear();
 		return response;
 	}
-	
+
 
 
 	private void writeCommand(SocketChannel socketChannel,CommandType command,Object object){
@@ -356,15 +378,5 @@ public class DraughtsClient {
 		} catch (IOException e){
 			e.printStackTrace();
 		}
-	}
-	
-	public static void main(String[] args){
-		DraughtsClient client=new DraughtsClient();
-		boolean response=client.establishConnection("127.0.0.1", 50000);
-		System.out.println(response);
-		ResponseType resp=client.registerUser("piotr");
-		System.out.println(resp);
-		//		client.closeConnection();
-		while(true);
 	}
 }

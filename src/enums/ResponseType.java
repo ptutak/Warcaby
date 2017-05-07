@@ -37,5 +37,6 @@ public enum ResponseType {
 	USER_RECONNECTED,
 	
 	WRONG_GAME_NAME,
+	USER_NOT_IN_GAME,
 	CONNECTION_ENDED
 }
