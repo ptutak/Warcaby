@@ -332,8 +332,8 @@ public class DraughtsServer extends Thread {
 						}
 					}
 					else {
-						writeResponse(socketChannel,ResponseType.WRONG_GAME_NAME,null);
-						System.out.println(ResponseType.WRONG_GAME_NAME);
+						writeResponse(socketChannel,ResponseType.WRONG_GAME_NAME_OR_ID,null);
+						System.out.println(ResponseType.WRONG_GAME_NAME_OR_ID);
 					}
 				} 
 				else {
@@ -357,8 +357,8 @@ public class DraughtsServer extends Thread {
 							System.out.println(ResponseType.USER_NOT_IN_GAME);
 						}
 					} else {
-						writeResponse(socketChannel,ResponseType.WRONG_GAME_NAME,null);
-						System.out.println(ResponseType.WRONG_GAME_NAME);
+						writeResponse(socketChannel,ResponseType.WRONG_GAME_NAME_OR_ID,null);
+						System.out.println(ResponseType.WRONG_GAME_NAME_OR_ID);
 					}
 				}else{
 					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);

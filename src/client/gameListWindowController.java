@@ -93,7 +93,7 @@ public class GameListWindowController {
 				mainController.refreshBoard();
 				mainController.initImages();
 				stage.setScene(mainScene);
-			} else if(response==ResponseType.WRONG_GAME_NAME){
+			} else if(response==ResponseType.WRONG_GAME_NAME_OR_ID){
 				infoLabel.setText("Wrong game name");
 			} else {
 				infoLabel.setText("Connection error");
