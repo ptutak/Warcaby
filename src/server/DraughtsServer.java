@@ -51,7 +51,6 @@ public class DraughtsServer extends Thread {
 	private int port;
 
 	final int BUFFSIZE=4096;
-
 	long responseTime=500;
 
 	private ServerSocketChannel serverSocketChannel = null;
