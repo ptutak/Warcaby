@@ -204,12 +204,9 @@ public class DraughtsClient {
 		if (socketChannel!=null){
 			writeCommand(socketChannel,CommandType.END_CONNECTION,null);
 			ServerResponsePackage response=checkResponse(socketChannel);
-			if (response!=null){
-				if (response.response==ResponseType.CONNECTION_ENDED){
-					closeConnection();
-				}
+			closeConnection();
+			if (response!=null)
 				return response.response;
-			}
 		}
 		return null;
 	}
@@ -259,11 +256,7 @@ public class DraughtsClient {
 	}
 
 	public void reconnect(){
-		try {
-			socketChannel.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		endConnection();
 		socketChannel=null;
 		establishConnection(serverIp,serverPort);
 		registerUser(player.getLogin());
