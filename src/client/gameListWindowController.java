@@ -1,6 +1,7 @@
 package client;
 
 import enums.ResponseType;
+import general.GameInfo;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,7 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import server.GameInfo;
 
 public class GameListWindowController {
 	

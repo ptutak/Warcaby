@@ -6,6 +6,7 @@ import enums.MoveType;
 import enums.GameDecisionType;
 import general.Board;
 import general.ColPiece;
+import general.GameInfo;
 import general.Move;
 import general.Player;
 import enums.PieceType;

@@ -20,6 +20,7 @@ public enum CommandType {
 	NEW_GAME,
 	AVAILABLE_GAMES,
 	JOIN_GAME,
+	START_GAME,
 	GAME_MOVE,
 	END_CONNECTION
 }

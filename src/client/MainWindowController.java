@@ -43,23 +43,31 @@ public class MainWindowController {
 	boolean gameStarted=false;
 	
 	public void waitForGameReady(){
+		Runnable updateImages=new Runnable(){
+			@Override
+			public void run(){
+				initImages();
+			}
+		};
 		Runnable waitForGameReady=new Runnable(){
 			@Override
 			public void run(){
 				while(true){
 					if (client.getOppositePlayer()!=null){
-						initImages();
+						Platform.runLater(updateImages);
 						break;
 					}
 				}
 			}
 		};
-		Platform.runLater(waitForGameReady);
+		new Thread(waitForGameReady).start();
 	}
 
 	@FXML private void startGameButtonClick(){
-		if (client.getOppositePlayer()!=null)
+		if (client.getOppositePlayer()!=null && gameStarted==false){
 			gameStarted=true;
+			client.startGame();
+		}
 	}
 	
 	@FXML private void exitButtonClick(){

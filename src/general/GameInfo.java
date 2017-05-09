@@ -1,4 +1,4 @@
-package server;
+package general;
 import java.io.Serializable;
 /* 
   Copyright 2017 Piotr Tutak
@@ -19,10 +19,6 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import enums.GameStatusType;
-import general.BoardBounds;
-import general.ColPiece;
-import general.Player;
-import general.PlayerWithMove;
 
 public class GameInfo implements Serializable {
 	/**
@@ -37,12 +33,13 @@ public class GameInfo implements Serializable {
 	private int rowNumber;
 	private int turnTimeLimit;
 	private int gameTimeLimit;
+	public int readyNumber;
 
 	public PlayerWithMove playerRedMove;
 	public PlayerWithMove playerGreenMove;
 	public Player winner;
 	
-	GameInfo(String gameName){
+	public GameInfo(String gameName){
 		this.gameName=gameName;
 		this.ID=UUID.randomUUID();
 		gameStatus=GameStatusType.GAME_WAITING;
@@ -53,6 +50,7 @@ public class GameInfo implements Serializable {
 		winner=null;
 		turnTimeLimit=0;
 		gameTimeLimit=0;
+		readyNumber=2;
 	}
 	public boolean containsPlayer(Player player){
 		if (playerRedMove.player.equals(player) || playerGreenMove.player.equals(player))

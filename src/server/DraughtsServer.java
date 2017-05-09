@@ -31,6 +31,7 @@ import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import enums.ResponseType;
@@ -39,6 +40,7 @@ import general.PlayerWithMove;
 import general.ServerResponsePackage;
 import general.UserCommandPackage;
 import general.BoardInfo;
+import general.GameInfo;
 import general.Move;
 import enums.GameStatusType;
 import enums.MoveType;
@@ -305,7 +307,12 @@ public class DraughtsServer extends Thread {
 				break;
 			case AVAILABLE_GAMES:
 				if (playerMap.containsKey(command.player)){
-					GameInfo[] gameList=gameMap.values().toArray(new GameInfo[0]);
+					LinkedList<GameInfo> gl=new LinkedList<GameInfo>();
+					for (GameInfo x:gameMap.values()){
+						if (x.getGameStatus()==GameStatusType.GAME_WAITING)
+							gl.add(x);
+					}
+					GameInfo[] gameList=gl.toArray(new GameInfo[0]);
 					writeResponse(socketChannel,ResponseType.GAME_LIST,gameList);
 					System.out.println(ResponseType.GAME_LIST);
 				}else{
@@ -359,11 +366,40 @@ public class DraughtsServer extends Thread {
 						writeResponse(socketChannel,ResponseType.WRONG_GAME_NAME_OR_ID,null);
 						System.out.println(ResponseType.WRONG_GAME_NAME_OR_ID);
 					}
-				}else{
+				} else {
 					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
 					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}
 				break;
+			}
+			case START_GAME:{
+				GameInfo game=gameMap.get(command.gameName);
+				if (playerMap.containsKey(command.player)){
+					if (game!=null && game.getID().equals(command.gameID)){
+						if(game.containsPlayer(command.player)){
+							if (game.getGameStatus().equals(GameStatusType.GAME_READY)){
+								game.readyNumber--;
+								if (game.readyNumber==0) {
+									Game newGame=new Game(this,game);
+									newGame.start();
+																		
+								}
+							} else {
+								writeResponse(socketChannel,ResponseType.GAME_NOT_READY,null);
+								System.out.println(ResponseType.GAME_NOT_READY);
+							}
+						} else {
+							writeResponse(socketChannel,ResponseType.USER_NOT_IN_GAME,null);
+							System.out.println(ResponseType.USER_NOT_IN_GAME);
+						}
+					} else {
+						writeResponse(socketChannel,ResponseType.WRONG_GAME_NAME_OR_ID,null);
+						System.out.println(ResponseType.WRONG_GAME_NAME_OR_ID);
+					}
+				} else {
+					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
+					System.out.println(ResponseType.USER_NOT_REGISTERED);
+				}
 			}
 			case END_CONNECTION:
 				if (playerMap.containsKey(command.player)){
@@ -385,6 +421,9 @@ public class DraughtsServer extends Thread {
 					}
 					playerMap.remove(command.player);
 					System.out.println(ResponseType.CONNECTION_ENDED);
+				} else {
+					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
+					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}
 				break;
 			}

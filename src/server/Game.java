@@ -3,6 +3,7 @@ import java.util.concurrent.TimeUnit;
 
 import enums.GameStatusType;
 import general.Board;
+import general.GameInfo;
 
 /* 
   Copyright 2017 Piotr Tutak
@@ -41,12 +42,12 @@ public class Game extends Thread{
 	public void run(){
 		gameTimer.start();
 		play.start();
-		try {
+/*		try {
 			TimeUnit.SECONDS.sleep(5);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		gameTurnInfo.setTimerOn(true);
+*/		gameTurnInfo.setTimerOn(true);
 		try{
 			play.join();
 			gameTimer.join();

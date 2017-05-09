@@ -40,6 +40,12 @@ public class PlayerWithMove implements Serializable {
 	public synchronized void setGameDecisionType(GameDecisionType gameDecisionType) {
 		this.gameDecisionType = gameDecisionType;
 	}
+	
+
+	public void setMove(Move move){
+		this.move=move;
+		moveDone=true;
+	}
 
 	public synchronized Move getMove() {
 		while(!moveDone)
@@ -51,7 +57,7 @@ public class PlayerWithMove implements Serializable {
 		return move;
 	}
 
-	public synchronized void setMove(Move move) {
+/*	public synchronized void setMove(Move move) {
 		while(moveDone)
 			try{
 				wait();
@@ -60,5 +66,5 @@ public class PlayerWithMove implements Serializable {
 		this.move = move;
 		notifyAll();
 	}
-	
+	*/
 }

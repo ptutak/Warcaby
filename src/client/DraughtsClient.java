@@ -21,24 +21,24 @@ import enums.GameDecisionType;
 import enums.ResponseType;
 import general.Board;
 import general.BoardInfo;
+import general.GameInfo;
 import general.Move;
 import general.Player;
 import general.ServerResponsePackage;
 import general.UserCommandPackage;
-import server.GameInfo;
 
 public class DraughtsClient {
 
 	private String serverIp=null;
 	private int serverPort=0;
 	private SocketChannel socketChannel=null;
-	private final long responseTime=1500;
-	private final int serverResponseMultiTime=3;
+	private final long RESPONSE_TIME=500;
+	private final int SERVER_RESPONSE_MULTI_TIME=3;
 
-	private final int BUFFSIZE=4096;
-	private ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
-	private ByteBuffer safeBuffer=ByteBuffer.allocate(16*BUFFSIZE);
-	private ByteBuffer writeBuffer=ByteBuffer.allocate(BUFFSIZE);
+	private final int BUFF_SIZE=4096;
+	private ByteBuffer readBuffer=ByteBuffer.allocate(BUFF_SIZE);
+	private ByteBuffer safeBuffer=ByteBuffer.allocate(16*BUFF_SIZE);
+	private ByteBuffer writeBuffer=ByteBuffer.allocate(BUFF_SIZE);
 
 	private Player player=null;
 	private FieldType playerCol=null;
@@ -50,11 +50,13 @@ public class DraughtsClient {
 	private Move move=null;
 
 	private String oppositePlayer=null;
+	
+	private Thread waitingThread=null;
 
 	private Runnable waitForGameReady=new Runnable(){
 		@Override
 		public void run(){
-			while (true){
+			while (socketChannel!=null && waitingThread!=null){
 				ServerResponsePackage response=checkResponse(socketChannel);
 				if (response!=null){
 					if (response.response==ResponseType.GAME_READY){
@@ -97,9 +99,9 @@ public class DraughtsClient {
 			boolean connected=socketChannel.connect(new InetSocketAddress(ip, port));
 			int i=0;
 			while (!connected){
-				TimeUnit.MILLISECONDS.sleep(responseTime);
+				TimeUnit.MILLISECONDS.sleep(RESPONSE_TIME);
 				connected=socketChannel.finishConnect();
-				if (i>serverResponseMultiTime)
+				if (i>SERVER_RESPONSE_MULTI_TIME)
 					break;
 				i++;
 			}
@@ -131,6 +133,14 @@ public class DraughtsClient {
 			} else if(response.response==ResponseType.USER_EXISTS)
 				return ResponseType.USER_EXISTS;
 		return null;
+	}
+	
+	public void startGame(){
+		if (socketChannel==null)
+			return;
+		writeCommand(socketChannel,CommandType.START_GAME,null);
+		ServerResponsePackage response=checkResponse(socketChannel);
+		
 	}
 
 	public ResponseType joinGame(String gameName){
@@ -169,7 +179,8 @@ public class DraughtsClient {
 					boardInfo=info;
 					playerCol=FieldType.RED;
 					initBoard();
-					new Thread(waitForGameReady).start();
+					waitingThread=new Thread(waitForGameReady);
+					waitingThread.start();
 				} else if (response.response==ResponseType.GAME_EXISTS){
 					this.gameName=null;
 				}
@@ -202,6 +213,14 @@ public class DraughtsClient {
 
 	public ResponseType endConnection(){
 		if (socketChannel!=null){
+			if (waitingThread!=null)
+				waitingThread=null;
+			try {
+				Thread.sleep(RESPONSE_TIME);
+			} catch (InterruptedException e) {
+
+				e.printStackTrace();
+			}
 			writeCommand(socketChannel,CommandType.END_CONNECTION,null);
 			ServerResponsePackage response=checkResponse(socketChannel);
 			closeConnection();
@@ -261,14 +280,16 @@ public class DraughtsClient {
 		establishConnection(serverIp,serverPort);
 		registerUser(player.getLogin());
 	}
-	private ServerResponsePackage checkResponse(SocketChannel socketChannel){
+	private synchronized ServerResponsePackage checkResponse(SocketChannel socketChannel){
 		System.out.println("check func");
+		if (socketChannel==null)
+			return null;
 		if (!socketChannel.isOpen())
 			return null;
 		//		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
 		ServerResponsePackage response=null;
 		long startTime=System.currentTimeMillis();
-		while (System.currentTimeMillis()-startTime<responseTime) {
+		while (System.currentTimeMillis()-startTime<RESPONSE_TIME) {
 			try {
 				long n = socketChannel.read(readBuffer);
 				//				System.out.println(n);
