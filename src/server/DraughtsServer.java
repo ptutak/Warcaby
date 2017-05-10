@@ -41,9 +41,7 @@ import general.ServerResponsePackage;
 import general.UserCommandPackage;
 import general.BoardInfo;
 import general.GameInfo;
-import general.Move;
 import enums.GameStatusType;
-import enums.MoveType;
 import enums.PackageLimiterType;
 
 
@@ -101,15 +99,19 @@ public class DraughtsServer extends Thread {
 
 	}
 
-	public void moveResponseAndForNext(String gameName, Player responsePlayer, Player nextPlayer,ResponseType response,ResponseType next,MoveType moveType, Move moveForNext){
-		if (gameMap.get(gameName).containsPlayer(nextPlayer) && gameMap.get(gameName).containsPlayer(responsePlayer)){
-			SocketChannel responseSC=playerMap.get(responsePlayer).channel;
-			writeResponse(responseSC,response,moveType);
-			System.out.println(response);
-			if (next!=null){
-				SocketChannel nextSC = playerMap.get(nextPlayer).channel;
-				writeResponse(nextSC,next,moveForNext);
-				System.out.println(next);
+	public void writeToGame(String gameName, ResponseType playerRedResponse,Object attachmentRed,ResponseType playerGreenResponse, Object attachmentGreen){
+		if (gameMap.containsKey(gameName)){
+			GameInfo game=gameMap.get(gameName);
+		
+			if (playerRedResponse!=null){
+				SocketChannel redSC=playerMap.get(game.playerRedMove.player).channel;
+				writeResponse(redSC,playerRedResponse,attachmentRed);
+				System.out.println(playerRedResponse);
+			}
+			if (playerGreenResponse!=null){
+				SocketChannel greenSC = playerMap.get(game.playerGreenMove.player).channel;
+				writeResponse(greenSC,playerGreenResponse,attachmentGreen);
+				System.out.println(playerGreenResponse);
 			}
 		}
 	}

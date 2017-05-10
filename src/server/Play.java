@@ -159,24 +159,18 @@ public class Play extends Thread {
 
 				switch(gameBoard.movePiece(move.moveFrom.piece, move.moveTo.piece.row, move.moveTo.piece.column)){
 				case MOVE:{
-					Player responsePlayer=turnInfo.getActivePlayer();
-					Player nextPlayer;
-					if (gameInfo.playerRedMove.player.equals(responsePlayer))
-						nextPlayer=gameInfo.playerGreenMove.player;
+					if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player))
+						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_FINAL,  MoveType.MOVE, ResponseType.GAME_OPPOSITE_MOVE_FINAL, move);
 					else
-						nextPlayer=gameInfo.playerRedMove.player;
-					server.moveResponseAndForNext(gameInfo.getGameName(), responsePlayer, nextPlayer, ResponseType.GAME_MOVE_FINAL, ResponseType.GAME_OPPOSITE_MOVE_FINAL, MoveType.MOVE, move);
+						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_OPPOSITE_MOVE_FINAL, move, ResponseType.GAME_MOVE_FINAL,  MoveType.MOVE);
 					nextPlayer();
 					break;
 				}
 				case KILL:{
-					Player responsePlayer=turnInfo.getActivePlayer();
-					Player nextPlayer;
-					if (gameInfo.playerRedMove.player.equals(responsePlayer))
-						nextPlayer=gameInfo.playerGreenMove.player;
+					if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player))
+						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_FINAL,  MoveType.KILL, ResponseType.GAME_OPPOSITE_MOVE_FINAL, move);
 					else
-						nextPlayer=gameInfo.playerRedMove.player;
-					server.moveResponseAndForNext(gameInfo.getGameName(), responsePlayer, nextPlayer, ResponseType.GAME_MOVE_FINAL, ResponseType.GAME_OPPOSITE_MOVE_FINAL, MoveType.KILL, move);
+						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_OPPOSITE_MOVE_FINAL, move, ResponseType.GAME_MOVE_FINAL,  MoveType.KILL);
 					if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
 						nextPlayer();
 					}
@@ -188,14 +182,10 @@ public class Play extends Thread {
 					break;
 				}
 				case BAD:{
-					Player responsePlayer=turnInfo.getActivePlayer();
-					Player nextPlayer;
-					if (gameInfo.playerRedMove.player.equals(responsePlayer))
-						nextPlayer=gameInfo.playerGreenMove.player;
+					if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player))
+						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_CONTINUE,  MoveType.BAD, null, null);
 					else
-						nextPlayer=gameInfo.playerRedMove.player;
-					server.moveResponseAndForNext(gameInfo.getGameName(), responsePlayer, nextPlayer, ResponseType.GAME_MOVE_CONTINUE, null, MoveType.BAD, null);
-					break;
+						server.writeToGame(gameInfo.getGameName(), null, null, ResponseType.GAME_MOVE_CONTINUE,  MoveType.BAD);break;
 				}
 				}
 

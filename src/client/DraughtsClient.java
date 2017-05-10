@@ -46,7 +46,7 @@ public class DraughtsClient {
 	private UUID gameID=null;
 	private Board board=null;
 	private BoardInfo boardInfo=null;
-	private GameDecisionType gameDecisionType=null;
+	private GameDecisionType gameDecision=null;
 	private Move move=null;
 
 	private String oppositePlayer=null;
@@ -233,6 +233,7 @@ public class DraughtsClient {
 	public ResponseType move(int rowFrom, int colFrom, int rowTo, int colTo){
 		if (socketChannel!=null){
 			move=board.getMove(rowFrom, colFrom, rowTo, colTo);
+			gameDecision=GameDecisionType.MOVE;
 			writeCommand(socketChannel,CommandType.GAME_MOVE,null);
 			ServerResponsePackage response=checkResponse(socketChannel);
 			if (response!=null){
@@ -372,7 +373,7 @@ public class DraughtsClient {
 		commandPackage.gameName=gameName;
 		commandPackage.gameID=gameID;
 		commandPackage.move=move;
-		commandPackage.gameDecisionType=gameDecisionType;
+		commandPackage.gameDecision=gameDecision;
 		try {
 			ByteArrayOutputStream bos=new ByteArrayOutputStream();
 			ObjectOutputStream oos=new ObjectOutputStream(bos);
