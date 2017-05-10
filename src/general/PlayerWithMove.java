@@ -41,6 +41,10 @@ public class PlayerWithMove implements Serializable {
 		this.gameDecisionType = gameDecisionType;
 	}
 	
+	public void zeroMove(){
+		moveDone=false;
+		this.move=null;
+	}
 
 	public void setMove(Move move){
 		this.move=move;

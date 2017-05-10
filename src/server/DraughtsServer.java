@@ -102,7 +102,6 @@ public class DraughtsServer extends Thread {
 	public void writeToGame(String gameName, ResponseType playerRedResponse,Object attachmentRed,ResponseType playerGreenResponse, Object attachmentGreen){
 		if (gameMap.containsKey(gameName)){
 			GameInfo game=gameMap.get(gameName);
-		
 			if (playerRedResponse!=null){
 				SocketChannel redSC=playerMap.get(game.playerRedMove.player).channel;
 				writeResponse(redSC,playerRedResponse,attachmentRed);

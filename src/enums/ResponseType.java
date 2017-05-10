@@ -24,6 +24,7 @@ public enum ResponseType {
 	GAME_NOT_RUNNING,
 	GAME_NOT_READY,
 	GAME_END,
+	GAME_ABORT,
 	
 	GAME_OPPOSITE_USER,
 	

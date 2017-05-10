@@ -107,12 +107,10 @@ public class MainWindowController {
 
 	private void move(){
 		if (gameStarted){
-			ResponseType response;
 			if (client.getPlayerCol()==FieldType.GREEN)
-				response=client.move(rowFrom, colFrom, rowTo, colTo);
+				client.move(rowFrom, colFrom, rowTo, colTo);
 			else
-				response=client.move(client.getBoardInfo().boardBounds.rowStop-rowFrom, client.getBoardInfo().boardBounds.colStop-colFrom, client.getBoardInfo().boardBounds.rowStop-rowTo, client.getBoardInfo().boardBounds.colStop-colTo);
-			System.out.println(response);
+				client.move(client.getBoardInfo().boardBounds.rowStop-rowFrom, client.getBoardInfo().boardBounds.colStop-colFrom, client.getBoardInfo().boardBounds.rowStop-rowTo, client.getBoardInfo().boardBounds.colStop-colTo);
 		}
 	}
 
