@@ -49,6 +49,13 @@ public class MainWindowController {
 		}
 	};
 	
+	Runnable refreshBoard=new Runnable(){
+		@Override
+		public void run(){
+			refreshBoard();
+		}
+	};
+	
 	public void waitForGameReady(){
 		Runnable waitForGameReady=new Runnable(){
 			@Override
@@ -58,6 +65,12 @@ public class MainWindowController {
 						gameReady=true;
 						Platform.runLater(updateImages);
 						break;
+					}
+					try {
+						Thread.sleep(300);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 			}
@@ -69,22 +82,34 @@ public class MainWindowController {
 		Runnable waitForGameMove=new Runnable(){
 			@Override
 			public void run(){
-				while(true){
+				boolean run=true;
+				while(run){
 					ResponseType response=client.getServerResponse();
 					if (response!=null){
 						switch(response){
 						case GAME_STARTED:
+							client.setServerResponse(null);
 							break;
 						case GAME_MOVE_FINAL:
 						case GAME_MOVE_CONTINUE:
 						case GAME_OPPOSITE_MOVE_FINAL:
 						case GAME_OPPOSITE_MOVE_CONTINUE:
-							Platform.runLater(updateImages);
+							client.setServerResponse(null);
+							Platform.runLater(refreshBoard);
+							break;
 						case GAME_ABORT:
+							client.setServerResponse(null);
+							run=false;
 							break;
 						default:
 							break;
 						}
+					}
+					try {
+						Thread.sleep(300);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 			}

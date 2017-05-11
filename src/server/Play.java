@@ -145,21 +145,17 @@ public class Play extends Thread {
 				if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
 					System.out.println("Before R");
 					move=gameInfo.playerRedMove.getMove();
-					System.out.println("Move got R");
 					gameDecision=gameInfo.playerRedMove.getGameDecisionType();
 					if (gameDecision==GameDecisionType.SURRENDER)
 						gameSurrender();
 					else if (gameDecision==GameDecisionType.DRAW)
 						gameDraw();
-					if (move==null)
-						continue;
 					if (move.moveFrom.field==FieldType.GREEN)
 						continue;
 				}
 				else {
 					System.out.println("Before G");
 					move=gameInfo.playerGreenMove.getMove();
-					System.out.println("Move got G");
 					gameDecision=gameInfo.playerGreenMove.getGameDecisionType();
 					if (gameDecision==GameDecisionType.SURRENDER)
 						gameSurrender();
@@ -168,7 +164,7 @@ public class Play extends Thread {
 					if (move.moveFrom.field==FieldType.RED)
 						continue;
 				}
-
+				System.out.println(move);
 				switch(gameBoard.movePiece(move.moveFrom.piece, move.moveTo.piece.row, move.moveTo.piece.column)){
 				case MOVE:{
 					if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player))

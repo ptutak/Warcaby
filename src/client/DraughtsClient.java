@@ -55,6 +55,7 @@ public class DraughtsClient {
 	private ResponseType serverResponse=null;
 	public MoveType responseMoveType=null;
 	public Move responseMove=null;
+	
 
 	private Runnable waitForGameReady=new Runnable(){
 		@Override
@@ -67,6 +68,12 @@ public class DraughtsClient {
 						waitingThread=null;
 						break;
 					}
+				}
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}
@@ -91,11 +98,14 @@ public class DraughtsClient {
 					case GAME_MOVE_FINAL:
 					case GAME_MOVE_CONTINUE:
 						responseMoveType=(MoveType)response.attachment;
+						board.makeMove(move);
+						System.out.println(responseMoveType);
 						break;
 					case GAME_OPPOSITE_MOVE_FINAL:
 					case GAME_OPPOSITE_MOVE_CONTINUE:
 						responseMove=(Move)response.attachment;
-						board.makeMove(responseMove);
+						System.out.println(board.makeMove(responseMove));
+						System.out.println(responseMove);
 						break;
 					case GAME_ABORT:
 						waitingThread=null;
@@ -105,6 +115,12 @@ public class DraughtsClient {
 					}
 					setServerResponse(response.response);
 					System.out.println(response.response);
+				}
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}
@@ -291,14 +307,6 @@ public class DraughtsClient {
 			move=board.getMove(rowFrom, colFrom, rowTo, colTo);
 			gameDecision=GameDecisionType.MOVE;
 			writeCommand(socketChannel,CommandType.GAME_MOVE,null);
-			ServerResponsePackage response=checkResponse(socketChannel);
-			if (response!=null){
-				if (response.response==ResponseType.GAME_MOVE_FINAL || response.response==ResponseType.GAME_MOVE_CONTINUE){
-					MoveType move=(MoveType)response.attachment;
-					if (move==MoveType.KILL || move==MoveType.MOVE)
-						board.movePiece(board.fieldState(rowFrom, colFrom).piece, rowTo, colTo);
-				}
-			}
 		}
 	}
 

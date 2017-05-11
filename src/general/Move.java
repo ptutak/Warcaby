@@ -26,4 +26,11 @@ public class Move implements java.io.Serializable {
 		this.moveFrom=moveFrom;
 		this.moveTo=moveTo;
 	}
+	@Override
+	public String toString(){
+		String ret=new String();
+		ret+=moveFrom.field.toString()+" r"+moveFrom.piece.row+" c"+moveFrom.piece.column+" ";
+		ret+=moveTo.field.toString()+" r"+moveTo.piece.row+" c"+moveTo.piece.column;
+		return ret;
+	}
 }
