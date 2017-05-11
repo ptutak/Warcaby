@@ -425,12 +425,15 @@ public class DraughtsClient {
 			writeBuffer.put(bos.toByteArray());
 			writeBuffer.flip();
 			socketChannel.write(writeBuffer);
-			writeBuffer.clear();
+
 		} catch (ClosedChannelException e){
 			reconnect();
 			e.printStackTrace();
 		} catch (IOException e){
 			e.printStackTrace();
+		} finally {
+			writeBuffer.clear();
 		}
+		
 	}
 }
