@@ -330,8 +330,8 @@ public class DraughtsServer extends Thread {
 							Player playerRed=gameMap.get(command.gameName).playerRedMove.player;
 
 							writeResponse(socketChannel,ResponseType.GAME_JOINED,gameMap.get(command.gameName));
-							writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
 							System.out.println(ResponseType.GAME_JOINED);
+							writeResponse(playerMap.get(playerRed).channel,ResponseType.GAME_READY,command.player.getLogin());
 							System.out.println(ResponseType.GAME_READY);
 
 							gameMap.get(command.gameName).setGameStatus(GameStatusType.GAME_READY);

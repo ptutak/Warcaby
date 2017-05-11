@@ -89,16 +89,13 @@ public class DraughtsClient {
 					case GAME_STARTED:
 						break;
 					case GAME_MOVE_FINAL:
-						responseMoveType=(MoveType)response.attachment;
-						break;
 					case GAME_MOVE_CONTINUE:
 						responseMoveType=(MoveType)response.attachment;
 						break;
 					case GAME_OPPOSITE_MOVE_FINAL:
-						responseMove=(Move)response.attachment;
-						break;
 					case GAME_OPPOSITE_MOVE_CONTINUE:
 						responseMove=(Move)response.attachment;
+						board.makeMove(responseMove);
 						break;
 					case GAME_ABORT:
 						waitingThread=null;

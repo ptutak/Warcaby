@@ -237,6 +237,10 @@ public class Board{
 		return new Move(moveFrom,moveTo);
 	}
 	
+	public MoveType makeMove(Move move){
+		return movePiece(move.moveFrom.piece,move.moveTo.piece.row,move.moveTo.piece.column);
+	}
+	
 	public MoveType movePiece(Piece piece,int row, int column){
 		if (piece==null)
 			return MoveType.BAD;

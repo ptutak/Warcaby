@@ -39,21 +39,23 @@ public class MainWindowController {
 	@FXML private ImageView oppositePlayerImageView;
 	@FXML private Label playerNameLabel;
 	@FXML private ImageView playerImageView;
-
+	boolean gameReady=false;
 	boolean gameStarted=false;
 	
+	Runnable updateImages=new Runnable(){
+		@Override
+		public void run(){
+			initImages();
+		}
+	};
+	
 	public void waitForGameReady(){
-		Runnable updateImages=new Runnable(){
-			@Override
-			public void run(){
-				initImages();
-			}
-		};
 		Runnable waitForGameReady=new Runnable(){
 			@Override
 			public void run(){
 				while(true){
 					if (client.getOppositePlayer()!=null){
+						gameReady=true;
 						Platform.runLater(updateImages);
 						break;
 					}
@@ -62,11 +64,39 @@ public class MainWindowController {
 		};
 		new Thread(waitForGameReady).start();
 	}
+	
+	private void waitForGameMove(){
+		Runnable waitForGameMove=new Runnable(){
+			@Override
+			public void run(){
+				while(true){
+					ResponseType response=client.getServerResponse();
+					if (response!=null){
+						switch(response){
+						case GAME_STARTED:
+							break;
+						case GAME_MOVE_FINAL:
+						case GAME_MOVE_CONTINUE:
+						case GAME_OPPOSITE_MOVE_FINAL:
+						case GAME_OPPOSITE_MOVE_CONTINUE:
+							Platform.runLater(updateImages);
+						case GAME_ABORT:
+							break;
+						default:
+							break;
+						}
+					}
+				}
+			}
+		};
+		new Thread(waitForGameMove).start();
+	}
 
 	@FXML private void startGameButtonClick(){
-		if (client.getOppositePlayer()!=null && gameStarted==false){
+		if (client.getOppositePlayer()!=null && !gameStarted && gameReady){
 			gameStarted=true;
 			client.startGame();
+			waitForGameMove();
 		}
 	}
 	

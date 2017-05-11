@@ -91,7 +91,7 @@ public class GameListWindowController {
 			ResponseType response=client.joinGame(gameName);
 			if (response==ResponseType.GAME_JOINED){
 				mainController.refreshBoard();
-				mainController.initImages();
+				mainController.waitForGameReady();
 				stage.setScene(mainScene);
 			} else if(response==ResponseType.WRONG_GAME_NAME_OR_ID){
 				infoLabel.setText("Wrong game name");
