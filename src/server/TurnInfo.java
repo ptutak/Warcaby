@@ -33,7 +33,7 @@ public class TurnInfo {
 		gameLimitTime=0;
 		turnLimitTime=0;
 		gameTime=0;
-		remainTurnTime=0;
+		remainTurnTime=1;
 		activePlayer=null;
 	}
 	public synchronized long getTurnStartTime() {

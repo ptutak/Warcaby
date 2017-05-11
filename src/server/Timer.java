@@ -50,7 +50,7 @@ class Timer extends Thread {
 			else
 				turnInfo.setRemainTurnTime(1);
 			try {
-				sleep(10);
+				sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

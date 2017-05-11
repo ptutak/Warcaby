@@ -33,11 +33,11 @@ public class PlayerWithMove implements Serializable {
 		this.move = move;
 	}
 
-	public synchronized GameDecisionType getGameDecisionType() {
+	public GameDecisionType getGameDecisionType() {
 		return gameDecisionType;
 	}
 
-	public synchronized void setGameDecisionType(GameDecisionType gameDecisionType) {
+	public void setGameDecisionType(GameDecisionType gameDecisionType) {
 		this.gameDecisionType = gameDecisionType;
 	}
 	
@@ -51,13 +51,16 @@ public class PlayerWithMove implements Serializable {
 		moveDone=true;
 	}
 
-	public synchronized Move getMove() {
-		while(!moveDone)
+	public Move getMove() {
+		while(!moveDone){
 			try {
-				wait();
-			} catch (InterruptedException e){}
+				Thread.sleep(100);
+			} catch (InterruptedException e){
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Move read");
 		moveDone=false;
-		notifyAll();
 		return move;
 	}
 

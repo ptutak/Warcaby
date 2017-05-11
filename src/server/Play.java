@@ -132,6 +132,7 @@ public class Play extends Thread {
 				sleep(10);
 			} catch (InterruptedException e){}
 		}
+		System.out.println("Started");
 		gameInfo.setGameStatus(GameStatusType.GAME_RUNNING);
 		while (gameInfo.getGameStatus()==GameStatusType.GAME_RUNNING){
 			if (turnInfo.getRemainTurnTime()<=0){
@@ -142,17 +143,23 @@ public class Play extends Thread {
 				Move move;
 				GameDecisionType gameDecision;
 				if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
+					System.out.println("Before R");
 					move=gameInfo.playerRedMove.getMove();
+					System.out.println("Move got R");
 					gameDecision=gameInfo.playerRedMove.getGameDecisionType();
 					if (gameDecision==GameDecisionType.SURRENDER)
 						gameSurrender();
 					else if (gameDecision==GameDecisionType.DRAW)
 						gameDraw();
+					if (move==null)
+						continue;
 					if (move.moveFrom.field==FieldType.GREEN)
 						continue;
 				}
 				else {
+					System.out.println("Before G");
 					move=gameInfo.playerGreenMove.getMove();
+					System.out.println("Move got G");
 					gameDecision=gameInfo.playerGreenMove.getGameDecisionType();
 					if (gameDecision==GameDecisionType.SURRENDER)
 						gameSurrender();

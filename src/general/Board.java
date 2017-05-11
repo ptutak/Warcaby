@@ -80,7 +80,7 @@ public class Board{
 			if (x.row==row && x.column==column)
 				return new ColPiece(x,FieldType.GREEN);
 		}
-		return new ColPiece(null,FieldType.FREE);
+		return new ColPiece(new Piece(PieceType.BLANK,row,column),FieldType.FREE);
 	}
 	
 	private ArrayList<ColPiece> validMove(Piece x){
@@ -124,7 +124,7 @@ public class Board{
 				}
 			}
 		}
-		else {
+		else if (x.type==PieceType.QUEEN){
 			boolean valid=true;
 			for(int dist=1;dist<maxRowCol;++dist){
 				if (x.row+dist<=rowStop && x.column-dist>=colStart && fieldState(x.row+dist,(x.column-dist)).field==FieldType.FREE)

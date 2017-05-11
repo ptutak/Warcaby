@@ -38,7 +38,7 @@ public class Game extends Thread{
 	}
 	
 	public void run(){
-		gameTimer.start();
+//		gameTimer.start();
 		play.start();
 /*		try {
 			TimeUnit.SECONDS.sleep(5);

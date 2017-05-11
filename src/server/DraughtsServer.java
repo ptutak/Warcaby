@@ -354,8 +354,9 @@ public class DraughtsServer extends Thread {
 					if (game!=null && game.getID().equals(command.gameID)){
 						if(game.containsPlayer(command.player)){
 							if (game.getGameStatus().equals(GameStatusType.GAME_RUNNING)){
-								playerMap.get(command.player).playerWithMove.setMove(command.move);
 								playerMap.get(command.player).playerWithMove.setGameDecisionType(command.gameDecision);
+								playerMap.get(command.player).playerWithMove.setMove(command.move);
+								System.out.println("Move Set");
 							} else {
 								writeResponse(socketChannel,ResponseType.GAME_NOT_RUNNING,null);
 								System.out.println(ResponseType.GAME_NOT_RUNNING);
