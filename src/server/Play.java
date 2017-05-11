@@ -147,7 +147,6 @@ public class Play extends Thread {
 				Move move;
 				GameDecisionType gameDecision;
 				if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
-					System.out.println("Before R");
 					move=gameInfo.playerRedMove.getMove();
 					gameDecision=gameInfo.playerRedMove.getGameDecisionType();
 					if (gameDecision==GameDecisionType.SURRENDER)
@@ -158,7 +157,6 @@ public class Play extends Thread {
 						continue;
 				}
 				else {
-					System.out.println("Before G");
 					move=gameInfo.playerGreenMove.getMove();
 					gameDecision=gameInfo.playerGreenMove.getGameDecisionType();
 					if (gameDecision==GameDecisionType.SURRENDER)

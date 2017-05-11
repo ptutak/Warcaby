@@ -59,7 +59,6 @@ public class PlayerWithMove implements Serializable {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Move read");
 		moveDone=false;
 		return move;
 	}
