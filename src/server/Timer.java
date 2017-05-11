@@ -17,7 +17,6 @@ package server;
 */
 class Timer extends Thread {
 	private long gameStartTime;
-	private long turnStartTime;
 	private long turnLimitTime;
 	private TurnInfo turnInfo;
 		
@@ -26,17 +25,14 @@ class Timer extends Thread {
 		turnLimitTime=turnInfo.getTurnLimitTime();
 	}
 	
-	public synchronized void nextTurn(){
-		turnStartTime=System.currentTimeMillis();
+	public void nextTurn(){
+		turnInfo.setTurnStartTime(System.currentTimeMillis());
 	}
 	
-	private synchronized long getTurnStartTime(){
-		return turnStartTime;
-	}
-	
-	private synchronized void gameStart(){
+	private void gameStart(){
 		gameStartTime=System.currentTimeMillis();
-		turnStartTime=gameStartTime;
+		turnInfo.setTurnStartTime(gameStartTime);
+		turnInfo.setGameStartTime(gameStartTime);
 	}
 	
 	@Override
@@ -50,7 +46,7 @@ class Timer extends Thread {
 		while (turnInfo.isTimerOn()){
 			turnInfo.setGameTime(System.currentTimeMillis()-gameStartTime);
 			if (turnLimitTime>0)
-				turnInfo.setRemainTurnTime(turnLimitTime-System.currentTimeMillis()+getTurnStartTime());
+				turnInfo.setRemainTurnTime(turnLimitTime-System.currentTimeMillis()+turnInfo.getTurnStartTime());
 			else
 				turnInfo.setRemainTurnTime(1);
 			try {

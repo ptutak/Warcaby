@@ -355,6 +355,7 @@ public class DraughtsServer extends Thread {
 						if(game.containsPlayer(command.player)){
 							if (game.getGameStatus().equals(GameStatusType.GAME_RUNNING)){
 								playerMap.get(command.player).playerWithMove.setMove(command.move);
+								playerMap.get(command.player).playerWithMove.setGameDecisionType(command.gameDecision);
 							} else {
 								writeResponse(socketChannel,ResponseType.GAME_NOT_RUNNING,null);
 								System.out.println(ResponseType.GAME_NOT_RUNNING);
@@ -382,8 +383,7 @@ public class DraughtsServer extends Thread {
 								game.readyNumber--;
 								if (game.readyNumber==0) {
 									Game newGame=new Game(this,game);
-									newGame.start();
-																		
+									newGame.start();							
 								}
 							} else {
 								writeResponse(socketChannel,ResponseType.GAME_NOT_READY,null);
@@ -401,6 +401,7 @@ public class DraughtsServer extends Thread {
 					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
 					System.out.println(ResponseType.USER_NOT_REGISTERED);
 				}
+				break;
 			}
 			case END_CONNECTION:
 				if (playerMap.containsKey(command.player)){

@@ -9,6 +9,7 @@ import general.ColPiece;
 import general.GameInfo;
 import general.Move;
 import general.Player;
+import general.PlayerInfo;
 import enums.PieceType;
 import enums.ResponseType;
 
@@ -39,6 +40,10 @@ public class Play extends Thread {
 		this.timer=timer;
 		this.turnInfo=turnInfo;
 		this.gameInfo=gameInfo;
+		if (this.gameInfo.playerGreenMove.player.getPlayerInfo()==null)
+			this.gameInfo.playerGreenMove.player.setPlayerInfo(new PlayerInfo());
+		if (this.gameInfo.playerRedMove.player.getPlayerInfo()==null)
+			this.gameInfo.playerRedMove.player.setPlayerInfo(new PlayerInfo());
 		this.server=server;
 	}
 

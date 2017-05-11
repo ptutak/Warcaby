@@ -22,6 +22,8 @@ public class TurnInfo {
 	private long remainTurnTime;
 	private long turnLimitTime;
 	private long gameLimitTime;
+	private long turnStartTime;
+	private long gameStartTime;
 	private Player activePlayer;
 	
 	private boolean timerOn;
@@ -33,6 +35,18 @@ public class TurnInfo {
 		gameTime=0;
 		remainTurnTime=0;
 		activePlayer=null;
+	}
+	public synchronized long getTurnStartTime() {
+		return turnStartTime;
+	}
+	public synchronized long getGameStartTime() {
+		return gameStartTime;
+	}
+	public synchronized void setTurnStartTime(long turnStartTime) {
+		this.turnStartTime = turnStartTime;
+	}
+	public synchronized void setGameStartTime(long gameStartTime) {
+		this.gameStartTime = gameStartTime;
 	}
 	public synchronized Player getActivePlayer() {
 		return activePlayer;

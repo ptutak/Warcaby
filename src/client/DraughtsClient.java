@@ -107,6 +107,7 @@ public class DraughtsClient {
 						break;
 					}
 					setServerResponse(response.response);
+					System.out.println(response.response);
 				}
 			}
 		}
@@ -199,6 +200,7 @@ public class DraughtsClient {
 		if (waitingThread!=null)
 			return;
 		writeCommand(socketChannel,CommandType.START_GAME,null);
+		System.out.println(CommandType.START_GAME);
 		waitForGameMove();
 	}
 
@@ -315,7 +317,7 @@ public class DraughtsClient {
 	}
 
 	public void reconnect(){
-		endConnection();
+		closeConnection();
 		socketChannel=null;
 		establishConnection(serverIp,serverPort);
 		registerUser(player.getLogin());
@@ -428,6 +430,7 @@ public class DraughtsClient {
 
 		} catch (ClosedChannelException e){
 			reconnect();
+			
 			e.printStackTrace();
 		} catch (IOException e){
 			e.printStackTrace();
