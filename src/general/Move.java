@@ -22,7 +22,7 @@ public class Move implements java.io.Serializable {
 		moveFrom=null;
 		moveTo=null;
 	}
-	Move(ColPiece moveFrom, ColPiece moveTo){
+	public Move(ColPiece moveFrom, ColPiece moveTo){
 		this.moveFrom=moveFrom;
 		this.moveTo=moveTo;
 	}

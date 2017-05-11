@@ -238,11 +238,14 @@ public class Board{
 	}
 	
 	public MoveType makeMove(Move move){
-		return movePiece(move.moveFrom.piece,move.moveTo.piece.row,move.moveTo.piece.column);
+		Piece piece=fieldState(move.moveFrom.piece.row,move.moveFrom.piece.column).piece;
+		return movePiece(piece,move.moveTo.piece.row,move.moveTo.piece.column);
 	}
 	
 	public MoveType movePiece(Piece piece,int row, int column){
 		if (piece==null)
+			return MoveType.BAD;
+		if (piece.type==PieceType.BLANK)
 			return MoveType.BAD;
 		if (fieldState(row,column).field!=FieldType.FREE)
 			return MoveType.BAD;
@@ -252,7 +255,7 @@ public class Board{
 			if (move.piece.type!=PieceType.BLANK){
 				ColPiece toRemove=null;
 				for (ColPiece x:vMove){
-					if (x==move)
+					if (x.equals(move))
 						break;
 					if (x.field!=FieldType.FREE)
 						toRemove=x;

@@ -328,7 +328,7 @@ public class DraughtsClient {
 		registerUser(player.getLogin());
 	}
 	private synchronized ServerResponsePackage checkResponse(SocketChannel socketChannel){
-		System.out.println("check func");
+//		System.out.println("check func");
 		if (socketChannel==null)
 			return null;
 		if (!socketChannel.isOpen())

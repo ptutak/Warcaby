@@ -119,10 +119,14 @@ public class Play extends Thread {
 		gameInfo.setBoardState(gameBoard.getBoardState());
 	}
 	void nextPlayer(){
-		if (gameInfo.playerGreenMove.player.equals(turnInfo.getActivePlayer()))
+		if (gameInfo.playerGreenMove.player.equals(turnInfo.getActivePlayer())){
+			gameInfo.playerRedMove.zeroMove();
 			turnInfo.setActivePlayer(gameInfo.playerRedMove.player);
-		else
+		}
+		else{
+			gameInfo.playerGreenMove.zeroMove();
 			turnInfo.setActivePlayer(gameInfo.playerGreenMove.player);
+		}
 		timer.nextTurn();
 	}
 
@@ -165,8 +169,9 @@ public class Play extends Thread {
 						continue;
 				}
 				System.out.println(move);
-				switch(gameBoard.movePiece(move.moveFrom.piece, move.moveTo.piece.row, move.moveTo.piece.column)){
+				switch(gameBoard.makeMove(move)){
 				case MOVE:{
+					System.out.println(move);
 					if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player))
 						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_FINAL,  MoveType.MOVE, ResponseType.GAME_OPPOSITE_MOVE_FINAL, move);
 					else

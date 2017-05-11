@@ -169,7 +169,7 @@ public class DraughtsServer extends Thread {
 		ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
 
-		System.out.println("Check func begin");
+//		System.out.println("Check func begin");
 		if (!socketChannel.isOpen())
 			return null;
 		UserCommandPackage command=null;
@@ -356,7 +356,7 @@ public class DraughtsServer extends Thread {
 							if (game.getGameStatus().equals(GameStatusType.GAME_RUNNING)){
 								playerMap.get(command.player).playerWithMove.setGameDecisionType(command.gameDecision);
 								playerMap.get(command.player).playerWithMove.setMove(command.move);
-								System.out.println("Move Set");
+								System.out.println("MOVE_SET");
 							} else {
 								writeResponse(socketChannel,ResponseType.GAME_NOT_RUNNING,null);
 								System.out.println(ResponseType.GAME_NOT_RUNNING);
