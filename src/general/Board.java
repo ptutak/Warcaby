@@ -1,7 +1,7 @@
 package general;
 /* 
   Copyright 2017 Piotr Tutak
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
@@ -13,7 +13,7 @@ package general;
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 import java.io.Console;
 import java.util.*;
 
@@ -22,7 +22,7 @@ import enums.MoveType;
 import enums.PieceType;
 
 public class Board{
-	
+
 	private LinkedList<Piece> red=new LinkedList<Piece>();
 	private LinkedList<Piece> green=new LinkedList<Piece>();
 
@@ -30,14 +30,14 @@ public class Board{
 	private int colStop;
 	private int rowStart;
 	private int rowStop;
-	
+
 	public Board(BoardBounds boardBounds){
 		this.rowStart=boardBounds.rowStart;
 		this.rowStop=boardBounds.rowStop;
 		this.colStop=boardBounds.colStop;
 		this.colStart=boardBounds.colStart;
 	}
-	
+
 	public int getColStart() {
 		return colStart;
 	}
@@ -50,18 +50,18 @@ public class Board{
 	public int getRowStop() {
 		return rowStop;
 	}
-	
+
 	public BoardBounds getBoardBounds(){
 		return new BoardBounds(rowStart,rowStop,colStart,colStop);
 	}
-	
+
 	public void setGameBounds(int rowStart,int rowStop,int colStart,int colStop){
 		this.rowStart=rowStart;
 		this.rowStop=rowStop;
 		this.colStart=colStart;
 		this.colStop=colStop;
 	}
-	
+
 	private ColPiece checkMove(ArrayList<ColPiece> list,int row, int column){
 		for (ColPiece x:list){
 			if(x.piece!=null)
@@ -70,7 +70,7 @@ public class Board{
 		}
 		return null;
 	}
-	
+
 	public ColPiece fieldState(int row, int column){
 		for (Piece x:red){
 			if (x.row==row && x.column==column)
@@ -82,17 +82,23 @@ public class Board{
 		}
 		return new ColPiece(new Piece(PieceType.BLANK,row,column),FieldType.FREE);
 	}
-	
+
 	private ArrayList<ColPiece> validMove(Piece x){
 		ColPiece toMove=fieldState(x.row,x.column);
 		ArrayList<ColPiece> ret=new ArrayList<ColPiece>();
 		int maxRowCol=Math.max(colStop-colStart, rowStop-rowStart);
 		if (x.type==PieceType.PAWN){
-			if(x.row+1<=rowStop && x.column-1>=colStart && fieldState(x.row+1,x.column-1).field==FieldType.FREE)
-				ret.add(new ColPiece(new Piece(PieceType.BLANK ,x.row+1,x.column-1),FieldType.FREE));
-			if(x.row+1<=rowStop && x.column+1<=colStop && fieldState(x.row+1,x.column+1).field==FieldType.FREE)
-				ret.add(new ColPiece(new Piece(PieceType.BLANK,x.row+1,x.column+1),FieldType.FREE));
-			
+			if (toMove.field==FieldType.RED){
+				if(x.row+1<=rowStop && x.column-1>=colStart && fieldState(x.row+1,x.column-1).field==FieldType.FREE)
+					ret.add(new ColPiece(new Piece(PieceType.BLANK ,x.row+1,x.column-1),FieldType.FREE));
+				if(x.row+1<=rowStop && x.column+1<=colStop && fieldState(x.row+1,x.column+1).field==FieldType.FREE)
+					ret.add(new ColPiece(new Piece(PieceType.BLANK,x.row+1,x.column+1),FieldType.FREE));
+			} else if (toMove.field==FieldType.GREEN){
+				if(x.row-1>=rowStart && x.column-1>=colStart && fieldState(x.row-1,x.column-1).field==FieldType.FREE)
+					ret.add(new ColPiece(new Piece(PieceType.BLANK ,x.row-1,x.column-1),FieldType.FREE));
+				if(x.row-1>=rowStart && x.column+1<=colStop && fieldState(x.row-1,x.column+1).field==FieldType.FREE)
+					ret.add(new ColPiece(new Piece(PieceType.BLANK,x.row-1,x.column+1),FieldType.FREE));
+			}
 			if(x.row+2<=rowStop && x.column-2>=colStart && fieldState(x.row+2,x.column-2).field==FieldType.FREE) {
 				ColPiece toSmash=fieldState(x.row+1,x.column-1);
 				if (toSmash.field!=toMove.field){
@@ -107,7 +113,7 @@ public class Board{
 					ret.add(new ColPiece(new Piece(x.type,x.row+2,(x.column+2)),FieldType.FREE));
 				}
 			}
-					
+
 			if(x.row-2>=rowStart && x.column-2>=colStart && fieldState(x.row-2,(x.column-2)).field==FieldType.FREE){
 				ColPiece toSmash=fieldState(x.row-1,(x.column-1));
 				if (toSmash.field!=toMove.field){
@@ -115,7 +121,7 @@ public class Board{
 					ret.add(new ColPiece(new Piece(x.type,x.row-2,(x.column-2)),FieldType.FREE));
 				}
 			}
-					
+
 			if(x.row-2>=rowStart && x.column+2<=colStop && fieldState(x.row-2,(x.column+2)).field==FieldType.FREE){
 				ColPiece toSmash=fieldState(x.row-1,(x.column+1));
 				if (toSmash.field!=toMove.field){
@@ -152,7 +158,7 @@ public class Board{
 						ret.add(new ColPiece(new Piece(PieceType.BLANK,x.row+dist,(x.column+dist)),FieldType.FREE));
 					else
 						ret.add(new ColPiece(new Piece(x.type,x.row+dist,(x.column+dist)),FieldType.FREE));
-					
+
 				else{
 					ColPiece toSmash=fieldState(x.row+dist,(x.column+dist));
 					if (toSmash.field==toMove.field)
@@ -209,7 +215,7 @@ public class Board{
 		}
 		return ret;
 	}
-	
+
 	public boolean setNRowGame(int n){
 		if ((rowStop-rowStart+1)/2<=n)
 			return false;
@@ -230,25 +236,31 @@ public class Board{
 		}
 		return true;
 	}
-	
+
 	public Move getMove(int rowFrom, int colFrom, int rowTo, int colTo){
 		ColPiece moveFrom=fieldState(rowFrom,colFrom);
 		ColPiece moveTo=fieldState(rowTo,colTo);
 		return new Move(moveFrom,moveTo);
 	}
-	
+
 	public MoveType makeMove(Move move){
 		Piece piece=fieldState(move.moveFrom.piece.row,move.moveFrom.piece.column).piece;
 		return movePiece(piece,move.moveTo.piece.row,move.moveTo.piece.column);
 	}
-	
+
 	public MoveType movePiece(Piece piece,int row, int column){
-		if (piece==null)
+		if (piece==null){
+			System.out.println("piece null");
 			return MoveType.BAD;
-		if (piece.type==PieceType.BLANK)
+		}
+		if (piece.type==PieceType.BLANK){
+			System.out.println("piece blank");
 			return MoveType.BAD;
-		if (fieldState(row,column).field!=FieldType.FREE)
+		}
+		if (fieldState(row,column).field!=FieldType.FREE){
+			System.out.println("field != Free");
 			return MoveType.BAD;
+		}
 		ArrayList<ColPiece> vMove=validMove(piece);
 		ColPiece move=checkMove(vMove,row,column);
 		if (move!=null){
@@ -274,9 +286,10 @@ public class Board{
 				return MoveType.MOVE;					
 			}
 		}
+		System.out.println("move==null");
 		return MoveType.BAD;
 	}
-	
+
 	public ArrayList<ColPiece> getBoardState(){
 		ArrayList<ColPiece> ret=new ArrayList<ColPiece>();
 		for (Piece x:red)
@@ -285,7 +298,7 @@ public class Board{
 			ret.add(new ColPiece(x,FieldType.GREEN));
 		return ret;
 	}
-	
+
 	public FieldType checkWinner(){
 		if (red.isEmpty())
 			return FieldType.GREEN;
@@ -303,7 +316,7 @@ public class Board{
 		for(int i=colStart;i<=colStop;++i)
 			System.out.print("---");
 		System.out.println("-");
-		for(int i=rowStop;i>=rowStart;--i){
+		for(int i=rowStart;i<=rowStop;++i){
 			System.out.print(i);
 			if (i<10)
 				System.out.print(" |");
@@ -330,8 +343,8 @@ public class Board{
 	}
 
 	public static void main(String[] args){
-		Board x=new Board(new BoardBounds(1,10,1,8));
-		x.setNRowGame(4);
+		Board x=new Board(new BoardBounds(0,7,0,7));
+		x.setNRowGame(3);
 		x.print();
 		while(true){
 			Console cons=System.console();
@@ -347,7 +360,7 @@ public class Board{
 			int aColumn=Integer.parseInt(coord[1]);
 			int bRow=Integer.parseInt(coord[2]);
 			int bColumn=Integer.parseInt(coord[3]);
-			
+
 			ColPiece toMove=x.fieldState(aRow,aColumn);
 			if (toMove.piece!=null){
 				MoveType done=x.movePiece(toMove.piece, bRow, bColumn);
@@ -365,8 +378,8 @@ public class Board{
 			x.print();
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 }

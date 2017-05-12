@@ -136,7 +136,6 @@ public class Play extends Thread {
 				sleep(10);
 			} catch (InterruptedException e){}
 		}
-		System.out.println("Started");
 		gameInfo.setGameStatus(GameStatusType.GAME_RUNNING);
 		while (gameInfo.getGameStatus()==GameStatusType.GAME_RUNNING){
 			if (turnInfo.getRemainTurnTime()<=0){
@@ -169,7 +168,6 @@ public class Play extends Thread {
 				System.out.println(move);
 				switch(gameBoard.makeMove(move)){
 				case MOVE:{
-					System.out.println(move);
 					if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player))
 						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_FINAL,  MoveType.MOVE, ResponseType.GAME_OPPOSITE_MOVE_FINAL, move);
 					else
@@ -182,10 +180,10 @@ public class Play extends Thread {
 						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_FINAL,  MoveType.KILL, ResponseType.GAME_OPPOSITE_MOVE_FINAL, move);
 					else
 						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_OPPOSITE_MOVE_FINAL, move, ResponseType.GAME_MOVE_FINAL,  MoveType.KILL);
+					
 					if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
 						nextPlayer();
-					}
-					else if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.getActivePlayer().equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
+					} else if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.getActivePlayer().equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
 						nextPlayer();
 					} else
 						nextPlayer();
