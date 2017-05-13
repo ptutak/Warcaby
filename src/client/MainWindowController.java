@@ -110,6 +110,10 @@ public class MainWindowController {
 						System.out.println("GAME READY");
 						waitForGameMove();
 						break;
+					} else if (client.getBoardInfo()==null){
+						client.setServerResponse(null);
+						stage.setScene(gameListScene);
+						break;
 					}
 					try {
 						Thread.sleep(300);

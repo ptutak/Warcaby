@@ -73,6 +73,10 @@ public class DraughtsClient {
 						gameReady=true;
 						waitForGameMove();
 						break;
+					} else if(response.response==ResponseType.GAME_ABORT){
+						waitingThread=null;
+						resetGame();
+						break;
 					}
 				}
 				try {
@@ -90,6 +94,20 @@ public class DraughtsClient {
 			waitingThread=new Thread(waitForGameReady);
 			waitingThread.start();
 		}
+	}
+	
+	private void resetGame(){
+		gameRunning=false;
+		gameReady=false;
+		responseMoveType=null;
+		responseMove=null;
+		oppositePlayer=null;
+		playerCol=null;
+		gameName=null;
+		gameID=null;
+		boardInfo=null;
+		gameDecision=null;
+		gameMove=null;
 	}
 	
 	private Runnable waitForGameMove=new Runnable(){
@@ -118,17 +136,7 @@ public class DraughtsClient {
 					case GAME_END:
 					case GAME_ABORT:
 						waitingThread=null;
-						gameRunning=false;
-						gameReady=false;
-						responseMoveType=null;
-						responseMove=null;
-						oppositePlayer=null;
-						playerCol=null;
-						gameName=null;
-						gameID=null;
-						boardInfo=null;
-						gameDecision=null;
-						gameMove=null;
+						resetGame();
 						break;
 					default:
 						break;
