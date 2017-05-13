@@ -42,6 +42,9 @@ public class DraughtsClientGui extends Application {
 		gameListWindowController.setMainScene(mainScene);
 		gameListWindowController.setMainController(mainWindowController);
 		
+		mainWindowController.setStage(stage);
+		mainWindowController.setGameListScene(gameListScene);
+		
 		stage.setResizable(false);
 
 		stage.setScene(loginScene);

@@ -22,5 +22,6 @@ public enum CommandType {
 	JOIN_GAME,
 	START_GAME,
 	GAME_MOVE,
+	EXIT_GAME,
 	END_CONNECTION
 }

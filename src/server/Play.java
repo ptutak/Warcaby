@@ -49,6 +49,8 @@ public class Play extends Thread {
 
 	public void gameSurrender(){
 		turnInfo.setTimerOn(false);
+		gameInfo.setGameStatus(GameStatusType.GAME_END);
+		server.writeToGame(this.getName(), ResponseType.GAME_END, null, ResponseType.GAME_END, null);
 		if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
 			gameInfo.winner=gameInfo.playerGreenMove.player;
 			int points=0;

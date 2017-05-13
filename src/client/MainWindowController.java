@@ -10,14 +10,27 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 public class MainWindowController {
+	
+	private Stage stage;
+	private Scene gameListScene;
+
+	public synchronized void setStage(Stage stage) {
+		this.stage = stage;
+	}
+
+	public synchronized void setGameListScene(Scene gameListScene) {
+		this.gameListScene = gameListScene;
+	}
 
 	private DraughtsClient client=null;
 	private Image greenPawn=new Image("File:./img/green-pawn.png");
@@ -139,6 +152,7 @@ public class MainWindowController {
 						case GAME_END:
 							client.setServerResponse(null);
 							run=false;
+							stage.setScene(gameListScene);
 							break;
 						default:
 							client.setServerResponse(null);
@@ -178,6 +192,12 @@ public class MainWindowController {
 			System.exit(-1);
 		}
 			
+	}
+	
+	@FXML private void gameListButtonClick(){
+		if (client!=null){
+			client.gameSurrender();
+		}
 	}
 
 	public void initImages(){

@@ -44,15 +44,17 @@ public class DraughtsClient {
 	private FieldType playerCol=null;
 	private String gameName=null;
 	private UUID gameID=null;
-	private Board board=null;
 	private BoardInfo boardInfo=null;
 	private GameDecisionType gameDecision=null;
-	private Move move=null;
+	private Move gameMove=null;
 
+	private Board board=null;
+	
 	private String oppositePlayer=null;
 
 	private Thread waitingThread=null;
 	private boolean gameReady=false;
+	private boolean gameRunning=false;
 	
 	private ResponseType serverResponse=null;
 	public MoveType responseMoveType=null;
@@ -98,23 +100,35 @@ public class DraughtsClient {
 				if (response!=null){
 					switch(response.response){
 					case GAME_STARTED:
+						gameRunning=true;
 					case GAME_OPPOSITE_USER_READY:
 						break;
 					case GAME_MOVE_FINAL:
 					case GAME_MOVE_CONTINUE:
 						responseMoveType=(MoveType)response.attachment;
-						board.makeMove(move);
-						System.out.println(responseMoveType);
+						board.makeMove(gameMove);
+//						System.out.println(responseMoveType);
 						break;
 					case GAME_OPPOSITE_MOVE_FINAL:
 					case GAME_OPPOSITE_MOVE_CONTINUE:
 						responseMove=(Move)response.attachment;
-						System.out.println(board.makeMove(responseMove));
-						System.out.println(responseMove);
+//						System.out.println(board.makeMove(responseMove));
+//						System.out.println(responseMove);
 						break;
 					case GAME_END:
 					case GAME_ABORT:
 						waitingThread=null;
+						gameRunning=false;
+						gameReady=false;
+						responseMoveType=null;
+						responseMove=null;
+						oppositePlayer=null;
+						playerCol=null;
+						gameName=null;
+						gameID=null;
+						boardInfo=null;
+						gameDecision=null;
+						gameMove=null;
 						break;
 					default:
 						break;
@@ -266,6 +280,17 @@ public class DraughtsClient {
 		}
 		return null;
 	}
+	
+	public void gameSurrender(){
+		if (socketChannel!=null){
+			gameDecision=GameDecisionType.SURRENDER;
+			gameMove=null;
+			if (gameRunning)
+				writeCommand(socketChannel,CommandType.GAME_MOVE,null);
+			else
+				writeCommand(socketChannel,CommandType.EXIT_GAME,null);
+		}
+	}
 
 	private void initBoard(){
 		if (boardInfo!=null){
@@ -308,7 +333,7 @@ public class DraughtsClient {
 
 	public void move(int rowFrom, int colFrom, int rowTo, int colTo){
 		if (socketChannel!=null){
-			move=board.getMove(rowFrom, colFrom, rowTo, colTo);
+			gameMove=board.getMove(rowFrom, colFrom, rowTo, colTo);
 			gameDecision=GameDecisionType.MOVE;
 			writeCommand(socketChannel,CommandType.GAME_MOVE,null);
 		}
@@ -422,7 +447,7 @@ public class DraughtsClient {
 		commandPackage.attachment=object;
 		commandPackage.gameName=gameName;
 		commandPackage.gameID=gameID;
-		commandPackage.move=move;
+		commandPackage.move=gameMove;
 		commandPackage.gameDecision=gameDecision;
 		try {
 			ByteArrayOutputStream bos=new ByteArrayOutputStream();

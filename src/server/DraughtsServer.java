@@ -102,20 +102,22 @@ public class DraughtsServer extends Thread {
 	public void writeToGame(String gameName, ResponseType playerRedResponse,Object attachmentRed,ResponseType playerGreenResponse, Object attachmentGreen){
 		if (gameMap.containsKey(gameName)){
 			GameInfo game=gameMap.get(gameName);
-			if (playerRedResponse!=null){
-				SocketChannel redSC=playerMap.get(game.playerRedMove.player).channel;
-				writeResponse(redSC,playerRedResponse,attachmentRed);
-				System.out.println(playerRedResponse);
-			}
-			if (playerGreenResponse!=null){
-				SocketChannel greenSC = playerMap.get(game.playerGreenMove.player).channel;
-				writeResponse(greenSC,playerGreenResponse,attachmentGreen);
-				System.out.println(playerGreenResponse);
-			}
+			if (game.playerRedMove.player!=null)
+				if (playerRedResponse!=null){
+					SocketChannel redSC=playerMap.get(game.playerRedMove.player).channel;
+					writeResponse(redSC,playerRedResponse,attachmentRed);
+					System.out.println(playerRedResponse);
+				}
+			if (game.playerGreenMove.player!=null)
+				if (playerGreenResponse!=null){
+					SocketChannel greenSC = playerMap.get(game.playerGreenMove.player).channel;
+					writeResponse(greenSC,playerGreenResponse,attachmentGreen);
+					System.out.println(playerGreenResponse);
+				}
 		}
 	}
 
-	private boolean removePlayer(SocketChannel channel){
+	private boolean removePlayerOnChannel(SocketChannel channel){
 		for (PlayerService x:playerMap.values()){
 			if (x.channel.equals(channel)){
 				String[] ks = new String[gameMap.size()];
@@ -133,6 +135,8 @@ public class DraughtsServer extends Thread {
 		}
 		return false;
 	}
+	
+	
 
 	private void serviceConnections() {
 		System.out.println("ServiceConnections");
@@ -212,7 +216,7 @@ public class DraughtsServer extends Thread {
 					}
 				}
 				else if (n==-1){
-					removePlayer(socketChannel);
+					removePlayerOnChannel(socketChannel);
 					socketChannel.close();
 					System.out.println("Service Channel Closed");
 					command=null;
@@ -225,7 +229,7 @@ public class DraughtsServer extends Thread {
 			} catch (ClosedChannelException e){
 				System.out.println("CCE");
 				try {
-					removePlayer(socketChannel);
+					removePlayerOnChannel(socketChannel);
 					socketChannel.close();
 					System.out.println("Service Channel Closed");
 				} catch (IOException e1) {
@@ -237,7 +241,7 @@ public class DraughtsServer extends Thread {
 				System.out.println("IOE");
 				//				e.printStackTrace();
 				try {
-					removePlayer(socketChannel);
+					removePlayerOnChannel(socketChannel);
 					socketChannel.close();
 					System.out.println("Service Channel Closed");
 				} catch (IOException e1) {
@@ -394,6 +398,32 @@ public class DraughtsServer extends Thread {
 									newGame.start();
 									writeToGame(game.getGameName(),ResponseType.GAME_STARTED,null,ResponseType.GAME_STARTED,null);
 								}
+							} else {
+								writeResponse(socketChannel,ResponseType.GAME_NOT_READY,null);
+								System.out.println(ResponseType.GAME_NOT_READY);
+							}
+						} else {
+							writeResponse(socketChannel,ResponseType.USER_NOT_IN_GAME,null);
+							System.out.println(ResponseType.USER_NOT_IN_GAME);
+						}
+					} else {
+						writeResponse(socketChannel,ResponseType.WRONG_GAME_NAME_OR_ID,null);
+						System.out.println(ResponseType.WRONG_GAME_NAME_OR_ID);
+					}
+				} else {
+					writeResponse(socketChannel,ResponseType.USER_NOT_REGISTERED,null);
+					System.out.println(ResponseType.USER_NOT_REGISTERED);
+				}
+				break;
+			}
+			case EXIT_GAME:{
+				GameInfo game=gameMap.get(command.gameName);
+				if (playerMap.containsKey(command.player)){
+					if (game!=null && game.getID().equals(command.gameID)){
+						if(game.containsPlayer(command.player)){
+							if (game.getGameStatus().equals(GameStatusType.GAME_WAITING) || game.getGameStatus().equals(GameStatusType.GAME_READY)){
+								gameMap.remove(game);
+								writeToGame(game.getGameName(),ResponseType.GAME_ABORT,null,ResponseType.GAME_ABORT,null);
 							} else {
 								writeResponse(socketChannel,ResponseType.GAME_NOT_READY,null);
 								System.out.println(ResponseType.GAME_NOT_READY);
