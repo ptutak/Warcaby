@@ -49,9 +49,11 @@ public class DraughtsClient {
 	private GameDecisionType gameDecision=null;
 	private Move move=null;
 
+	private String oppositePlayer=null;
 
 	private Thread waitingThread=null;
-	private String oppositePlayer=null;
+	private boolean gameReady=false;
+	
 	private ResponseType serverResponse=null;
 	public MoveType responseMoveType=null;
 	public Move responseMove=null;
@@ -60,12 +62,14 @@ public class DraughtsClient {
 	private Runnable waitForGameReady=new Runnable(){
 		@Override
 		public void run(){
-			while (socketChannel!=null && waitingThread!=null){
+			while (socketChannel!=null && !gameReady){
 				ServerResponsePackage response=checkResponse(socketChannel);
 				if (response!=null){
 					if (response.response==ResponseType.GAME_READY){
 						setOppositePlayer((String)response.attachment);
 						waitingThread=null;
+						gameReady=true;
+						waitForGameMove();
 						break;
 					}
 				}
@@ -94,6 +98,7 @@ public class DraughtsClient {
 				if (response!=null){
 					switch(response.response){
 					case GAME_STARTED:
+					case GAME_OPPOSITE_USER_READY:
 						break;
 					case GAME_MOVE_FINAL:
 					case GAME_MOVE_CONTINUE:
@@ -107,6 +112,7 @@ public class DraughtsClient {
 						System.out.println(board.makeMove(responseMove));
 						System.out.println(responseMove);
 						break;
+					case GAME_END:
 					case GAME_ABORT:
 						waitingThread=null;
 						break;
@@ -117,7 +123,7 @@ public class DraughtsClient {
 					System.out.println(response.response);
 				}
 				try {
-					Thread.sleep(500);
+					Thread.sleep(300);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -210,11 +216,8 @@ public class DraughtsClient {
 	public void startGame(){
 		if (socketChannel==null)
 			return;
-		if (waitingThread!=null)
-			return;
 		writeCommand(socketChannel,CommandType.START_GAME,null);
-		System.out.println(CommandType.START_GAME);
-		waitForGameMove();
+//		waitForGameMove();
 	}
 
 	public ResponseType joinGame(String gameName){
@@ -234,6 +237,7 @@ public class DraughtsClient {
 					gameID=info.getID();
 					playerCol=FieldType.GREEN;
 					initBoard();
+					waitForGameMove();
 				}
 				return response.response;
 			}
@@ -289,7 +293,7 @@ public class DraughtsClient {
 			if (waitingThread!=null)
 				waitingThread=null;
 			try {
-				Thread.sleep(RESPONSE_TIME);
+				Thread.sleep(2*RESPONSE_TIME);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

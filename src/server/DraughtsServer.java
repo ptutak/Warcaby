@@ -382,9 +382,17 @@ public class DraughtsServer extends Thread {
 						if(game.containsPlayer(command.player)){
 							if (game.getGameStatus().equals(GameStatusType.GAME_READY)){
 								game.readyNumber--;
-								if (game.readyNumber==0) {
+								if (game.readyNumber==1){
+									if (game.playerGreenMove.player.equals(command.player)){
+										writeResponse(playerMap.get(game.playerRedMove.player).channel,ResponseType.GAME_OPPOSITE_USER_READY,null);
+									} else {
+										writeResponse(playerMap.get(game.playerGreenMove.player).channel,ResponseType.GAME_OPPOSITE_USER_READY,null);
+									}
+									System.out.println(ResponseType.GAME_OPPOSITE_USER_READY);
+								} else if (game.readyNumber==0) {
 									Game newGame=new Game(this,game);
-									newGame.start();							
+									newGame.start();
+									writeToGame(game.getGameName(),ResponseType.GAME_STARTED,null,ResponseType.GAME_STARTED,null);
 								}
 							} else {
 								writeResponse(socketChannel,ResponseType.GAME_NOT_READY,null);

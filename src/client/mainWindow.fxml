@@ -47,7 +47,7 @@
                   <Font size="18.0" />
                </font>
             </Label>
-            <Label fx:id="playerNotReadyLabel" alignment="CENTER" layoutX="64.0" layoutY="621.0" prefHeight="33.0" prefWidth="172.0" text="Player NOT READY" textAlignment="CENTER">
+            <Label fx:id="playerReadyLabel" alignment="CENTER" layoutX="64.0" layoutY="621.0" prefHeight="33.0" prefWidth="172.0" text="Player NOT READY" textAlignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>

@@ -39,9 +39,37 @@ public class MainWindowController {
 	@FXML private ImageView oppositePlayerImageView;
 	@FXML private Label playerNameLabel;
 	@FXML private ImageView playerImageView;
+	@FXML private Label oppositePlayerReadyLabel;
+	Runnable updateOppositeLabel=new Runnable(){
+		@Override
+		public void run(){
+			oppositePlayerReadyLabel.setText("READY");
+		}
+	};
+	@FXML private Label playerReadyLabel;
+	@FXML private Label gameInfoLabel;
+	
 	boolean gameReady=false;
 	boolean gameStarted=false;
 	
+	private class CustomRunnable implements Runnable {
+		String text;
+		public CustomRunnable (){
+			text=new String("");
+		}
+		public void setText(String text){
+			this.text=text;
+			Platform.runLater(this);
+		}
+		@Override
+		public void run() {
+			gameInfoLabel.setText(text);
+		}
+		
+	}
+	
+	CustomRunnable updateInfoLabel=new CustomRunnable();
+		
 	Runnable updateImages=new Runnable(){
 		@Override
 		public void run(){
@@ -56,6 +84,7 @@ public class MainWindowController {
 		}
 	};
 	
+	
 	public void waitForGameReady(){
 		Runnable waitForGameReady=new Runnable(){
 			@Override
@@ -64,6 +93,9 @@ public class MainWindowController {
 					if (client.getOppositePlayer()!=null){
 						gameReady=true;
 						Platform.runLater(updateImages);
+						updateInfoLabel.setText("GAME READY");
+						System.out.println("GAME READY");
+						waitForGameMove();
 						break;
 					}
 					try {
@@ -89,6 +121,12 @@ public class MainWindowController {
 						switch(response){
 						case GAME_STARTED:
 							client.setServerResponse(null);
+							updateInfoLabel.setText("GAME STARTED!!!");
+							break;
+						case GAME_OPPOSITE_USER_READY:
+							client.setServerResponse(null);
+							Platform.runLater(updateOppositeLabel);
+							System.out.println("set");
 							break;
 						case GAME_MOVE_FINAL:
 						case GAME_MOVE_CONTINUE:
@@ -98,10 +136,13 @@ public class MainWindowController {
 							Platform.runLater(refreshBoard);
 							break;
 						case GAME_ABORT:
+						case GAME_END:
 							client.setServerResponse(null);
 							run=false;
 							break;
 						default:
+							client.setServerResponse(null);
+							System.out.println("default switch");
 							break;
 						}
 					}
@@ -119,9 +160,9 @@ public class MainWindowController {
 
 	@FXML private void startGameButtonClick(){
 		if (client.getOppositePlayer()!=null && !gameStarted && gameReady){
+			playerReadyLabel.setText("READY");
 			gameStarted=true;
 			client.startGame();
-			waitForGameMove();
 		}
 	}
 	
