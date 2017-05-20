@@ -32,7 +32,7 @@ public class DraughtsClient {
 	private String serverIp=null;
 	private int serverPort=0;
 	private SocketChannel socketChannel=null;
-	private final long RESPONSE_TIME=500;
+	private final long RESPONSE_TIME=250;
 	private final int SERVER_RESPONSE_MULTI_TIME=3;
 
 	private final int BUFF_SIZE=4096;
@@ -57,7 +57,7 @@ public class DraughtsClient {
 	private boolean gameRunning=false;
 	
 	private ResponseType serverResponse=null;
-	public MoveType responseMoveType=null;
+	public MoveType myMoveType=null;
 	public Move responseMove=null;
 	
 
@@ -80,7 +80,7 @@ public class DraughtsClient {
 					}
 				}
 				try {
-					Thread.sleep(500);
+					Thread.sleep(RESPONSE_TIME);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -99,7 +99,7 @@ public class DraughtsClient {
 	private void resetGame(){
 		gameRunning=false;
 		gameReady=false;
-		responseMoveType=null;
+		myMoveType=null;
 		responseMove=null;
 		oppositePlayer=null;
 		playerCol=null;
@@ -123,15 +123,25 @@ public class DraughtsClient {
 						break;
 					case GAME_MOVE_FINAL:
 					case GAME_MOVE_CONTINUE:
-						responseMoveType=(MoveType)response.attachment;
+						myMoveType=(MoveType)response.attachment;
 						board.makeMove(gameMove);
 //						System.out.println(responseMoveType);
+						break;
+					case GAME_MOVE_PROMOTE:
+						myMoveType=(MoveType)response.attachment;
+						board.makeMove(gameMove);
+						board.promotePiece(gameMove.moveTo.piece);
 						break;
 					case GAME_OPPOSITE_MOVE_FINAL:
 					case GAME_OPPOSITE_MOVE_CONTINUE:
 						responseMove=(Move)response.attachment;
-//						System.out.println(board.makeMove(responseMove));
+						board.makeMove(responseMove);
 //						System.out.println(responseMove);
+						break;
+					case GAME_OPPOSITE_MOVE_PROMOTE:
+						responseMove=(Move)response.attachment;
+						board.makeMove(responseMove);
+						board.promotePiece(responseMove.moveTo.piece);
 						break;
 					case GAME_END:
 					case GAME_ABORT:
@@ -145,7 +155,7 @@ public class DraughtsClient {
 					System.out.println(response.response);
 				}
 				try {
-					Thread.sleep(300);
+					Thread.sleep(RESPONSE_TIME);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

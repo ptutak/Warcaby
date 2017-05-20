@@ -150,8 +150,10 @@ public class Play extends Thread {
 				if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
 					move=gameInfo.playerRedMove.getMove();
 					gameDecision=gameInfo.playerRedMove.getGameDecisionType();
-					if (gameDecision==GameDecisionType.SURRENDER)
+					if (gameDecision==GameDecisionType.SURRENDER){
 						gameSurrender();
+						continue;
+					}
 					else if (gameDecision==GameDecisionType.DRAW)
 						gameDraw();
 					if (move.moveFrom.field==FieldType.GREEN)
@@ -160,8 +162,10 @@ public class Play extends Thread {
 				else {
 					move=gameInfo.playerGreenMove.getMove();
 					gameDecision=gameInfo.playerGreenMove.getGameDecisionType();
-					if (gameDecision==GameDecisionType.SURRENDER)
+					if (gameDecision==GameDecisionType.SURRENDER){
 						gameSurrender();
+						continue;
+					}
 					else if (gameDecision==GameDecisionType.DRAW)
 						gameDraw();
 					if (move.moveFrom.field==FieldType.RED)
@@ -171,25 +175,46 @@ public class Play extends Thread {
 				switch(gameBoard.makeMove(move)){
 				case MOVE:{
 					if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player))
-						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_FINAL,  MoveType.MOVE, ResponseType.GAME_OPPOSITE_MOVE_FINAL, move);
+						if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop()){
+							gameBoard.promotePiece(move.moveTo.piece);
+							server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_PROMOTE,  MoveType.MOVE, ResponseType.GAME_OPPOSITE_MOVE_PROMOTE, move);
+						} else {
+							server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_FINAL,  MoveType.MOVE, ResponseType.GAME_OPPOSITE_MOVE_FINAL, move);
+						}
 					else
-						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_OPPOSITE_MOVE_FINAL, move, ResponseType.GAME_MOVE_FINAL,  MoveType.MOVE);
+						if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart()){
+							gameBoard.promotePiece(move.moveTo.piece);
+							server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_OPPOSITE_MOVE_PROMOTE, move, ResponseType.GAME_MOVE_PROMOTE,  MoveType.MOVE);
+						} else {
+							server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_OPPOSITE_MOVE_FINAL, move, ResponseType.GAME_MOVE_FINAL,  MoveType.MOVE);
+						}
 					nextPlayer();
 					break;
 				}
 				case KILL:{
-					if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player))
-						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_FINAL,  MoveType.KILL, ResponseType.GAME_OPPOSITE_MOVE_FINAL, move);
-					else
-						server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_OPPOSITE_MOVE_FINAL, move, ResponseType.GAME_MOVE_FINAL,  MoveType.KILL);
-					
-					if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop() && turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
-						nextPlayer();
-					} else if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart() && turnInfo.getActivePlayer().equals(gameInfo.playerGreenMove.player) && move.moveTo.piece.type==PieceType.QUEEN){
-						nextPlayer();
-					} else
-						nextPlayer();
+					if (turnInfo.getActivePlayer().equals(gameInfo.playerRedMove.player)){
+						if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStop()){
+							gameBoard.promotePiece(move.moveTo.piece);
+							server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_PROMOTE,  MoveType.KILL, ResponseType.GAME_OPPOSITE_MOVE_PROMOTE, move);
+						} else if (gameBoard.checkKill(move.moveTo.piece)) {
+							server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_CONTINUE,  MoveType.KILL, ResponseType.GAME_OPPOSITE_MOVE_CONTINUE, move);
+							break;
+						} else {
+							server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_MOVE_FINAL,  MoveType.KILL, ResponseType.GAME_OPPOSITE_MOVE_FINAL, move);
+						}
 
+					}else{
+						if (move.moveFrom.piece.type==PieceType.PAWN && move.moveTo.piece.row==gameBoard.getRowStart()){
+							gameBoard.promotePiece(move.moveTo.piece);
+							server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_OPPOSITE_MOVE_PROMOTE, move, ResponseType.GAME_MOVE_PROMOTE,  MoveType.KILL);
+						} else if (gameBoard.checkKill(move.moveTo.piece)){
+							server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_OPPOSITE_MOVE_CONTINUE, move, ResponseType.GAME_MOVE_CONTINUE,  MoveType.KILL);
+							break;	
+						}else {
+							server.writeToGame(gameInfo.getGameName(), ResponseType.GAME_OPPOSITE_MOVE_FINAL, move, ResponseType.GAME_MOVE_FINAL,  MoveType.KILL);
+						}
+					}
+					nextPlayer();
 					break;
 				}
 				case BAD:{

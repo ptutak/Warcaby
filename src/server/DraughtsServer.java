@@ -96,24 +96,29 @@ public class DraughtsServer extends Thread {
 
 	private void gameEnd(GameInfo game){
 
+	}
 
+	void removeGame(GameInfo game){
+		gameMap.remove(game.getGameName());
 	}
 
 	public void writeToGame(String gameName, ResponseType playerRedResponse,Object attachmentRed,ResponseType playerGreenResponse, Object attachmentGreen){
 		if (gameMap.containsKey(gameName)){
 			GameInfo game=gameMap.get(gameName);
-			if (game.playerRedMove.player!=null)
-				if (playerRedResponse!=null){
-					SocketChannel redSC=playerMap.get(game.playerRedMove.player).channel;
-					writeResponse(redSC,playerRedResponse,attachmentRed);
-					System.out.println(playerRedResponse);
-				}
-			if (game.playerGreenMove.player!=null)
-				if (playerGreenResponse!=null){
-					SocketChannel greenSC = playerMap.get(game.playerGreenMove.player).channel;
-					writeResponse(greenSC,playerGreenResponse,attachmentGreen);
-					System.out.println(playerGreenResponse);
-				}
+			if (game.playerRedMove!=null)
+				if (game.playerRedMove.player!=null)
+					if (playerRedResponse!=null){
+						SocketChannel redSC=playerMap.get(game.playerRedMove.player).channel;
+						writeResponse(redSC,playerRedResponse,attachmentRed);
+						System.out.println(playerRedResponse);
+					}
+			if (game.playerGreenMove!=null)
+				if (game.playerGreenMove.player!=null)
+					if (playerGreenResponse!=null){
+						SocketChannel greenSC = playerMap.get(game.playerGreenMove.player).channel;
+						writeResponse(greenSC,playerGreenResponse,attachmentGreen);
+						System.out.println(playerGreenResponse);
+					}
 		}
 	}
 
@@ -122,11 +127,11 @@ public class DraughtsServer extends Thread {
 			if (x.channel.equals(channel)){
 				String[] ks = new String[gameMap.size()];
 				gameMap.keySet().toArray(ks);
-				for (String game:ks){
-					if (gameMap.containsKey(game))
-						if ((gameMap.get(game).playerRedMove.player.equals(x.playerWithMove.player)) || (gameMap.get(game).playerGreenMove!=null && gameMap.get(game).playerGreenMove.player.equals(x.playerWithMove.player))) {
-							gameEnd(gameMap.get(game));
-							gameMap.remove(game);
+				for (String gameName:ks){
+					if (gameMap.containsKey(gameName))
+						if ((gameMap.get(gameName).playerRedMove.player.equals(x.playerWithMove.player)) || (gameMap.get(gameName).playerGreenMove!=null && gameMap.get(gameName).playerGreenMove.player.equals(x.playerWithMove.player))) {
+							gameEnd(gameMap.get(gameName));
+							gameMap.remove(gameName);
 						} 
 				}
 				if (playerLoginSet.remove(x.playerWithMove.player.getLogin()))
@@ -135,8 +140,8 @@ public class DraughtsServer extends Thread {
 		}
 		return false;
 	}
-	
-	
+
+
 
 	private void serviceConnections() {
 		System.out.println("ServiceConnections");
@@ -173,7 +178,7 @@ public class DraughtsServer extends Thread {
 		ByteBuffer readBuffer=ByteBuffer.allocate(BUFFSIZE);
 		ByteBuffer safeBuffer=ByteBuffer.allocate(BUFFSIZE);
 
-//		System.out.println("Check func begin");
+		//		System.out.println("Check func begin");
 		if (!socketChannel.isOpen())
 			return null;
 		UserCommandPackage command=null;
@@ -422,8 +427,8 @@ public class DraughtsServer extends Thread {
 					if (game!=null && game.getID().equals(command.gameID)){
 						if(game.containsPlayer(command.player)){
 							if (game.getGameStatus().equals(GameStatusType.GAME_WAITING) || game.getGameStatus().equals(GameStatusType.GAME_READY)){
-								gameMap.remove(game);
 								writeToGame(game.getGameName(),ResponseType.GAME_ABORT,null,ResponseType.GAME_ABORT,null);
+								gameMap.remove(game.getGameName());
 							} else {
 								writeResponse(socketChannel,ResponseType.GAME_NOT_READY,null);
 								System.out.println(ResponseType.GAME_NOT_READY);

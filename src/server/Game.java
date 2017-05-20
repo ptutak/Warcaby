@@ -1,5 +1,6 @@
 package server;
 import enums.GameStatusType;
+import enums.ResponseType;
 import general.Board;
 import general.GameInfo;
 
@@ -50,8 +51,14 @@ public class Game extends Thread{
 			play.join();
 			gameTimer.join();
 		} catch (InterruptedException e){e.printStackTrace();}
-		if (gameInfo.getGameStatus()==GameStatusType.GAME_PAUSE)
+		if (gameInfo.getGameStatus()==GameStatusType.GAME_PAUSE){
 			server.addToDatabase(gameInfo, gameTurnInfo);
+			server.writeToGame(gameInfo.getGameName(),ResponseType.GAME_END,gameInfo,ResponseType.GAME_END,gameInfo);
+			server.removeGame(gameInfo);
+		} else if (gameInfo.getGameStatus()==GameStatusType.GAME_END) {
+			server.writeToGame(gameInfo.getGameName(),ResponseType.GAME_END,gameInfo,ResponseType.GAME_END,gameInfo);
+			server.removeGame(gameInfo);
+		}
 	}
 
 	public static void main(String[] args) {

@@ -55,7 +55,7 @@ public class Board{
 		return new BoardBounds(rowStart,rowStop,colStart,colStop);
 	}
 
-	public void setGameBounds(int rowStart,int rowStop,int colStart,int colStop){
+	public void setBoardBounds(int rowStart,int rowStop,int colStart,int colStop){
 		this.rowStart=rowStart;
 		this.rowStop=rowStop;
 		this.colStart=colStart;
@@ -82,6 +82,7 @@ public class Board{
 		}
 		return new ColPiece(new Piece(PieceType.BLANK,row,column),FieldType.FREE);
 	}
+
 
 	private ArrayList<ColPiece> validMove(Piece x){
 		ColPiece toMove=fieldState(x.row,x.column);
@@ -247,8 +248,24 @@ public class Board{
 		Piece piece=fieldState(move.moveFrom.piece.row,move.moveFrom.piece.column).piece;
 		return movePiece(piece,move.moveTo.piece.row,move.moveTo.piece.column);
 	}
+	
+	public void promotePiece(Piece piece){
+		Piece boardPiece=fieldState(piece.row,piece.column).piece;
+		if (boardPiece.type==PieceType.PAWN)
+			boardPiece.type=PieceType.QUEEN;
+	}
+	
+	public boolean checkKill(Piece piece){
+		piece=fieldState(piece.row,piece.column).piece;
+		ArrayList<ColPiece> vMove=validMove(piece);
+		for (ColPiece x : vMove){
+			if (x.field==FieldType.GREEN || x.field==FieldType.RED)
+				return true;
+		}
+		return false;
+	}
 
-	public MoveType movePiece(Piece piece,int row, int column){
+	private MoveType movePiece(Piece piece,int row, int column){
 		if (piece==null){
 			System.out.println("piece null");
 			return MoveType.BAD;
@@ -262,12 +279,12 @@ public class Board{
 			return MoveType.BAD;
 		}
 		ArrayList<ColPiece> vMove=validMove(piece);
-		ColPiece move=checkMove(vMove,row,column);
-		if (move!=null){
-			if (move.piece.type!=PieceType.BLANK){
+		ColPiece moveTo=checkMove(vMove,row,column);
+		if (moveTo!=null){
+			if (moveTo.piece.type!=PieceType.BLANK){
 				ColPiece toRemove=null;
 				for (ColPiece x:vMove){
-					if (x.equals(move))
+					if (x.equals(moveTo))
 						break;
 					if (x.field!=FieldType.FREE)
 						toRemove=x;

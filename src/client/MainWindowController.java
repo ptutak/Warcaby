@@ -53,21 +53,16 @@ public class MainWindowController {
 	@FXML private Label playerNameLabel;
 	@FXML private ImageView playerImageView;
 	@FXML private Label oppositePlayerReadyLabel;
-	Runnable updateOppositeLabel=new Runnable(){
-		@Override
-		public void run(){
-			oppositePlayerReadyLabel.setText("READY");
-		}
-	};
+
 	@FXML private Label playerReadyLabel;
 	@FXML private Label gameInfoLabel;
 	
 	boolean gameReady=false;
 	boolean gameStarted=false;
 	
-	private class CustomRunnable implements Runnable {
+	private class CustomGameInfoLabelRunnable implements Runnable {
 		String text;
-		public CustomRunnable (){
+		public CustomGameInfoLabelRunnable (){
 			text=new String("");
 		}
 		public void setText(String text){
@@ -81,8 +76,24 @@ public class MainWindowController {
 		
 	}
 	
-	CustomRunnable updateInfoLabel=new CustomRunnable();
-		
+	private class CustomOppositePlayerReadyLabelRunnable implements Runnable{
+		String text;
+		public CustomOppositePlayerReadyLabelRunnable (){
+			text=new String("");
+		}
+		public void setText(String text){
+			this.text=text;
+			Platform.runLater(this);
+		}
+		@Override
+		public void run() {
+			oppositePlayerReadyLabel.setText(text);
+		}	
+	}
+	
+	CustomGameInfoLabelRunnable updateInfoLabel=new CustomGameInfoLabelRunnable();
+	CustomOppositePlayerReadyLabelRunnable updatePlayerReadyLabel=new CustomOppositePlayerReadyLabelRunnable();
+	
 	Runnable updateImages=new Runnable(){
 		@Override
 		public void run(){
@@ -97,6 +108,12 @@ public class MainWindowController {
 		}
 	};
 	
+	Runnable changeToListScene=new Runnable(){
+		@Override
+		public void run(){
+			stage.setScene(gameListScene);
+		}
+	};
 	
 	public void waitForGameReady(){
 		Runnable waitForGameReady=new Runnable(){
@@ -112,7 +129,7 @@ public class MainWindowController {
 						break;
 					} else if (client.getBoardInfo()==null){
 						client.setServerResponse(null);
-						stage.setScene(gameListScene);
+						Platform.runLater(changeToListScene);
 						break;
 					}
 					try {
@@ -142,13 +159,15 @@ public class MainWindowController {
 							break;
 						case GAME_OPPOSITE_USER_READY:
 							client.setServerResponse(null);
-							Platform.runLater(updateOppositeLabel);
-							System.out.println("set");
+							updatePlayerReadyLabel.setText("READY");
+							Platform.runLater(updatePlayerReadyLabel);
 							break;
 						case GAME_MOVE_FINAL:
 						case GAME_MOVE_CONTINUE:
+						case GAME_MOVE_PROMOTE:
 						case GAME_OPPOSITE_MOVE_FINAL:
 						case GAME_OPPOSITE_MOVE_CONTINUE:
+						case GAME_OPPOSITE_MOVE_PROMOTE:
 							client.setServerResponse(null);
 							Platform.runLater(refreshBoard);
 							break;
@@ -156,7 +175,9 @@ public class MainWindowController {
 						case GAME_END:
 							client.setServerResponse(null);
 							run=false;
-							stage.setScene(gameListScene);
+							gameReady=false;
+							gameStarted=false;
+							Platform.runLater(changeToListScene);
 							break;
 						default:
 							client.setServerResponse(null);
@@ -165,7 +186,7 @@ public class MainWindowController {
 						}
 					}
 					try {
-						Thread.sleep(300);
+						Thread.sleep(250);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -211,13 +232,18 @@ public class MainWindowController {
 				oppositePlayerImageView.setImage(redPlayer);
 			else
 				oppositePlayerImageView.setImage(greenPlayer);
-		} else
+		} else {
 			oppositePlayerNameLabel.setText("No player");
+			oppositePlayerImageView.setImage(null);
+		}
 		if (client.getPlayerCol()==FieldType.GREEN)
 			playerImageView.setImage(greenPlayer);
 		else
 			playerImageView.setImage(redPlayer);
 		playerNameLabel.setText(client.getPlayerName());
+		gameInfoLabel.setText("GAME NOT READY");
+		playerReadyLabel.setText("Player NOT READY");
+		oppositePlayerReadyLabel.setText("Player NOT READY");
 	}
 	
 
