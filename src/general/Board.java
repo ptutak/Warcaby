@@ -36,6 +36,10 @@ public class Board{
 		this.rowStop=boardBounds.rowStop;
 		this.colStop=boardBounds.colStop;
 		this.colStart=boardBounds.colStart;
+		if (this.colStart<0)
+			this.colStart=0;
+		if (this.rowStart<0)
+			this.rowStart=0;
 	}
 
 	public int getColStart() {
@@ -57,16 +61,20 @@ public class Board{
 
 	public void setBoardBounds(int rowStart,int rowStop,int colStart,int colStop){
 		this.rowStart=rowStart;
+		if (this.rowStart<0)
+			this.rowStart=0;
 		this.rowStop=rowStop;
 		this.colStart=colStart;
+		if (this.colStart<0)
+			this.colStart=0;
 		this.colStop=colStop;
 	}
 
 	private ColPiece checkMove(ArrayList<ColPiece> list,int row, int column){
 		for (ColPiece x:list){
-			if(x.piece!=null)
-				if (x.piece.row==row && x.piece.column==column && x.field==FieldType.FREE)
+			if (x.piece.row==row && x.piece.column==column && x.field==FieldType.FREE){
 					return x;
+			}
 		}
 		return null;
 	}
@@ -84,8 +92,8 @@ public class Board{
 	}
 
 
-	private ArrayList<ColPiece> validMove(Piece x){
-		ColPiece toMove=fieldState(x.row,x.column);
+	private ArrayList<ColPiece> validMove(ColPiece toMove){
+		Piece x=toMove.piece;
 		ArrayList<ColPiece> ret=new ArrayList<ColPiece>();
 		int maxRowCol=Math.max(colStop-colStart, rowStop-rowStart);
 		if (x.type==PieceType.PAWN){
@@ -139,7 +147,7 @@ public class Board{
 						ret.add(new ColPiece(new Piece(PieceType.BLANK,x.row+dist,(x.column-dist)),FieldType.FREE));
 					else
 						ret.add(new ColPiece(new Piece(x.type,x.row+dist,(x.column-dist)),FieldType.FREE));
-				else{
+				else {
 					ColPiece toSmash=fieldState(x.row+dist,(x.column-dist));
 					if (toSmash.field==toMove.field)
 						break;
@@ -152,6 +160,7 @@ public class Board{
 						break;
 				}
 			}
+			ret.add(new ColPiece(new Piece(PieceType.BLANK,-1,-1),FieldType.FREE));
 			valid=true;
 			for(int dist=1;dist<maxRowCol;++dist){
 				if (x.row+dist<=rowStop && x.column+dist<=colStop && fieldState(x.row+dist,(x.column+dist)).field==FieldType.FREE)
@@ -173,6 +182,7 @@ public class Board{
 						break;
 				}
 			}
+			ret.add(new ColPiece(new Piece(PieceType.BLANK,-1,-1),FieldType.FREE));
 			valid=true;
 			for(int dist=1;dist<maxRowCol;++dist){
 				if (x.row-dist>=rowStart && x.column+dist<=colStop && fieldState(x.row-dist,(x.column+dist)).field==FieldType.FREE)
@@ -193,6 +203,7 @@ public class Board{
 						break;
 				}
 			}
+			ret.add(new ColPiece(new Piece(PieceType.BLANK,-1,-1),FieldType.FREE));
 			valid=true;
 			for(int dist=1;dist<maxRowCol;++dist){
 				if (x.row-dist>=rowStart && x.column-dist>=colStart && fieldState(x.row-dist,(x.column-dist)).field==FieldType.FREE)
@@ -245,8 +256,20 @@ public class Board{
 	}
 
 	public MoveType makeMove(Move move){
-		Piece piece=fieldState(move.moveFrom.piece.row,move.moveFrom.piece.column).piece;
-		return movePiece(piece,move.moveTo.piece.row,move.moveTo.piece.column);
+		ColPiece colPiece=fieldState(move.moveFrom.piece.row,move.moveFrom.piece.column);
+		boolean obligatoryKill=false;
+		if (colPiece.field==FieldType.GREEN){
+			for (Piece x : green){
+				if (checkKill(x))
+					obligatoryKill=true;
+			}
+		} else {
+			for (Piece x : red){
+				if (checkKill(x))
+					obligatoryKill=true;
+			}
+		}
+		return movePiece(colPiece.piece,move.moveTo.piece.row,move.moveTo.piece.column,obligatoryKill);
 	}
 	
 	public void promotePiece(Piece piece){
@@ -256,7 +279,14 @@ public class Board{
 	}
 	
 	public boolean checkKill(Piece piece){
-		piece=fieldState(piece.row,piece.column).piece;
+		ArrayList<ColPiece> vMove=validMove(fieldState(piece.row,piece.column));
+		for (ColPiece x : vMove){
+			if (x.field==FieldType.GREEN || x.field==FieldType.RED)
+				return true;
+		}
+		return false;
+	}
+	public boolean checkKill(ColPiece piece){
 		ArrayList<ColPiece> vMove=validMove(piece);
 		for (ColPiece x : vMove){
 			if (x.field==FieldType.GREEN || x.field==FieldType.RED)
@@ -264,8 +294,29 @@ public class Board{
 		}
 		return false;
 	}
+	
+	private ArrayList<ColPiece> checkKill(ColPiece piece,ArrayList<ColPiece> validMove){
+		ArrayList<ColPiece> ret=new ArrayList<ColPiece>();
+		boolean killFound=false;
+		for (ColPiece x:validMove){
+			if (x.piece.row==-1){
+				killFound=false;
+				continue;
+			}
+			if (killFound){
+				if (checkKill(new ColPiece(new Piece(PieceType.QUEEN,x.piece.row,x.piece.column),piece.field))){
+					ret.add(x);
+				}
+			}
+			if (x.field!=FieldType.FREE){
+				killFound=true;
+			}
 
-	private MoveType movePiece(Piece piece,int row, int column){
+		}
+		return ret;
+	}
+
+	private MoveType movePiece(Piece piece,int row, int column,boolean obligatoryKill){
 		if (piece==null){
 			System.out.println("piece null");
 			return MoveType.BAD;
@@ -278,16 +329,22 @@ public class Board{
 			System.out.println("field != Free");
 			return MoveType.BAD;
 		}
-		ArrayList<ColPiece> vMove=validMove(piece);
+		ArrayList<ColPiece> vMove=validMove(fieldState(piece.row,piece.column));
 		ColPiece moveTo=checkMove(vMove,row,column);
 		if (moveTo!=null){
 			if (moveTo.piece.type!=PieceType.BLANK){
+				if (piece.type==PieceType.QUEEN){
+					ArrayList<ColPiece> queenKillMoveList=checkKill(fieldState(piece.row,piece.column),vMove);
+					if (!queenKillMoveList.contains(moveTo) && !queenKillMoveList.isEmpty())
+						return MoveType.BAD;
+				}
 				ColPiece toRemove=null;
 				for (ColPiece x:vMove){
-					if (x.equals(moveTo))
+					if (x.piece.equals(piece))
 						break;
-					if (x.field!=FieldType.FREE)
+					if (x.field!=FieldType.FREE){
 						toRemove=x;
+					}
 				}
 				piece.row=row;
 				piece.column=column;
@@ -296,14 +353,12 @@ public class Board{
 				else
 					red.remove(toRemove.piece);
 				return MoveType.KILL;
-			}
-			else{
+			}else if (!obligatoryKill) {
 				piece.row=row;
 				piece.column=column;
 				return MoveType.MOVE;					
 			}
 		}
-		System.out.println("move==null");
 		return MoveType.BAD;
 	}
 
@@ -380,7 +435,7 @@ public class Board{
 
 			ColPiece toMove=x.fieldState(aRow,aColumn);
 			if (toMove.piece!=null){
-				MoveType done=x.movePiece(toMove.piece, bRow, bColumn);
+				MoveType done=x.makeMove(new Move(toMove,x.fieldState(bRow, bColumn)));
 				switch(done){
 				case BAD:
 					System.out.println("Zly ruch");
