@@ -41,6 +41,8 @@ public class DraughtsClient {
 	private ByteBuffer writeBuffer=ByteBuffer.allocate(BUFF_SIZE);
 
 	private Player player=null;
+
+
 	private FieldType playerCol=null;
 	private String gameName=null;
 	private UUID gameID=null;
@@ -57,9 +59,21 @@ public class DraughtsClient {
 	private boolean gameRunning=false;
 	
 	private ResponseType serverResponse=null;
-	public MoveType myMoveType=null;
-	public Move responseMove=null;
+	private MoveType myMoveType=null;
+	private Move responseMove=null;
+	private GameInfo endedGame=null;
+
+	public synchronized GameInfo getEndedGame() {
+		return endedGame;
+	}
 	
+	public synchronized Player getPlayer() {
+		return player;
+	}
+
+	public synchronized void setEndedGame(GameInfo endedGame) {
+		this.endedGame = endedGame;
+	}
 
 	private Runnable waitForGameReady=new Runnable(){
 		@Override
@@ -144,6 +158,7 @@ public class DraughtsClient {
 						board.promotePiece(responseMove.moveTo.piece);
 						break;
 					case GAME_END:
+						setEndedGame((GameInfo)response.attachment);
 					case GAME_ABORT:
 						waitingThread=null;
 						resetGame();

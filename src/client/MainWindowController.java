@@ -6,11 +6,14 @@ import enums.FieldType;
 import enums.PieceType;
 import enums.ResponseType;
 import general.ColPiece;
+import general.GameInfo;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -59,6 +62,9 @@ public class MainWindowController {
 	
 	boolean gameReady=false;
 	boolean gameStarted=false;
+	
+	Alert youWon = new Alert(AlertType.INFORMATION);
+	Alert youLost = new Alert(AlertType.INFORMATION);
 	
 	private class CustomGameInfoLabelRunnable implements Runnable {
 		String text;
@@ -112,6 +118,19 @@ public class MainWindowController {
 		@Override
 		public void run(){
 			stage.setScene(gameListScene);
+		}
+	};
+	
+	Runnable youWonRunnable=new Runnable(){
+		@Override
+		public void run(){
+			youWon.showAndWait();
+		}
+	};
+	Runnable youLostRunnable=new Runnable(){
+		@Override
+		public void run(){
+			youLost.showAndWait();
 		}
 	};
 	
@@ -171,12 +190,18 @@ public class MainWindowController {
 							client.setServerResponse(null);
 							Platform.runLater(refreshBoard);
 							break;
-						case GAME_ABORT:
 						case GAME_END:
-							client.setServerResponse(null);
+							GameInfo game=client.getEndedGame();
+							if (game.winner.equals(client.getPlayer()))
+								Platform.runLater(youWonRunnable);
+							else
+								Platform.runLater(youLostRunnable);
+							client.setEndedGame(null);
+						case GAME_ABORT:
 							run=false;
 							gameReady=false;
 							gameStarted=false;
+							client.setServerResponse(null);
 							Platform.runLater(changeToListScene);
 							break;
 						default:
@@ -328,6 +353,11 @@ public class MainWindowController {
 
 	@FXML public void initialize(){
 		//		board=new Board(new BoardBounds());
+		youWon.setTitle("Congratulations");
+		youWon.setHeaderText("You have WON!!!");
+
+		youLost.setTitle("I'm sorry");
+		youLost.setHeaderText("You have lost.");
 
 	}
 
