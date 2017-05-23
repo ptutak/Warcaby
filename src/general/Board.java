@@ -96,7 +96,7 @@ public class Board{
 	private ArrayList<ColPiece> validMove(ColPiece movedField){
 		Piece x=movedField.piece;
 		ArrayList<ColPiece> ret=new ArrayList<ColPiece>();
-		int maxRowCol=Math.max(colStop-colStart, rowStop-rowStart);
+
 		if (x.type==PieceType.PAWN){
 			if (movedField.field==FieldType.RED){
 				if(x.row+1<=rowStop && x.column-1>=colStart && fieldState(x.row+1,x.column-1).field==FieldType.FREE)
@@ -146,6 +146,7 @@ public class Board{
 			}
 		}
 		else if (x.type==PieceType.QUEEN){
+			int maxRowCol=Math.max(colStop-colStart, rowStop-rowStart)+1;
 			boolean valid=true;
 			for(int dist=1;dist<maxRowCol;++dist){
 				if (x.row+dist<=rowStop && x.column-dist>=colStart && fieldState(x.row+dist,(x.column-dist)).field==FieldType.FREE)
