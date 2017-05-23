@@ -138,7 +138,6 @@ public class DraughtsClient {
 //						System.out.println(responseMoveType);
 						break;
 					case GAME_MOVE_PROMOTE:
-
 						board.makeMove(gameMove);
 						board.promotePiece(gameMove.moveTo.piece);
 						break;
@@ -155,6 +154,7 @@ public class DraughtsClient {
 						break;
 					case GAME_END:
 						setEndedGame((GameInfo)response.attachment);
+						System.out.println("Here I am");
 					case GAME_ABORT:
 						waitingThread=null;
 						resetGame();

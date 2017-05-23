@@ -207,6 +207,7 @@ public class MainWindowController {
 						default:
 							client.setServerResponse(null);
 							System.out.println("default switch");
+							System.out.println(response);
 							break;
 						}
 					}
