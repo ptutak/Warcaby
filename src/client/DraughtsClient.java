@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import enums.CommandType;
 import enums.FieldType;
-import enums.MoveType;
 import enums.PackageLimiterType;
 import enums.GameDecisionType;
 import enums.ResponseType;
@@ -59,7 +58,6 @@ public class DraughtsClient {
 	private boolean gameRunning=false;
 	
 	private ResponseType serverResponse=null;
-	private MoveType myMoveType=null;
 	private Move responseMove=null;
 	private GameInfo endedGame=null;
 
@@ -113,7 +111,6 @@ public class DraughtsClient {
 	private void resetGame(){
 		gameRunning=false;
 		gameReady=false;
-		myMoveType=null;
 		responseMove=null;
 		oppositePlayer=null;
 		playerCol=null;
@@ -137,12 +134,11 @@ public class DraughtsClient {
 						break;
 					case GAME_MOVE_FINAL:
 					case GAME_MOVE_CONTINUE:
-						myMoveType=(MoveType)response.attachment;
 						board.makeMove(gameMove);
 //						System.out.println(responseMoveType);
 						break;
 					case GAME_MOVE_PROMOTE:
-						myMoveType=(MoveType)response.attachment;
+
 						board.makeMove(gameMove);
 						board.promotePiece(gameMove.moveTo.piece);
 						break;
