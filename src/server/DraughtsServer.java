@@ -512,13 +512,13 @@ public class DraughtsServer extends Thread {
 		String ipS=new String("127.0.0.1");
 		int port=50000;
 
-		/*		ipS=System.console().readLine();
+		ipS=System.console().readLine();
 		port=Integer.parseInt(System.console().readLine());
 
 		System.out.println(ipS);
 		System.out.println(Integer.toString(port));
 		new InetSocketAddress(ipS, port);
-		 */
+		
 		DraughtsServer server=new DraughtsServer(ipS,port);
 
 		server.establishConnection();
