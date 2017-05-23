@@ -49,13 +49,19 @@ public class Game extends Thread{
 */		gameTurnInfo.setTimerOn(true);
 		try{
 			play.join();
-			gameTimer.join();
+//			gameTimer.join();
 		} catch (InterruptedException e){e.printStackTrace();}
 		if (gameInfo.getGameStatus()==GameStatusType.GAME_PAUSE){
 			server.addToDatabase(gameInfo, gameTurnInfo);
 			server.writeToGame(gameInfo.getGameName(),ResponseType.GAME_END,gameInfo,ResponseType.GAME_END,gameInfo);
 			server.removeGame(gameInfo);
 		} else if (gameInfo.getGameStatus()==GameStatusType.GAME_END) {
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			server.writeToGame(gameInfo.getGameName(),ResponseType.GAME_END,gameInfo,ResponseType.GAME_END,gameInfo);
 			server.removeGame(gameInfo);
 		}
