@@ -26,6 +26,34 @@ public class ColPiece implements java.io.Serializable{
 		this.field=field;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((field == null) ? 0 : field.hashCode());
+		result = prime * result + ((piece == null) ? 0 : piece.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ColPiece other = (ColPiece) obj;
+		if (field != other.field)
+			return false;
+		if (piece == null) {
+			if (other.piece != null)
+				return false;
+		} else if (!piece.equals(other.piece))
+			return false;
+		return true;
+	}
+	@Override
 	public String toString(){
 		return field+" "+piece.type+" r"+piece.row+" c"+piece.column;
 	}

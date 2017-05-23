@@ -335,13 +335,14 @@ public class Board{
 			System.out.println("field != Free");
 			return MoveType.BAD;
 		}
-		ArrayList<ColPiece> vMove=validMove(fieldState(piece.row,piece.column));
+		ColPiece moveFrom=fieldState(piece.row,piece.column);
+		ArrayList<ColPiece> vMove=validMove(moveFrom);
 		ColPiece moveTo=checkMove(vMove,row,column);
 		if (moveTo!=null){
 			if (moveTo.piece.type!=PieceType.BLANK){
 				if (piece.type==PieceType.QUEEN){
-					ArrayList<ColPiece> queenKillMoveList=checkKillQueen(fieldState(piece.row,piece.column),vMove);
-					if (!queenKillMoveList.contains(moveTo) && !queenKillMoveList.isEmpty())
+					ArrayList<ColPiece> queenKillMoveList=checkKillQueen(moveFrom,vMove);
+					if (!queenKillMoveList.isEmpty() && !queenKillMoveList.contains(moveTo))
 						return MoveType.BAD;
 				}
 				ColPiece toRemove=null;
