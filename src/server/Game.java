@@ -57,7 +57,7 @@ public class Game extends Thread{
 			server.removeGame(gameInfo);
 		} else if (gameInfo.getGameStatus()==GameStatusType.GAME_END) {
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(1500);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

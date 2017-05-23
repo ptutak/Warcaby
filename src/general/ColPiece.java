@@ -25,4 +25,8 @@ public class ColPiece implements java.io.Serializable{
 		this.piece=piece;
 		this.field=field;
 	}
+	
+	public String toString(){
+		return field+" "+piece.type+" r"+piece.row+" c"+piece.column;
+	}
 }
