@@ -1,5 +1,7 @@
 package client;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import enums.FieldType;
@@ -26,6 +28,8 @@ public class MainWindowController {
 	
 	private Stage stage;
 	private Scene gameListScene;
+	private String absolutePath;
+	private String filePath;
 
 	public synchronized void setStage(Stage stage) {
 		this.stage = stage;
@@ -36,7 +40,7 @@ public class MainWindowController {
 	}
 
 	private DraughtsClient client=null;
-	private Image greenPawn=new Image("File:./img/green-pawn.png");
+	private Image greenPawn=new Image("File:"+filePath+"\\img\\green-pawn.png");
 	private Image redPawn=new Image("File:./img/red-pawn.png");
 	private Image greenQueen=new Image("File:./img/green-queen.png");
 	private Image redQueen=new Image("File:./img/red-queen.png");
@@ -49,7 +53,7 @@ public class MainWindowController {
 	private Integer rowTo=null;
 	private Integer colTo=null;
 
-	@FXML private ImageView backgroundImage=new ImageView("File:./img/Chess_Board.jpg");
+	@FXML private ImageView backgroundImage=new ImageView("File:"+filePath+"\\img\\Chess_Board.jpg");
 	@FXML private Button startGameButton;
 	@FXML private GridPane boardGrid;
 	@FXML private Label oppositePlayerNameLabel;
@@ -359,6 +363,17 @@ public class MainWindowController {
 
 		youLost.setTitle("I'm sorry");
 		youLost.setHeaderText("You have lost.");
+		
+		try{
+
+    	    File temp = File.createTempFile("i-am-a-temp-file", ".tmp" );
+    	    absolutePath = temp.getAbsolutePath();
+    	    filePath = absolutePath.substring(0,absolutePath.lastIndexOf(File.separator));
+    	}catch(IOException e){
+
+    	    e.printStackTrace();
+
+    	}
 
 	}
 
