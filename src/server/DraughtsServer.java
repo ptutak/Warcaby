@@ -95,7 +95,7 @@ public class DraughtsServer extends Thread {
 	}
 
 	private void gameEnd(GameInfo game){
-
+		writeToGame(game.getGameName(),ResponseType.GAME_ABORT,null,ResponseType.GAME_ABORT,null);
 	}
 
 	void removeGame(GameInfo game){
@@ -507,16 +507,17 @@ public class DraughtsServer extends Thread {
 	}
 
 	public static void main(String[] args) {
-		System.out.println("Podaj adres ip i port");
-
 		String ipS=new String("127.0.0.1");
 		int port=50000;
-
+		System.out.println("ip:");
 		ipS=System.console().readLine();
+		System.out.println("port:");
 		port=Integer.parseInt(System.console().readLine());
 
+		System.out.println("Your ip and port:");
 		System.out.println(ipS);
 		System.out.println(Integer.toString(port));
+		System.out.println("Connecting...");
 		new InetSocketAddress(ipS, port);
 		
 		DraughtsServer server=new DraughtsServer(ipS,port);

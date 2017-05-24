@@ -154,7 +154,6 @@ public class DraughtsClient {
 						break;
 					case GAME_END:
 						setEndedGame((GameInfo)response.attachment);
-						System.out.println("Here I am");
 					case GAME_ABORT:
 						waitingThread=null;
 						resetGame();
@@ -198,7 +197,9 @@ public class DraughtsClient {
 	}
 	
 	public synchronized ResponseType getServerResponse() {
-		return serverResponse;
+		ResponseType resp=serverResponse;
+		serverResponse=null;
+		return resp;
 	}
 
 	public synchronized void setServerResponse(ResponseType serverResponse) {

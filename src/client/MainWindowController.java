@@ -173,23 +173,24 @@ public class MainWindowController {
 					if (response!=null){
 						switch(response){
 						case GAME_STARTED:
-							client.setServerResponse(null);
 							updateInfoLabel.setText("GAME STARTED!!!");
 							break;
 						case GAME_OPPOSITE_USER_READY:
-							client.setServerResponse(null);
 							updatePlayerReadyLabel.setText("READY");
-							Platform.runLater(updatePlayerReadyLabel);
 							break;
-						case GAME_MOVE_FINAL:
-						case GAME_MOVE_CONTINUE:
+						
 						case GAME_MOVE_PROMOTE:
-						case GAME_OPPOSITE_MOVE_FINAL:
+						case GAME_MOVE_FINAL:
 						case GAME_OPPOSITE_MOVE_CONTINUE:
-						case GAME_OPPOSITE_MOVE_PROMOTE:
-							client.setServerResponse(null);
+							updateInfoLabel.setText("OPPONENTS MOVE");
 							Platform.runLater(refreshBoard);
 							break;
+						case GAME_MOVE_CONTINUE:	
+						case GAME_OPPOSITE_MOVE_FINAL:
+						case GAME_OPPOSITE_MOVE_PROMOTE:
+							updateInfoLabel.setText("YOUR MOVE");
+							Platform.runLater(refreshBoard);
+							break;						
 						case GAME_END:
 							GameInfo game=client.getEndedGame();
 							if (game.winner.equals(client.getPlayer()))
@@ -201,11 +202,9 @@ public class MainWindowController {
 							run=false;
 							gameReady=false;
 							gameStarted=false;
-							client.setServerResponse(null);
 							Platform.runLater(changeToListScene);
 							break;
 						default:
-							client.setServerResponse(null);
 							System.out.println("default switch");
 							System.out.println(response);
 							break;
