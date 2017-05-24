@@ -40,20 +40,21 @@ public class MainWindowController {
 	}
 
 	private DraughtsClient client=null;
-	private Image greenPawn=new Image("File:"+filePath+"\\img\\green-pawn.png");
+	private Image greenPawn=new Image("File:./img/green-pawn.png");
 	private Image redPawn=new Image("File:./img/red-pawn.png");
 	private Image greenQueen=new Image("File:./img/green-queen.png");
 	private Image redQueen=new Image("File:./img/red-queen.png");
 	private Image blank=new Image("File:./img/blank.png");
 	private Image greenPlayer=new Image("File:./img/green-player.png");
 	private Image redPlayer=new Image("File:./img/red-player.png");
-
+	private Image background=new Image("File:./img/Chess_Board.png");
+	
 	private Integer rowFrom=null;
 	private Integer colFrom=null;
 	private Integer rowTo=null;
 	private Integer colTo=null;
 
-	@FXML private ImageView backgroundImage=new ImageView("File:"+filePath+"\\img\\Chess_Board.jpg");
+	@FXML private ImageView backgroundImage;
 	@FXML private Button startGameButton;
 	@FXML private GridPane boardGrid;
 	@FXML private Label oppositePlayerNameLabel;
@@ -369,11 +370,14 @@ public class MainWindowController {
     	    File temp = File.createTempFile("i-am-a-temp-file", ".tmp" );
     	    absolutePath = temp.getAbsolutePath();
     	    filePath = absolutePath.substring(0,absolutePath.lastIndexOf(File.separator));
+    	    
+    	    System.out.println(filePath);
     	}catch(IOException e){
 
     	    e.printStackTrace();
 
     	}
+		backgroundImage.setImage(background);
 
 	}
 
