@@ -49,6 +49,7 @@ public class MainWindowController {
 	private Integer rowTo=null;
 	private Integer colTo=null;
 
+	@FXML private ImageView backgroundImage=new ImageView("File:./img/Chess_Board.jpg");
 	@FXML private Button startGameButton;
 	@FXML private GridPane boardGrid;
 	@FXML private Label oppositePlayerNameLabel;

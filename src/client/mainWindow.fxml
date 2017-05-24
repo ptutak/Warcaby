@@ -11,11 +11,7 @@
    <children>
       <AnchorPane>
          <children>
-            <ImageView fx:id="backgroundImage" fitHeight="800.0" fitWidth="800.0" pickOnBounds="true">
-               <image>
-                  <Image url="@../../img/Chess_Board.jpg" />
-               </image>
-            </ImageView>
+            <ImageView fx:id="backgroundImage" fitHeight="800.0" fitWidth="800.0" pickOnBounds="true" />
          </children>
       </AnchorPane>
       <GridPane fx:id="boardGrid" alignment="CENTER" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0">
