@@ -86,7 +86,7 @@
                   <Font size="14.0" />
                </font>
             </Button>
-            <Button fx:id="pauseButton" layoutX="42.0" layoutY="746.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="68.0" text="Pause" />
+            <Button fx:id="pauseButton" disable="true" layoutX="42.0" layoutY="746.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="68.0" text="Pause" visible="false" />
          </children>
       </AnchorPane>
    </children>
